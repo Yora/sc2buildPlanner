@@ -56,28 +56,6 @@ module.exports = Boot;
 },{}],3:[function(require,module,exports){
 function Main() {}
 
-localStorage.clear();
-
-$(function(){
-  
-  // Bind an event to window.onhashchange that, when the hash changes, gets the
-  // hash and adds the class "selected" to any matching nav link.
-  $(window).hashchange( function(){
-    
-    var hash = location.hash;
-    
-    console.log(hash)
-
-  })
-  
-  // Since the event is only triggered when the hash changes, we need to trigger
-  // the event now, to handle the hash the page may have loaded with.
-  $(window).hashchange();
-
-  
-});
-
-
 Main.prototype = {
 
     create: function() {
@@ -93,9 +71,11 @@ Main.prototype = {
         _game.input.onDown.add(this.touchInputDown, this);
 
         // Assign state variables
+        this.buildHash = window.location.hash;
+
+        console.log(this.buildHash);
+
         this.timer = _game.time.create(true);
-
-
 
     },
 
