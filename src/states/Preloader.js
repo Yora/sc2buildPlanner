@@ -7,10 +7,13 @@ Preloader.prototype = {
 
 		this.game.advancedTiming = true;
 
+		this.load.image('icon', 'assets/icon.png');
+		this.load.image('ui-units', 'assets/ui-units.png');
+
 	},
 	create: function() {
 
-		this.game.state.start('Main');
+		this.game.state.start('MainMenu');
 
 	}
 };

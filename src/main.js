@@ -3,8 +3,13 @@ window.onload = function () {
     var width = window.innerWidth * window.devicePixelRatio;
     var height = window.innerHeight * window.devicePixelRatio;
 
+    var desktopWidth = window.innerWidth;
+    var desktopHeight = 640; //window.innerHeight;
+
+
     if (window.devicePixelRatio == 1)
-        var game = new Phaser.Game(960, 640, Phaser.WEB_GL, '');
+        var game = new Phaser.Game(desktopWidth, desktopHeight, Phaser.WEB_GL, 'game');
+        //var game = new Phaser.Game(960, 640, Phaser.WEB_GL, '');
     else
         var game = new Phaser.Game(width / (window.devicePixelRatio - 1), height / (window.devicePixelRatio - 1), Phaser.WEB_GL, '');
 

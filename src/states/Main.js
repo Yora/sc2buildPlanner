@@ -1,6 +1,34 @@
 function Main() {}
 
+// resizing - if width is too small, start to move the building UI off the side and make more room for timeline
+
 Main.prototype = {
+
+    init: function(race) {
+
+        this.race = race;
+
+    },
+
+    preload: function () {
+
+        switch (this.race) {
+
+            case 'terran':
+            this.game.load.atlas('terran', 'assets/terran.png', 'assets/terran.json');
+            break;
+
+            case 'protoss':
+            this.game.load.atlas('protoss', 'assets/protoss.png', 'assets/protoss.json');
+            break;
+
+            case 'zerg':
+            this.game.load.atlas('zerg', 'assets/zerg.png', 'assets/zerg.json');
+            break;
+
+        }
+
+    },
 
     create: function() {
 
@@ -9,15 +37,26 @@ Main.prototype = {
         _game = this.game;
 
         _game.world.setBounds(0, 0, 1960, 640);
+        _game.scale.onSizeChange.add(this.scaleChange, this);
+
 
         // Create mouse events
         _game.input.onUp.add(this.touchInputUp, this);
         _game.input.onDown.add(this.touchInputDown, this);
 
+
         // Assign state variables
         this.buildHash = window.location.hash;
+        this.unitCount = 0;
+        this.structureCount = 0;
 
-        console.log(this.buildHash);
+        this.unitGroupUI = this.game.add.group();
+
+        this.initRace();
+
+        this.initUI();
+
+        this.createUnits();
 
         this.timer = _game.time.create(true);
 
@@ -26,10 +65,349 @@ Main.prototype = {
     update: function() {
     },
 
+    scaleChange: function() {
+
+        this.unitGroupUI.x = this.game.width - this.unitGroupUI.width;
+    },
+
     touchInputDown: function() {
     },
 
     touchInputUp: function() {
+    },
+
+    initRace: function() {
+
+        var race;
+
+        race = this.race;
+
+        switch (race) {
+
+            case 'terran':
+            this.unitCount = 15;
+            this.structureCount = 17;
+            break;
+
+            case 'protoss':
+            this.unitCount = 20;
+            this.structureCount = 14;
+            break;
+
+            case 'zerg':
+            this.unitCount = 18;
+            this.structureCount = 18;
+            break;
+
+        }
+    },
+
+    initUI: function() {
+
+        var unitUI;
+
+        unitUI = this.game.add.sprite(0, 0, 'ui-units');
+        unitUI.width = 300;
+        unitUI.height = this.game.height;
+        this.unitGroupUI.add(unitUI);
+
+        this.unitGroupUI.x = this.game.width - this.unitGroupUI.width;
+    },
+
+    createUnits: function() {
+
+        var xx;
+        var yy;
+        var x;
+        var y;
+        var index;
+        var texture;
+        var icon;
+
+        index = 0;
+
+        for (yy = 0; yy < 7; yy++) {
+            for (xx = 0; xx < 4; xx++) {
+
+                index++;
+
+                if (index > this.unitCount)
+                    return;
+
+                x = 15 + xx * 62 + (xx * 7);
+                y = 16 + yy * 62 + (yy * 7);
+
+                icon = this.game.add.sprite(x - 3, y - 2, 'icon');
+                icon.width = 66;
+                icon.height = 66;
+                //icon.tint = 0xff0000;
+
+                this.unitGroupUI.add(icon);
+
+                texture = this._getTexture(index);
+
+                this._createUnit(x, y, texture);
+
+            }
+        }
+
+    },
+
+    _getTexture: function(index) {
+
+        var texture;
+
+        if (this.race === 'terran')
+            switch (index) {
+
+                case 1:
+                texture = 'scv';
+                break;
+
+                case 2:
+                texture = 'reaper';
+                break;
+
+                case 3:
+                texture = 'marauder';
+                break;
+
+                case 4:
+                texture = 'ghost';
+                break;
+
+                case 5:
+                texture = 'hellion';
+                break;
+
+                case 6:
+                texture = 'widow-mine';
+                break;
+
+                case 7:
+                texture = 'siege-tank';
+                break;
+
+                case 8:
+                texture = 'cyclone';
+                break;
+
+                case 9:
+                texture = 'thor';
+                break;
+
+                case 10:
+                texture = 'viking';
+                break;
+
+                case 11:
+                texture = 'medivac';
+                break;
+
+                case 12:
+                texture = 'liberator';
+                break;
+
+                case 13:
+                texture = 'raven';
+                break;
+
+                case 14:
+                texture = 'banshee';
+                break;
+
+                case 15:
+                texture = 'battlecruiser';
+                break;
+            }
+
+        else if (this.race === 'protoss')
+            switch (index) {
+
+                case 1:
+                texture = 'probe';
+                break;
+
+                case 2:
+                texture = 'zealot';
+                break;
+
+                case 3:
+                texture = 'adept';
+                break;
+
+                case 4:
+                texture = 'sentry';
+                break;
+
+                case 5:
+                texture = 'stalker';
+                break;
+
+                case 6:
+                texture = 'dark-templar';
+                break;
+
+                case 7:
+                texture = 'high-templar';
+                break;
+
+                case 8:
+                texture = 'archon';
+                break;
+
+                case 9:
+                texture = 'observer';
+                break;
+
+                case 10:
+                texture = 'void-prism';
+                break;
+
+                case 11:
+                texture = 'immortal';
+                break;
+
+                case 12:
+                texture = 'collosus';
+                break;
+
+                case 13:
+                texture = 'disruptor';
+                break;
+
+                case 14:
+                texture = 'phoenix';
+                break;
+
+                case 15:
+                texture = 'void-ray';
+                break;
+
+                case 16:
+                texture = 'oracle';
+                break;
+
+                case 17:
+                texture = 'tempest';
+                break;
+
+                case 18:
+                texture = 'carrier';
+                break;
+
+                case 19:
+                texture = 'mothership-core';
+                break;
+
+                case 20:
+                texture = 'mothership';
+                break;
+            }
+
+        else if (this.race === 'zerg')
+            switch (index) {
+
+                case 1:
+                texture = 'larva';
+                break;
+
+                case 2:
+                texture = 'drone';
+                break;
+
+                case 3:
+                texture = 'zergling';
+                break;
+
+                case 4:
+                texture = 'baneling';
+                break;
+
+                case 5:
+                texture = 'roach';
+                break;
+
+                case 6:
+                texture = 'ravager';
+                break;
+
+                case 7:
+                texture = 'hydralisk';
+                break;
+
+                case 8:
+                texture = 'lurker';
+                break;
+
+                case 9:
+                texture = 'viper';
+                break;
+
+                case 10:
+                texture = 'mutalisk';
+                break;
+
+                case 11:
+                texture = 'corruptor';
+                break;
+
+                case 12:
+                texture = 'swarm-host';
+                break;
+
+                case 13:
+                texture = 'infestor';
+                break;
+
+                case 14:
+                texture = 'ultralisk';
+                break;
+
+                case 15:
+                texture = 'broodlord';
+                break;
+
+                case 16:
+                texture = 'overlord';
+                break;
+
+                case 17:
+                texture = 'overseer';
+                break;
+
+                case 18:
+                texture = 'queen';
+                break;
+            }
+
+        return texture;
+    },
+
+    _createUnit: function(x, y, texture) {
+
+        var sprite;
+
+        sprite = this.game.make.button(x, y, this.race, this.unitPressed, this, texture + "-highlight", texture, texture, texture);
+
+        this.unitGroupUI.add(sprite);
+
+    },
+
+    unitPressed: function() {
+
+        //console.log(this)
+
+    },
+
+    highlightUnit: function(unit, fun, string) {
+
+        if (string === 'over')
+            unit.tint = 0x86bfda;
+        else if (string === 'out')
+            unit.tint = 0xffffff;
+
+        console.log(string)
     },
 
     newArray: function(size) {
