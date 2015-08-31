@@ -2,7 +2,7 @@ function MainMenu () {
 }
 
 MainMenu.prototype = {
-
+ 
 	create: function() {
 
 		this.add.sprite(0, 0, 'loaderEmpty');

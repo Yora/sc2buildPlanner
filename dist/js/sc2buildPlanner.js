@@ -69,12 +69,17 @@ function Main() {}
 
 // resizing - if width is too small, start to move the building UI off the side and make more room for timeline
 
+// next setup all upgrades, as well as minerals, gas, supply, energy, larva, etc
+
+// have an array of constructing buildings and constructed buildings
+
+// base allowed buildings off constructed buildings array.  Fade out things that cant be made yet
+
 Main.prototype = {
 
     init: function(race) {
 
         this.race = race;
-
     },
 
     preload: function () {
@@ -94,7 +99,6 @@ Main.prototype = {
             break;
 
         }
-
     },
 
     create: function() {
@@ -104,7 +108,8 @@ Main.prototype = {
         _game = this.game;
 
         _game.world.setBounds(0, 0, 1960, 640);
-        _game.scale.onSizeChange.add(this.scaleChange, this);
+        _game.scale.onSizeChange.add(this.scaleUpdate, this);
+        _game.input.justReleasedRate = 10;
 
 
         // Create mouse events
@@ -116,25 +121,100 @@ Main.prototype = {
         this.buildHash = window.location.hash;
         this.unitCount = 0;
         this.structureCount = 0;
+        this.maxScrollCount = 0;
+        this.isScrolling = false;
+        this.scrollDifference = 0;
+
+        this.bg = this.game.add.sprite(0, 0, 'stars')
+        this.bg.alpha = 0.2;
 
         this.unitGroupUI = this.game.add.group();
-
-        this.initRace();
+        this.structureGroupUI = this.game.add.group();
+        this.upgradeGroupUI = this.game.add.group();
 
         this.initUI();
 
+        this.initRace();
+ 
         this.createUnits();
 
-        this.timer = _game.time.create(true);
+        this.createStructures();
 
+        this.createUpgrades();
+
+        this.startUI();
+
+        this.world.bringToTop(this.selectionUI);
+
+        console.log(this.maxScrollCount);
+
+        //this.maxScrollCount = 10;
+
+        this.scrollingBar.height = this.game.height - (this.maxScrollCount - 9) * 74;
+
+
+
+        this.timer = _game.time.create(true);
     },
 
     update: function() {
+
+        if (this.isScrolling) {
+
+            var scrollValue;
+            var _scrollingBar;
+            var _game;
+            var _unitGroupUI;
+            var _structureGroupUI;
+            var _upgradeGroupUI;
+
+            _scrollingBar = this.scrollingBar;
+            _game = this.game;
+            _unitGroupUI = this.unitGroupUI;
+            _structureGroupUI = this.structureGroupUI;
+            _upgradeGroupUI = this.upgradeGroupUI;
+
+            scrollValue = (_game.input.activePointer.y - _scrollingBar.y);
+
+            if (scrollValue >= _scrollingBar.height)
+                scrollValue = _scrollingBar.height;
+
+            // follow input with scroll bar
+            //_scrollingBar.y = _game.input.activePointer.y;//_game.input.activePointer.y - (_scrollingBar.height / 2);
+            //_scrollingBar.y = _game.input.activePointer.y - scrollValue;
+            _scrollingBar.y = _game.input.activePointer.y - this.scrollDifference;
+
+            // scroll bar at top
+            //if (_scrollingBar.y < 0) 
+            //    _scrollingBar.y = 0;
+
+            // scroll bar at bottom
+            /*else*/ if (_scrollingBar.y > (_game.height - _scrollingBar.height)) 
+                _scrollingBar.y = (_game.height - _scrollingBar.height);
+
+            //console.log((this.game.input.activePointer.y - _scrollingBar.y));
+
+
+            _unitGroupUI.y = -_scrollingBar.y - 5;
+            _structureGroupUI.y = -_scrollingBar.y + _unitGroupUI.getTop().y + 54;
+            _upgradeGroupUI.y = -_scrollingBar.y +  _structureGroupUI.height + _unitGroupUI.height + 12;
+
+            //_unitGroupUI.y = -5;
+            //_structureGroupUI.y = _unitGroupUI.getTop().y + 54;
+            //_upgradeGroupUI.y = _structureGroupUI.y + _structureGroupUI.getTop().y + 54;
+
+
+        }
     },
 
-    scaleChange: function() {
+    scaleUpdate: function() {
 
-        this.unitGroupUI.x = this.game.width - this.unitGroupUI.width;
+        this.selectionUI.x = this.game.width - this.selectionUI.width - 25;
+        this.scrollBar.x = this.game.width - this.scrollBar.width;
+        this.scrollingBar.x = this.game.width - this.scrollingBar.width;
+        this.unitGroupUI.x = this.selectionUI.x - 5;
+        this.structureGroupUI.x = this.selectionUI.x - 5;
+        this.upgradeGroupUI.x = this.selectionUI.x - 5;
     },
 
     touchInputDown: function() {
@@ -154,16 +234,19 @@ Main.prototype = {
             case 'terran':
             this.unitCount = 15;
             this.structureCount = 17;
+            this.upgradeCount = 25;
             break;
 
             case 'protoss':
             this.unitCount = 20;
             this.structureCount = 14;
+            this.upgradeCount = 24;
             break;
 
             case 'zerg':
             this.unitCount = 18;
             this.structureCount = 18;
+            this.upgradeCount = 28;
             break;
 
         }
@@ -171,14 +254,43 @@ Main.prototype = {
 
     initUI: function() {
 
-        var unitUI;
+        this.selectionUI = this.game.add.sprite(0, 0, 'ui-units');
+        this.selectionUI.width = 290;
+        this.selectionUI.height = this.game.height;
 
-        unitUI = this.game.add.sprite(0, 0, 'ui-units');
-        unitUI.width = 300;
-        unitUI.height = this.game.height;
-        this.unitGroupUI.add(unitUI);
+        this.scrollingBar = this.game.add.button(0, 0, 'scrolling-bar', this._scrollBar, this);
+        this.scrollingBar.onInputDown.add(this._scrollBar, this);
+        this.scrollingBar.height = 200;
 
-        this.unitGroupUI.x = this.game.width - this.unitGroupUI.width;
+        this.scrollingBar.width += 10;
+
+        this.scrollBar = this.game.add.sprite(0, 0, 'scroll-bar');
+        this.scrollBar.height = this.game.height;
+        this.scrollBar.width += 10;
+
+        this.scaleUpdate();
+    },
+
+    _scrollBar: function() {
+
+        var scrollValue;
+
+        this.isScrolling = !(this.isScrolling);
+
+        if (!this.isScrolling) {
+
+            this.scrollingBar.anchor.setTo(0, 0);
+            return;
+        }
+
+        scrollValue =  (this.game.input.activePointer.y - this.scrollingBar.y);
+
+        this.scrollDifference = scrollValue;
+    },
+
+    startUI: function() {
+
+        console.log(this.scrollingBar.input);
     },
 
     createUnits: function() {
@@ -193,7 +305,13 @@ Main.prototype = {
 
         index = 0;
 
+        this.unitGroupUI.x = this.selectionUI.x;
+        this.unitGroupUI.y = -5;
+
         for (yy = 0; yy < 7; yy++) {
+
+            this.maxScrollCount++;
+
             for (xx = 0; xx < 4; xx++) {
 
                 index++;
@@ -211,16 +329,114 @@ Main.prototype = {
 
                 this.unitGroupUI.add(icon);
 
-                texture = this._getTexture(index);
+                texture = this._getUnitTexture(index);
 
-                this._createUnit(x, y, texture);
+                this._createEntity(x, y, texture, this.unitGroupUI);
 
             }
         }
-
     },
 
-    _getTexture: function(index) {
+    createStructures: function() {
+
+        var xx;
+        var yy;
+        var x;
+        var y;
+        var index;
+        var texture;
+        var icon;
+
+        index = 0;
+
+        this.structureGroupUI.y = this.unitGroupUI.getTop().y + 54;
+
+        for (yy = 0; yy < 7; yy++) {
+
+            this.maxScrollCount++;
+
+            for (xx = 0; xx < 4; xx++) {
+
+                index++;
+
+                if (index > this.structureCount)
+                    return;
+
+                x = 15 + xx * 62 + (xx * 7);
+                y = 16 + yy * 62 + (yy * 7);
+
+                icon = this.game.add.sprite(x - 3, y - 2, 'icon');
+                icon.width = 66;
+                icon.height = 66;
+                //icon.tint = 0xff0000;
+
+                this.structureGroupUI.add(icon);
+
+                texture = this._getStructureTexture(index);
+
+                this._createEntity(x, y, texture, this.structureGroupUI);
+
+            }
+        }
+    },
+
+    createUpgrades: function() {
+
+        var xx;
+        var yy;
+        var x;
+        var y;
+        var index;
+        var texture;
+        var icon;
+
+        index = 0;
+
+        this.upgradeGroupUI.y = this.structureGroupUI.y + this.structureGroupUI.getTop().y + 54;
+
+        for (yy = 0; yy < 7; yy++) {
+
+            this.maxScrollCount++;
+
+            for (xx = 0; xx < 4; xx++) {
+
+                index++;
+
+                if (index > this.upgradeCount)
+                    return;
+
+                x = 15 + xx * 62 + (xx * 7);
+                y = 16 + yy * 62 + (yy * 7);
+
+                icon = this.game.add.sprite(x - 3, y - 2, 'icon');
+                icon.width = 66;
+                icon.height = 66;
+
+                this.upgradeGroupUI.add(icon);
+
+                texture = this._getUpgradeTexture(index);
+
+                this._createEntity(x, y, texture, this.upgradeGroupUI);
+
+            }
+        }
+    },
+    
+    _createEntity: function(x, y, texture, group) {
+
+        var sprite;
+
+        sprite = this.game.make.button(x, y, this.race, this.unitPressed, this, texture + "-highlight", texture, texture, texture);
+
+        group.add(sprite);
+    },
+
+    unitPressed: function() {
+
+        console.log(this)
+    },
+
+    _getUnitTexture: function(index) {
 
         var texture;
 
@@ -451,30 +667,543 @@ Main.prototype = {
         return texture;
     },
 
-    _createUnit: function(x, y, texture) {
+    _getStructureTexture: function(index) {
 
-        var sprite;
+        var texture;
 
-        sprite = this.game.make.button(x, y, this.race, this.unitPressed, this, texture + "-highlight", texture, texture, texture);
+        if (this.race === 'terran')
+            switch (index) {
 
-        this.unitGroupUI.add(sprite);
+                case 1:
+                texture = 'command-center';
+                break;
 
+                case 2:
+                texture = 'orbital';
+                break;
+
+                case 3:
+                texture = 'planetary-fortress';
+                break;
+
+                case 4:
+                texture = 'refinery';
+                break;
+
+                case 5:
+                texture = 'supply-depot';
+                break;
+
+                case 6:
+                texture = 'barracks';
+                break;
+
+                case 7:
+                texture = 'engineering-bay';
+                break;
+
+                case 8:
+                texture = 'bunker';
+                break;
+
+                case 9:
+                texture = 'turret';
+                break;
+
+                case 10:
+                texture = 'sensor-tower';
+                break;
+
+                case 11:
+                texture = 'ghost-academy';
+                break;
+
+                case 12:
+                texture = 'factory';
+                break;
+
+                case 13:
+                texture = 'armory';
+                break;
+
+                case 14:
+                texture = 'starport';
+                break;
+
+                case 15:
+                texture = 'fusion-core';
+                break;
+
+                case 16:
+                texture = 'tech-lab';
+                break;
+
+                case 17:
+                texture = 'reactor';
+                break;
+
+            }
+
+        else if (this.race === 'protoss')
+            switch (index) {
+
+                case 1:
+                texture = 'nexus';
+                break;
+
+                case 2:
+                texture = 'assimilator';
+                break;
+
+                case 3:
+                texture = 'pylon';
+                break;
+
+                case 4:
+                texture = 'gateway';
+                break;
+
+                case 5:
+                texture = 'forge';
+                break;
+
+                case 6:
+                texture = 'cybernetics-core';
+                break;
+
+                case 7:
+                texture = 'cannon';
+                break;
+
+                case 8:
+                texture = 'twilight-council';
+                break;
+
+                case 9:
+                texture = 'stargate';
+                break;
+
+                case 10:
+                texture = 'robotics-facility';
+                break;
+
+                case 11:
+                texture = 'templar-archives';
+                break;
+
+                case 12:
+                texture = 'fleet-beacon';
+                break;
+
+                case 13:
+                texture = 'robotics-bay';
+                break;
+
+                case 14:
+                texture = 'dark-shrine';
+                break;
+            }
+
+        else if (this.race === 'zerg')
+            switch (index) {
+
+                case 1:
+                texture = 'hatchery';
+                break;
+
+                case 2:
+                texture = 'lair';
+                break;
+
+                case 3:
+                texture = 'hive';
+                break;
+
+                case 4:
+                texture = 'extractor';
+                break;
+
+                case 5:
+                texture = 'spawning-pool';
+                break;
+
+                case 6:
+                texture = 'evolution-chamber';
+                break;
+
+                case 7:
+                texture = 'roach-warren';
+                break;
+
+                case 8:
+                texture = 'baneling-nest';
+                break;
+
+                case 9:
+                texture = 'spine-crawler';
+                break;
+
+                case 10:
+                texture = 'spore-crawler';
+                break;
+
+                case 11:
+                texture = 'hydralisk-den';
+                break;
+
+                case 12:
+                texture = 'lurker-den';
+                break;
+
+                case 13:
+                texture = 'infestation-pit';
+                break;
+
+                case 14:
+                texture = 'spire';
+                break;
+
+                case 15:
+                texture = 'greater-spire';
+                break;
+
+                case 16:
+                texture = 'nydus-network';
+                break;
+
+                case 17:
+                texture = 'ultralisk-cavern';
+                break;
+            }
+
+        return texture;
     },
 
-    unitPressed: function() {
+    _getUpgradeTexture: function(index) {
 
-        //console.log(this)
+        var texture;
 
-    },
+        if (this.race === 'terran')
+            switch (index) {
 
-    highlightUnit: function(unit, fun, string) {
+                case 1:
+                texture = 'infantry-weapons-1';
+                break;
 
-        if (string === 'over')
-            unit.tint = 0x86bfda;
-        else if (string === 'out')
-            unit.tint = 0xffffff;
+                case 2:
+                texture = 'infantry-weapons-2';
+                break;
 
-        console.log(string)
+                case 3:
+                texture = 'infantry-weapons-3';
+                break;
+
+                case 4:
+                texture = 'vehicle-weapons-1';
+                break;
+
+                case 5:
+                texture = 'vehicle-weapons-2';
+                break;
+
+                case 6:
+                texture = 'vehicle-weapons-3';
+                break;
+
+                case 7:
+                texture = 'infantry-armor-1';
+                break;
+
+                case 8:
+                texture = 'infantry-armor-2';
+                break;
+
+                case 9:
+                texture = 'infantry-armor-3';
+                break;
+
+                case 10:
+                texture = 'vehicle-plating-1';
+                break;
+
+                case 11:
+                texture = 'vehicle-plating-2';
+                break;
+
+                case 12:
+                texture = 'vehicle-plating-3';
+                break;
+
+                case 13:
+                texture = 'hisec-auto-tracking';
+                break;
+
+                case 14:
+                texture = 'cloaking-field';
+                break;
+
+                case 15:
+                texture = 'stimpack';
+                break;
+
+                case 16:
+                texture = 'yamato-cannon';
+                break;
+
+                case 17:
+                texture = 'behemoth-reactor';
+                break;
+
+                case 18:
+                texture = 'corvid-reactor';
+                break;
+
+                case 19:
+                texture = 'moebius-reactor';
+                break;
+
+                case 20:
+                texture = 'drilling-claws';
+                break;
+
+                case 21:
+                texture = 'building-armor';
+                break;
+
+                case 22:
+                texture = 'combat-shield';
+                break;
+
+                case 23:
+                texture = 'durable-materials';
+                break;
+
+                case 24:
+                texture = 'infernal-preigniter';
+                break;
+
+                case 25:
+                texture = 'neosteel-frames';
+                break;
+            }
+
+        else if (this.race === 'protoss')
+            switch (index) {
+
+                case 1:
+                texture = 'ground-weapons-1';
+                break;
+
+                case 2:
+                texture = 'ground-weapons-2';
+                break;
+
+                case 3:
+                texture = 'ground-weapons-3';
+                break;
+
+                case 4:
+                texture = 'air-weapons-1';
+                break;
+
+                case 5:
+                texture = 'air-weapons-2';
+                break;
+
+                case 6:
+                texture = 'air-weapons-3';
+                break;
+
+                case 7:
+                texture = 'ground-armor-1';
+                break;
+
+                case 8:
+                texture = 'ground-armor-2';
+                break;
+
+                case 9:
+                texture = 'ground-armor-3';
+                break;
+
+                case 10:
+                texture = 'air-armor-1';
+                break;
+
+                case 11:
+                texture = 'air-armor-2';
+                break;
+
+                case 12:
+                texture = 'air-armor-3';
+                break;
+
+                case 13:
+                texture = 'shields-1';
+                break;
+
+                case 14:
+                texture = 'shields-2';
+                break;
+
+                case 15:
+                texture = 'shields-3';
+                break;
+
+                case 16:
+                texture = 'charge';
+                break;
+
+                case 17:
+                texture = 'gravitic-booster';
+                break;
+
+                case 18:
+                texture = 'gravitic-drive';
+                break;
+
+                case 19:
+                texture = 'anion-pulse-crystals';
+                break;
+
+                case 20:
+                texture = 'extended-thermal-lances';
+                break;
+
+                case 21:
+                texture = 'psionic-storm';
+                break;
+
+                case 22:
+                texture = 'blink';
+                break;
+
+                case 23:
+                texture = 'hallucination';
+                break;
+
+                case 24:
+                texture = 'graviton-catapult';
+                break;
+            }
+
+        else if (this.race === 'zerg')
+            switch (index) {
+
+                case 1:
+                texture = 'melee-attacks-1';
+                break;
+
+                case 2:
+                texture = 'melee-attacks-2';
+                break;
+
+                case 3:
+                texture = 'melee-attacks-3';
+                break;
+
+                case 4:
+                texture = 'missile-attacks-1';
+                break;
+
+                case 5:
+                texture = 'missile-attacks-2';
+                break;
+
+                case 6:
+                texture = 'missile-attacks-3';
+                break;
+
+                case 7:
+                texture = 'flyer-attacks-1';
+                break;
+
+                case 8:
+                texture = 'flyer-attacks-2';
+                break;
+
+                case 9:
+                texture = 'flyer-attacks-3';
+                break;
+
+                case 10:
+                texture = 'ground-carapace-1';
+                break;
+
+                case 11:
+                texture = 'ground-carapace-2';
+                break;
+
+                case 12:
+                texture = 'ground-carapace-3';
+                break;
+
+                case 13:
+                texture = 'flyer-carapace-1';
+                break;
+
+                case 14:
+                texture = 'flyer-carapace-2';
+                break;
+
+                case 15:
+                texture = 'flyer-carapace-3';
+                break;
+
+                case 16:
+                texture = 'chitinous-plating';
+                break;
+
+                case 17:
+                texture = 'centrifugal-hooks';
+                break;
+
+                case 18:
+                texture = 'glial-reconstitution';
+                break;
+
+                case 19:
+                texture = 'metabolic-boost';
+                break;
+
+                case 20:
+                texture = 'pneumatized-carapace';
+                break;
+
+                case 21:
+                texture = 'muscular-augments';
+                break;
+
+                case 22:
+                texture = 'grooved-spines';
+                break;
+
+                case 23:
+                texture = 'burrow';
+                break;
+
+                case 24:
+                texture = 'neural-parasite';
+                break;
+
+                case 25:
+                texture = 'pathogen-glands';
+                break;
+
+                case 26:
+                texture = 'adrenal-glands';
+                break;
+
+                case 27:
+                texture = 'tunneling-claws';
+                break;
+
+                case 28:
+                texture = 'flying-locust';
+                break;
+            }
+
+        return texture;
     },
 
     newArray: function(size) {
@@ -500,7 +1229,7 @@ function MainMenu () {
 }
 
 MainMenu.prototype = {
-
+ 
 	create: function() {
 
 		this.add.sprite(0, 0, 'loaderEmpty');
@@ -529,6 +1258,10 @@ Preloader.prototype = {
 
 		this.load.image('icon', 'assets/icon.png');
 		this.load.image('ui-units', 'assets/ui-units.png');
+		this.load.image('scroll-bar', 'assets/scroll-bar.png');
+		this.load.image('scrolling-bar', 'assets/scrolling-bar.png');
+		this.load.image('stars', 'assets/stars.png');
+
 
 	},
 	create: function() {

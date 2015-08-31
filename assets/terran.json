@@ -91,7 +91,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "bunker-highlight",
+	"filename": "behemoth-reactor-highlight",
 	"frame": {"x":610,"y":0,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -100,7 +100,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "bunker",
+	"filename": "behemoth-reactor",
 	"frame": {"x":671,"y":0,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -109,7 +109,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "command-center-highlight",
+	"filename": "building-armor-highlight",
 	"frame": {"x":732,"y":0,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -118,7 +118,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "command-center",
+	"filename": "building-armor",
 	"frame": {"x":793,"y":0,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -127,7 +127,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "cyclone-highlight",
+	"filename": "bunker-highlight",
 	"frame": {"x":854,"y":0,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -136,7 +136,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "cyclone",
+	"filename": "bunker",
 	"frame": {"x":915,"y":0,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -145,7 +145,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "engineering-bay-highlight",
+	"filename": "caduceus-reactor-highlight",
 	"frame": {"x":976,"y":0,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -154,7 +154,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "engineering-bay",
+	"filename": "caduceus-reactor",
 	"frame": {"x":1037,"y":0,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -163,7 +163,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "factory-highlight",
+	"filename": "cloaking-field-highlight",
 	"frame": {"x":1098,"y":0,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -172,7 +172,16 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "factory",
+	"filename": "personal-cloaking-highlight",
+	"frame": {"x":1098,"y":0,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "cloaking-field",
 	"frame": {"x":1159,"y":0,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -181,7 +190,16 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "fusion-core-highlight",
+	"filename": "personal-cloaking",
+	"frame": {"x":1159,"y":0,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "combat-shield-highlight",
 	"frame": {"x":1220,"y":0,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -190,7 +208,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "fusion-core",
+	"filename": "combat-shield",
 	"frame": {"x":1281,"y":0,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -199,7 +217,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "ghost-academy-highlight",
+	"filename": "command-center-highlight",
 	"frame": {"x":1342,"y":0,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -208,7 +226,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "ghost-academy",
+	"filename": "command-center",
 	"frame": {"x":1403,"y":0,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -217,7 +235,70 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "ghost-highlight",
+	"filename": "concussive-shells-highlight",
+	"frame": {"x":1464,"y":0,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "concussive-shells",
+	"frame": {"x":1525,"y":0,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "corvid-reactor-highlight",
+	"frame": {"x":1586,"y":0,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "corvid-reactor",
+	"frame": {"x":1647,"y":0,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "cyclone-highlight",
+	"frame": {"x":1708,"y":0,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "cyclone",
+	"frame": {"x":1769,"y":0,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "drilling-claws-highlight",
+	"frame": {"x":1830,"y":0,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "drilling-claws",
 	"frame": {"x":0,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -226,7 +307,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "ghost",
+	"filename": "durable-materials-highlight",
 	"frame": {"x":61,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -235,7 +316,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "hellion-highlight",
+	"filename": "durable-materials",
 	"frame": {"x":122,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -244,7 +325,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "hellion",
+	"filename": "engineering-bay-highlight",
 	"frame": {"x":183,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -253,7 +334,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "liberator-highlight",
+	"filename": "engineering-bay",
 	"frame": {"x":244,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -262,7 +343,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "liberator",
+	"filename": "factory-highlight",
 	"frame": {"x":305,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -271,7 +352,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "marauder-highlight",
+	"filename": "factory",
 	"frame": {"x":366,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -280,7 +361,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "marauder",
+	"filename": "fusion-core-highlight",
 	"frame": {"x":427,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -289,7 +370,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "marine-highlight",
+	"filename": "fusion-core",
 	"frame": {"x":488,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -298,7 +379,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "marine",
+	"filename": "ghost-academy-highlight",
 	"frame": {"x":549,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -307,7 +388,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "medivac-highlight",
+	"filename": "ghost-academy",
 	"frame": {"x":610,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -316,7 +397,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "medivac",
+	"filename": "ghost-highlight",
 	"frame": {"x":671,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -325,7 +406,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "mule-highlight",
+	"filename": "ghost",
 	"frame": {"x":732,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -334,7 +415,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "mule",
+	"filename": "hellion-highlight",
 	"frame": {"x":793,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -343,7 +424,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "orbital-highlight",
+	"filename": "hellion",
 	"frame": {"x":854,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -352,7 +433,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "orbital",
+	"filename": "hisec-auto-tracking-highlight",
 	"frame": {"x":915,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -361,7 +442,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "planetary-fortress-highlight",
+	"filename": "hisec-auto-tracking",
 	"frame": {"x":976,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -370,7 +451,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "planetary-fortress",
+	"filename": "infantry-armor-1-highlight",
 	"frame": {"x":1037,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -379,7 +460,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "raven-highlight",
+	"filename": "infantry-armor-1",
 	"frame": {"x":1098,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -388,7 +469,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "raven",
+	"filename": "infantry-armor-2-highlight",
 	"frame": {"x":1159,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -397,7 +478,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "reactor-highlight",
+	"filename": "infantry-armor-2",
 	"frame": {"x":1220,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -406,7 +487,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "reactor",
+	"filename": "infantry-armor-3-highlight",
 	"frame": {"x":1281,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -415,8 +496,17 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "reaper-highlight",
-	"frame": {"x":1342,"y":62,"w":61,"h":62},
+	"filename": "infantry-armor-3",
+	"frame": {"x":1342,"y":62,"w":62,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":62,"h":62},
+	"sourceSize": {"w":62,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "infantry-weapons-1-highlight",
+	"frame": {"x":1404,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
@@ -424,8 +514,8 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "reaper",
-	"frame": {"x":1403,"y":62,"w":61,"h":62},
+	"filename": "infantry-weapons-1",
+	"frame": {"x":1465,"y":62,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
@@ -433,7 +523,61 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "refinery-highlight",
+	"filename": "infantry-weapons-2-highlight",
+	"frame": {"x":1526,"y":62,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "infantry-weapons-2",
+	"frame": {"x":1587,"y":62,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "infantry-weapons-3-highlight",
+	"frame": {"x":1648,"y":62,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "infantry-weapons-3",
+	"frame": {"x":1709,"y":62,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "infernal-preigniter-highlight",
+	"frame": {"x":1770,"y":62,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "infernal-preigniter",
+	"frame": {"x":1831,"y":62,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "liberator-highlight",
 	"frame": {"x":0,"y":124,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -442,7 +586,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "refinery",
+	"filename": "liberator",
 	"frame": {"x":61,"y":124,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -451,7 +595,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "scv-highlight",
+	"filename": "marauder-highlight",
 	"frame": {"x":122,"y":124,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -460,7 +604,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "scv",
+	"filename": "marauder",
 	"frame": {"x":183,"y":124,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -469,7 +613,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "sensor-tower-highlight",
+	"filename": "marine-highlight",
 	"frame": {"x":244,"y":124,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -478,7 +622,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "sensor-tower",
+	"filename": "marine",
 	"frame": {"x":305,"y":124,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -487,7 +631,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "siege-tank-highlight",
+	"filename": "medivac-highlight",
 	"frame": {"x":366,"y":124,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -496,7 +640,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "siege-tank",
+	"filename": "medivac",
 	"frame": {"x":427,"y":124,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -505,7 +649,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "starport-highlight",
+	"filename": "moebius-reactor-highlight",
 	"frame": {"x":488,"y":124,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -514,7 +658,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "starport",
+	"filename": "moebius-reactor",
 	"frame": {"x":549,"y":124,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -523,7 +667,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "supply-depot-highlight",
+	"filename": "mule-highlight",
 	"frame": {"x":610,"y":124,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -532,7 +676,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "supply-depot",
+	"filename": "mule",
 	"frame": {"x":671,"y":124,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -541,7 +685,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "tech-lab-highlight",
+	"filename": "neosteel-frames-highlight",
 	"frame": {"x":732,"y":124,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -550,7 +694,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "tech-lab",
+	"filename": "neosteel-frames",
 	"frame": {"x":793,"y":124,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -559,7 +703,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "thor-highlight",
+	"filename": "orbital-highlight",
 	"frame": {"x":854,"y":124,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -568,7 +712,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "thor",
+	"filename": "orbital",
 	"frame": {"x":915,"y":124,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -577,7 +721,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "turret-highlight",
+	"filename": "planetary-fortress-highlight",
 	"frame": {"x":976,"y":124,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -586,7 +730,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "turret",
+	"filename": "planetary-fortress",
 	"frame": {"x":1037,"y":124,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -595,7 +739,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "viking-highlight",
+	"filename": "raven-highlight",
 	"frame": {"x":1098,"y":124,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -604,7 +748,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "viking",
+	"filename": "raven",
 	"frame": {"x":1159,"y":124,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -613,7 +757,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "widow-mine-highlight",
+	"filename": "reactor-highlight",
 	"frame": {"x":1220,"y":124,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
@@ -622,8 +766,368 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "widow-mine",
+	"filename": "reactor",
 	"frame": {"x":1281,"y":124,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "reaper-highlight",
+	"frame": {"x":1342,"y":124,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "reaper",
+	"frame": {"x":1403,"y":124,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "refinery-highlight",
+	"frame": {"x":1464,"y":124,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "refinery",
+	"frame": {"x":1525,"y":124,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "scv-highlight",
+	"frame": {"x":1586,"y":124,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "scv",
+	"frame": {"x":1647,"y":124,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "sensor-tower-highlight",
+	"frame": {"x":1708,"y":124,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "sensor-tower",
+	"frame": {"x":1769,"y":124,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "siege-tank-highlight",
+	"frame": {"x":1830,"y":124,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "siege-tank",
+	"frame": {"x":0,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "starport-highlight",
+	"frame": {"x":61,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "starport",
+	"frame": {"x":122,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "stimpack-highlight",
+	"frame": {"x":183,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "stimpack",
+	"frame": {"x":244,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "supply-depot-highlight",
+	"frame": {"x":305,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "supply-depot",
+	"frame": {"x":366,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "tech-lab-highlight",
+	"frame": {"x":427,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "tech-lab",
+	"frame": {"x":488,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "thor-highlight",
+	"frame": {"x":549,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "thor",
+	"frame": {"x":610,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "turret-highlight",
+	"frame": {"x":671,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "turret",
+	"frame": {"x":732,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "vehicle-plating-1-highlight",
+	"frame": {"x":793,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "vehicle-plating-1",
+	"frame": {"x":854,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "vehicle-plating-2-highlight",
+	"frame": {"x":915,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "vehicle-plating-2",
+	"frame": {"x":976,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "vehicle-plating-3-highlight",
+	"frame": {"x":1037,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "vehicle-plating-3",
+	"frame": {"x":1098,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "vehicle-weapons-1-highlight",
+	"frame": {"x":1159,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "vehicle-weapons-1",
+	"frame": {"x":1220,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "vehicle-weapons-2-highlight",
+	"frame": {"x":1281,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "vehicle-weapons-2",
+	"frame": {"x":1342,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "vehicle-weapons-3-highlight",
+	"frame": {"x":1403,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "vehicle-weapons-3",
+	"frame": {"x":1464,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "viking-highlight",
+	"frame": {"x":1525,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "viking",
+	"frame": {"x":1586,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "widow-mine-highlight",
+	"frame": {"x":1647,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "widow-mine",
+	"frame": {"x":1708,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "yamato-cannon-highlight",
+	"frame": {"x":1769,"y":186,"w":61,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
+	"sourceSize": {"w":61,"h":62},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "yamato-cannon",
+	"frame": {"x":1830,"y":186,"w":61,"h":62},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":62},
@@ -635,8 +1139,8 @@
 	"version": "1.0",
 	"image": "terran.png",
 	"format": "RGBA8888",
-	"size": {"w":1464,"h":186},
+	"size": {"w":1892,"h":248},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:18d932b528a142852749d21226f49ea8:e5e2a3b19144da25d2541960a23ab42b:11c72fd2503a3f2d9d04d67c2daab8b8$"
+	"smartupdate": "$TexturePacker:SmartUpdate:51b6a0d0dded0b6a20b95b0d9ec16b7a:935ff4f6427e1e38f26fd14b13ff84d9:11c72fd2503a3f2d9d04d67c2daab8b8$"
 }
 }
