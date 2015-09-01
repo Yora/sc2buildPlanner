@@ -57,6 +57,7 @@ Main.prototype = {
         this.maxScrollCount = 0;
         this.isScrolling = false;
         this.scrollDifference = 0;
+        this.maxRowsOnScreen = 0;
 
         this.bg = this.game.add.sprite(0, 0, 'stars')
         this.bg.alpha = 0.2;
@@ -78,14 +79,6 @@ Main.prototype = {
         this.startUI();
 
         this.world.bringToTop(this.selectionUI);
-
-        console.log(this.maxScrollCount);
-
-        //this.maxScrollCount = 10;
-
-        this.scrollingBar.height = this.game.height - (this.maxScrollCount - 9) * 74;
-
-
 
         this.timer = _game.time.create(true);
     },
@@ -113,30 +106,45 @@ Main.prototype = {
                 scrollValue = _scrollingBar.height;
 
             // follow input with scroll bar
-            //_scrollingBar.y = _game.input.activePointer.y;//_game.input.activePointer.y - (_scrollingBar.height / 2);
-            //_scrollingBar.y = _game.input.activePointer.y - scrollValue;
             _scrollingBar.y = _game.input.activePointer.y - this.scrollDifference;
 
+
             // scroll bar at top
-            //if (_scrollingBar.y < 0) 
-            //    _scrollingBar.y = 0;
+            if (_scrollingBar.y < 0) 
+                _scrollingBar.y = 0;
 
             // scroll bar at bottom
-            /*else*/ if (_scrollingBar.y > (_game.height - _scrollingBar.height)) 
+            else if (_scrollingBar.y > (_game.height - _scrollingBar.height)) 
                 _scrollingBar.y = (_game.height - _scrollingBar.height);
 
-            //console.log((this.game.input.activePointer.y - _scrollingBar.y));
+            //_unitGroupUI.y = -_scrollingBar.y - 5
+            //_structureGroupUI.y = -_scrollingBar.y + _unitGroupUI.getTop().y + 54
+            //_upgradeGroupUI.y = -_scrollingBar.y +  _structureGroupUI.height + _unitGroupUI.height + 12
 
+            //_unitGroupUI.y = -_scrollingBar.y - 5 * ((640 - this.game.height) / 68);
+            //_structureGroupUI.y = -_scrollingBar.y + _unitGroupUI.getTop().y + 54 * ((640 - this.game.height) / 68);
+            //_upgradeGroupUI.y = -_scrollingBar.y +  _structureGroupUI.height + _unitGroupUI.height + 12 * ((640 - this.game.height) / 68);
 
-            _unitGroupUI.y = -_scrollingBar.y - 5;
-            _structureGroupUI.y = -_scrollingBar.y + _unitGroupUI.getTop().y + 54;
-            _upgradeGroupUI.y = -_scrollingBar.y +  _structureGroupUI.height + _unitGroupUI.height + 12;
+            //console.log((-((_scrollingBar.y/* - 5*/) * (1 + ((640 - this.game.height) / 640)))));
 
-            //_unitGroupUI.y = -5;
-            //_structureGroupUI.y = _unitGroupUI.getTop().y + 54;
-            //_upgradeGroupUI.y = _structureGroupUI.y + _structureGroupUI.getTop().y + 54;
+            //console.log((1 + ((640 - this.game.height - _scrollingBar.height) / 640)));
 
+            var percent = this.game.height - (this.scrollingBar.y + this.scrollingBar.height);
 
+            console.log(percent)
+
+            var totalPercent = (1 + (this.game.height / (this.unitGroupUI.height + this.structureGroupUI.height + this.upgradeGroupUI.height - 20)));
+
+            //_unitGroupUI.y = -((_scrollingBar.y/* - 5*/) * (1 + ((640 - this.game.height) / 640)));// - (((640 - this.game.height) / 100) * _scrollingBar.y);
+            //_unitGroupUI.y = -_scrollingBar.y;
+            //_unitGroupUI.y = -((_scrollingBar.y/* - 5*/) * (1 + ((640 - this.game.height) / (640 - _scrollingBar.height))));// - (((640 - this.game.height) / 100) * _scrollingBar.y);
+            _unitGroupUI.y = -_scrollingBar.y * (totalPercent);
+            _structureGroupUI.y = _unitGroupUI.y + _unitGroupUI.height + 10;
+            _upgradeGroupUI.y = _unitGroupUI.y + _unitGroupUI.height + _structureGroupUI.height + 20;
+
+            //console.log(_unitGroupUI.y);
+
+            //console.log((this.game.height / (_unitGroupUI.height + _structureGroupUI.height + _upgradeGroupUI.height + 20)) - 68);
         }
     },
 
@@ -192,16 +200,41 @@ Main.prototype = {
         this.selectionUI.height = this.game.height;
 
         this.scrollingBar = this.game.add.button(0, 0, 'scrolling-bar', this._scrollBar, this);
-        this.scrollingBar.onInputDown.add(this._scrollBar, this);
-        this.scrollingBar.height = 200;
-
         this.scrollingBar.width += 10;
 
-        this.scrollBar = this.game.add.sprite(0, 0, 'scroll-bar');
+        this.scrollBar = this.game.add.button(0, 0, 'scroll-bar', this._scrollBar, this);
         this.scrollBar.height = this.game.height;
+        this.scrollBar.onInputDown.add(this._scrollBar, this);
         this.scrollBar.width += 10;
 
+        this.maxRowsOnScreen = Math.floor(this.game.height / 69);
+
+        console.log(this.maxRowsOnScreen);
+
         this.scaleUpdate();
+    },
+
+    startUI: function() {
+
+        this.selectionUI.x = this.game.width - this.selectionUI.width - 25;
+        this.scrollBar.x = this.game.width - this.scrollBar.width;
+        this.scrollingBar.x = this.game.width - this.scrollingBar.width;
+        this.unitGroupUI.x = this.selectionUI.x - 5;
+        this.structureGroupUI.x = this.selectionUI.x - 5;
+        this.upgradeGroupUI.x = this.selectionUI.x - 5;
+
+        //this.scrollingBar.height = this.game.height - ((this.maxScrollCount - this.maxRowsOnScreen) * 69) - 20; // 20 = small gaps between types
+        //this.scrollingBar.height = this.game.height * (this.game.height / (this.unitGroupUI.height + this.structureGroupUI.height + this.upgradeGroupUI.height))
+        //this.scrollingBar.height = (this.unitGroupUI.height + this.structureGroupUI.height + this.upgradeGroupUI.height) - this.game.height - (this.maxScrollCount * 2);
+
+        //this.scrollingBar.height = this.game.height - (this.game.height / (this.game.height - (this.unitGroupUI.height + this.structureGroupUI.height + this.upgradeGroupUI.height))) 
+
+        this.scrollingBar.height = this.game.height * (1 - (this.game.height / (this.unitGroupUI.height + this.structureGroupUI.height + this.upgradeGroupUI.height - 20))) 
+
+        //console.log(((this.game.height / (this.unitGroupUI.height + this.structureGroupUI.height + this.upgradeGroupUI.height - 20))))
+
+        //console.log(((640 - this.game.height) / 68))
+        //this.scrollingBar.height *= (((640 - this.game.height) / 68));
     },
 
     _scrollBar: function() {
@@ -221,11 +254,6 @@ Main.prototype = {
         this.scrollDifference = scrollValue;
     },
 
-    startUI: function() {
-
-        console.log(this.scrollingBar.input);
-    },
-
     createUnits: function() {
 
         var xx;
@@ -239,9 +267,11 @@ Main.prototype = {
         index = 0;
 
         this.unitGroupUI.x = this.selectionUI.x;
-        this.unitGroupUI.y = -5;
 
-        for (yy = 0; yy < 7; yy++) {
+        for (yy = 0; yy <= 7; yy++) {
+
+            if (index + 1 > this.unitCount)
+                return;
 
             this.maxScrollCount++;
 
@@ -282,9 +312,14 @@ Main.prototype = {
 
         index = 0;
 
-        this.structureGroupUI.y = this.unitGroupUI.getTop().y + 54;
+        //this.structureGroupUI.y = this.unitGroupUI.getTop().y + 54;
+        this.structureGroupUI.y = this.unitGroupUI.y + this.unitGroupUI.height + 10;
 
-        for (yy = 0; yy < 7; yy++) {
+
+        for (yy = 0; yy <= 7; yy++) {
+
+            if (index + 1 > this.structureCount)
+                return;
 
             this.maxScrollCount++;
 
@@ -325,9 +360,13 @@ Main.prototype = {
 
         index = 0;
 
-        this.upgradeGroupUI.y = this.structureGroupUI.y + this.structureGroupUI.getTop().y + 54;
+        //this.upgradeGroupUI.y = this.structureGroupUI.y + this.structureGroupUI.getTop().y + 54;
+        this.upgradeGroupUI.y = this.unitGroupUI.y + this.unitGroupUI.height + this.structureGroupUI.height + 20;
 
-        for (yy = 0; yy < 7; yy++) {
+        for (yy = 0; yy <= 7; yy++) {
+
+            if (index + 1 > this.upgradeCount)
+                return;
 
             this.maxScrollCount++;
 
@@ -361,6 +400,7 @@ Main.prototype = {
 
         sprite = this.game.make.button(x, y, this.race, this.unitPressed, this, texture + "-highlight", texture, texture, texture);
 
+        //console.log(sprite.width) //lolol theres still a sprite in terran with 62 width
         group.add(sprite);
     },
 
