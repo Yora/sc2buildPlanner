@@ -140,6 +140,7 @@ Main.prototype = {
         this.unitGroupUI = this.game.add.group();
         this.structureGroupUI = this.game.add.group();
         this.upgradeGroupUI = this.game.add.group();
+        this.lineGroup = this.game.add.group();
 
         this.initUI();
 
@@ -156,7 +157,6 @@ Main.prototype = {
         this.world.bringToTop(this.selectionUI);
 
         this.timer = _game.time.create(true);
-
     },
 
     update: function() {
@@ -239,11 +239,10 @@ Main.prototype = {
     },
 
     initUI: function() {
-
+        
         var supplyIcon;
         var gasIcon;
         var mineralIcon;
-        var time1;
 
         // Selection UI
         this.selectionUI = this.game.add.sprite(0, 91, 'ui-units');
@@ -282,16 +281,19 @@ Main.prototype = {
         this.supplyText = this.game.add.bitmapText(420, 10, 'Agency_35', '12/15', 35); 
         this.supplyText.tint = 0x00ff00;
 
-        // Timer UI
-        time1 = this.game.add.sprite(5, 57, 'time1');
-        time2 = this.game.add.sprite(95, 57, 'time2');
-        time3 = this.game.add.sprite(185, 57, 'time3');
-        //this.game.add.bitmapText(100, 53, 'Agency_35', '0:15', 28);
-
         this.scaleUpdate();
     },
 
     startUI: function() {
+
+        var i;
+        var timeCount;
+        var timeValue;
+        var timeString1;
+        var timeString2;
+        var timeString;
+        var time;
+        var line;
 
         this.unitGroupUI.x = this.selectionUI.x + 11;
         this.structureGroupUI.x = this.unitGroupUI.x;
@@ -308,6 +310,30 @@ Main.prototype = {
         this.heightDifferece = (this.maxHeight - this.game.height + 20);
         this.scrollingBar.height = this.game.height * ((this.maxHeight - this.game.height) / this.maxHeight);
         this.gameAndScrollHeight = (this.game.height - this.scrollingBar.height);
+    
+
+        // Timer UI
+        this.game.add.bitmapText(5, 58, 'Agency_35', '0:00', 25);
+
+        timeCount = Math.floor(this.timerUI.width / 90) - 1;
+
+        for (i = 0; i < timeCount; i++) {
+
+            timeValue = (i + 1) * 30;
+
+            timeString1 = Math.floor(timeValue / 60).toString();
+            timeString2 = this.pad((timeValue % 60), 2)
+
+            timeString = (timeString1 + ":" + timeString2);
+
+            time = this.game.add.bitmapText(95 + (i * 90), 58, 'Agency_35', timeString, 25);
+            line = this.game.make.graphics(90 + (i * 90), 80);
+            line.lineStyle(3, 0x00ff00, 1);
+            line.lineTo(0, -8);
+            this.lineGroup.add(time);
+            this.lineGroup.add(line);
+
+        }
     },
 
     scaleUpdate: function() {
@@ -1285,6 +1311,12 @@ Main.prototype = {
         }
 
         return array;
+    },
+
+    pad: function(str, max) {
+
+      str = str.toString();
+      return str.length < max ? this.pad("0" + str, max) : str;
     }
 };
 
