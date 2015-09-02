@@ -21,10 +21,10 @@
 */
 Phaser.ImageCollection = function (name, firstgid, width, height, margin, spacing, properties) {
 
-    if (typeof width === 'undefined' || width <= 0) { width = 32; }
-    if (typeof height === 'undefined' || height <= 0) { height = 32; }
-    if (typeof margin === 'undefined') { margin = 0; }
-    if (typeof spacing === 'undefined') { spacing = 0; }
+    if (width === undefined || width <= 0) { width = 32; }
+    if (height === undefined || height <= 0) { height = 32; }
+    if (margin === undefined) { margin = 0; }
+    if (spacing === undefined) { spacing = 0; }
 
     /**
     * The name of the Image Collection.
@@ -752,7 +752,7 @@ Phaser.Tilemap.prototype = {
     */
     create: function (name, width, height, tileWidth, tileHeight, group) {
 
-        if (typeof group === 'undefined') { group = this.game.world; }
+        if (group === undefined) { group = this.game.world; }
 
         this.width = width;
         this.height = height;
@@ -799,12 +799,12 @@ Phaser.Tilemap.prototype = {
     */
     addTilesetImage: function (tileset, key, tileWidth, tileHeight, tileMargin, tileSpacing, gid) {
 
-        if (typeof tileset === 'undefined') { return null; }
-        if (typeof tileWidth === 'undefined') { tileWidth = this.tileWidth; }
-        if (typeof tileHeight === 'undefined') { tileHeight = this.tileHeight; }
-        if (typeof tileMargin === 'undefined') { tileMargin = 0; }
-        if (typeof tileSpacing === 'undefined') { tileSpacing = 0; }
-        if (typeof gid === 'undefined') { gid = 0; }
+        if (tileset === undefined) { return null; }
+        if (tileWidth === undefined) { tileWidth = this.tileWidth; }
+        if (tileHeight === undefined) { tileHeight = this.tileHeight; }
+        if (tileMargin === undefined) { tileMargin = 0; }
+        if (tileSpacing === undefined) { tileSpacing = 0; }
+        if (gid === undefined) { gid = 0; }
 
         //  In-case we're working from a blank map
         if (tileWidth === 0)
@@ -819,7 +819,7 @@ Phaser.Tilemap.prototype = {
 
         var img = null;
 
-        if (typeof key === 'undefined' || key === null)
+        if (key === undefined || key === null)
         {
             key = tileset;
         }
@@ -925,11 +925,11 @@ Phaser.Tilemap.prototype = {
     */
     createFromObjects: function (name, gid, key, frame, exists, autoCull, group, CustomClass, adjustY) {
 
-        if (typeof exists === 'undefined') { exists = true; }
-        if (typeof autoCull === 'undefined') { autoCull = false; }
-        if (typeof group === 'undefined') { group = this.game.world; }
-        if (typeof CustomClass === 'undefined') { CustomClass = Phaser.Sprite; }
-        if (typeof adjustY === 'undefined') { adjustY = true; }
+        if (exists === undefined) { exists = true; }
+        if (autoCull === undefined) { autoCull = false; }
+        if (group === undefined) { group = this.game.world; }
+        if (CustomClass === undefined) { CustomClass = Phaser.Sprite; }
+        if (adjustY === undefined) { adjustY = true; }
 
         if (!this.objects[name])
         {
@@ -937,50 +937,46 @@ Phaser.Tilemap.prototype = {
             return;
         }
 
-        var sprite;
-        var found = false;
-
-        for (var i = 0, len = this.objects[name].length; i < len; i++)
+        for (var i = 0; i < this.objects[name].length; i++)
         {
-            if (typeof this.objects[name][i].gid !== 'undefined' && typeof gid === 'number')
-            {
-                if (this.objects[name][i].gid === gid)
-                {
-                    found = true;
-                }
-            }
+            var found = false;
+            var obj = this.objects[name][i];
 
-            if (typeof this.objects[name][i].id !== 'undefined' && typeof gid === 'number')
+            if (obj.gid !== undefined && typeof gid === 'number' && obj.gid === gid)
             {
-                if (this.objects[name][i].id === gid)
-                {
-                    found = true;
-                }
+                found = true;
             }
-
-            if (typeof this.objects[name][i].name !== 'undefined' && typeof gid === 'string')
+            else if (obj.id !== undefined && typeof gid === 'number' && obj.id === gid)
             {
-                if (this.objects[name][i].name === gid)
-                {
-                    found = true;
-                }
+                found = true;
+            }
+            else if (obj.name !== undefined && typeof gid === 'string' && obj.name === gid)
+            {
+                found = true;
             }
 
             if (found)
             {
-                sprite = new CustomClass(this.game, this.objects[name][i].x, this.objects[name][i].y, key, frame);
+                var sprite = new CustomClass(this.game, parseFloat(obj.x, 10), parseFloat(obj.y, 10), key, frame);
 
-                sprite.name = this.objects[name][i].name;
-                sprite.visible = this.objects[name][i].visible;
+                sprite.name = obj.name;
+                sprite.visible = obj.visible;
                 sprite.autoCull = autoCull;
                 sprite.exists = exists;
 
-                sprite.width = this.objects[name][i].width;
-                sprite.height = this.objects[name][i].height;
-
-                if (this.objects[name][i].rotation)
+                if (obj.width)
                 {
-                    sprite.angle = this.objects[name][i].rotation;
+                    sprite.width = obj.width;
+                }
+
+                if (obj.height)
+                {
+                    sprite.height = obj.height;
+                }
+
+                if (obj.rotation)
+                {
+                    sprite.angle = obj.rotation;
                 }
 
                 if (adjustY)
@@ -990,9 +986,9 @@ Phaser.Tilemap.prototype = {
 
                 group.add(sprite);
 
-                for (var property in this.objects[name][i].properties)
+                for (var property in obj.properties)
                 {
-                    group.set(sprite, property, this.objects[name][i].properties[property], false, false, 0, true);
+                    group.set(sprite, property, obj.properties[property], false, false, 0, true);
                 }
             }
         }
@@ -1018,7 +1014,7 @@ Phaser.Tilemap.prototype = {
 
         if (typeof tiles === 'number') { tiles = [tiles]; }
 
-        if (typeof replacements === 'undefined' || replacements === null)
+        if (replacements === undefined || replacements === null)
         {
             replacements = [];
         }
@@ -1029,8 +1025,8 @@ Phaser.Tilemap.prototype = {
 
         layer = this.getLayer(layer);
 
-        if (typeof group === 'undefined') { group = this.game.world; }
-        if (typeof properties === 'undefined') { properties = {}; }
+        if (group === undefined) { group = this.game.world; }
+        if (properties === undefined) { properties = {}; }
 
         if (properties.customClass === undefined)
         {
@@ -1110,9 +1106,9 @@ Phaser.Tilemap.prototype = {
 
         //  Add Buffer support for the left of the canvas
 
-        if (typeof width === 'undefined') { width = this.game.width; }
-        if (typeof height === 'undefined') { height = this.game.height; }
-        if (typeof group === 'undefined') { group = this.game.world; }
+        if (width === undefined) { width = this.game.width; }
+        if (height === undefined) { height = this.game.height; }
+        if (group === undefined) { group = this.game.world; }
 
         var index = layer;
 
@@ -1145,7 +1141,7 @@ Phaser.Tilemap.prototype = {
     */
     createBlankLayer: function (name, width, height, tileWidth, tileHeight, group) {
 
-        if (typeof group === 'undefined') { group = this.game.world; }
+        if (group === undefined) { group = this.game.world; }
 
         if (this.getLayerIndex(name) !== null)
         {
@@ -1364,8 +1360,8 @@ Phaser.Tilemap.prototype = {
     */
     setCollision: function (indexes, collides, layer, recalculate) {
 
-        if (typeof collides === 'undefined') { collides = true; }
-        if (typeof recalculate === 'undefined') { recalculate = true; }
+        if (collides === undefined) { collides = true; }
+        if (recalculate === undefined) { recalculate = true; }
         
         layer = this.getLayer(layer);
 
@@ -1404,8 +1400,8 @@ Phaser.Tilemap.prototype = {
     */
     setCollisionBetween: function (start, stop, collides, layer, recalculate) {
 
-        if (typeof collides === 'undefined') { collides = true; }
-        if (typeof recalculate === 'undefined') { recalculate = true; }
+        if (collides === undefined) { collides = true; }
+        if (recalculate === undefined) { recalculate = true; }
         
         layer = this.getLayer(layer);
 
@@ -1439,8 +1435,8 @@ Phaser.Tilemap.prototype = {
     */
     setCollisionByExclusion: function (indexes, collides, layer, recalculate) {
 
-        if (typeof collides === 'undefined') { collides = true; }
-        if (typeof recalculate === 'undefined') { recalculate = true; }
+        if (collides === undefined) { collides = true; }
+        if (recalculate === undefined) { recalculate = true; }
         
         layer = this.getLayer(layer);
 
@@ -1474,9 +1470,9 @@ Phaser.Tilemap.prototype = {
     */
     setCollisionByIndex: function (index, collides, layer, recalculate) {
 
-        if (typeof collides === 'undefined') { collides = true; }
-        if (typeof layer === 'undefined') { layer = this.currentLayer; }
-        if (typeof recalculate === 'undefined') { recalculate = true; }
+        if (collides === undefined) { collides = true; }
+        if (layer === undefined) { layer = this.currentLayer; }
+        if (recalculate === undefined) { recalculate = true; }
 
         if (collides)
         {
@@ -1537,7 +1533,7 @@ Phaser.Tilemap.prototype = {
     */
     getLayer: function (layer) {
 
-        if (typeof layer === 'undefined')
+        if (layer === undefined)
         {
             layer = this.currentLayer;
         }
@@ -1929,8 +1925,8 @@ Phaser.Tilemap.prototype = {
     */
     searchTileIndex: function (index, skip, reverse, layer) {
 
-        if (typeof skip === 'undefined') { skip = 0; }
-        if (typeof reverse === 'undefined') { reverse = false; }
+        if (skip === undefined) { skip = 0; }
+        if (reverse === undefined) { reverse = false; }
 
         layer = this.getLayer(layer);
 
@@ -1993,7 +1989,7 @@ Phaser.Tilemap.prototype = {
     */
     getTile: function (x, y, layer, nonNull) {
 
-        if (typeof nonNull === 'undefined') { nonNull = false; }
+        if (nonNull === undefined) { nonNull = false; }
 
         layer = this.getLayer(layer);
 
@@ -2036,8 +2032,8 @@ Phaser.Tilemap.prototype = {
     */
     getTileWorldXY: function (x, y, tileWidth, tileHeight, layer, nonNull) {
 
-        if (typeof tileWidth === 'undefined') { tileWidth = this.tileWidth; }
-        if (typeof tileHeight === 'undefined') { tileHeight = this.tileHeight; }
+        if (tileWidth === undefined) { tileWidth = this.tileWidth; }
+        if (tileHeight === undefined) { tileHeight = this.tileHeight; }
 
         layer = this.getLayer(layer);
 
@@ -2069,10 +2065,10 @@ Phaser.Tilemap.prototype = {
             return;
         }
 
-        if (typeof x === "undefined") { x = 0; }
-        if (typeof y === "undefined") { y = 0; }
-        if (typeof width === "undefined") { width = this.layers[layer].width; }
-        if (typeof height === "undefined") { height = this.layers[layer].height; }
+        if (x === undefined) { x = 0; }
+        if (y === undefined) { y = 0; }
+        if (width === undefined) { width = this.layers[layer].width; }
+        if (height === undefined) { height = this.layers[layer].height; }
         
         if (x < 0)
         {
@@ -2121,8 +2117,8 @@ Phaser.Tilemap.prototype = {
     */
     paste: function (x, y, tileblock, layer) {
 
-        if (typeof x === "undefined") { x = 0; }
-        if (typeof y === "undefined") { y = 0; }
+        if (x === undefined) { x = 0; }
+        if (y === undefined) { y = 0; }
 
         layer = this.getLayer(layer);
 
@@ -2339,7 +2335,7 @@ Phaser.Tilemap.prototype = {
             }
         }
 
-        Phaser.Utils.shuffle(indexes);
+        Phaser.ArrayUtils.shuffle(indexes);
 
         for (var i = 1; i < this._results.length; i++)
         {
@@ -2533,7 +2529,7 @@ Phaser.TilemapLayer = function (game, tilemap, index, width, height) {
     * @property {HTMLCanvasElement} canvas
     * @protected
     */
-    this.canvas = Phaser.Canvas.create(width, height);
+    this.canvas = PIXI.CanvasPool.create(this, width, height);
 
     /**
     * The 2d context of the canvas.
@@ -2732,6 +2728,7 @@ Phaser.TilemapLayer.sharedCopyCanvas = null;
 *
 * Code that uses the canvas is responsible to ensure the dimensions and save/restore state as appropriate.
 *
+* @method Phaser.TilemapLayer#ensureSharedCopyCanvas
 * @protected
 * @static
 */
@@ -2749,8 +2746,7 @@ Phaser.TilemapLayer.ensureSharedCopyCanvas = function () {
 /**
 * Automatically called by World.preUpdate.
 *
-* @method Phaser.Image#preUpdate
-* @memberof Phaser.Image
+* @method Phaser.TilemapLayer#preUpdate
 */
 Phaser.TilemapLayer.prototype.preUpdate = function() {
 
@@ -2775,6 +2771,19 @@ Phaser.TilemapLayer.prototype.postUpdate = function () {
     this.scrollY = camera.y * this.scrollFactorY / this.scale.y;
 
     this.render();
+
+};
+
+/**
+* Destroys this TilemapLayer.
+*
+* @method Phaser.TilemapLayer#destroy
+*/
+Phaser.TilemapLayer.prototype.destroy = function() {
+
+    PIXI.CanvasPool.remove(this);
+
+    Phaser.Component.Destroy.prototype.destroy.call(this);
 
 };
 
@@ -2977,8 +2986,8 @@ Phaser.TilemapLayer.prototype.getTileXY = function (x, y, point) {
 Phaser.TilemapLayer.prototype.getRayCastTiles = function (line, stepRate, collides, interestingFace) {
 
     if (!stepRate) { stepRate = this.rayStepRate; }
-    if (typeof collides === 'undefined') { collides = false; }
-    if (typeof interestingFace === 'undefined') { interestingFace = false; }
+    if (collides === undefined) { collides = false; }
+    if (interestingFace === undefined) { interestingFace = false; }
 
     //  First get all tiles that touch the bounds of the line
     var tiles = this.getTiles(line.x, line.y, line.width, line.height, collides, interestingFace);
@@ -3026,8 +3035,8 @@ Phaser.TilemapLayer.prototype.getRayCastTiles = function (line, stepRate, collid
 Phaser.TilemapLayer.prototype.getTiles = function (x, y, width, height, collides, interestingFace) {
 
     //  Should we only get tiles that have at least one of their collision flags set? (true = yes, false = no just get them all)
-    if (typeof collides === 'undefined') { collides = false; }
-    if (typeof interestingFace === 'undefined') { interestingFace = false; }
+    if (collides === undefined) { collides = false; }
+    if (interestingFace === undefined) { interestingFace = false; }
 
     var fetchAll = !(collides || interestingFace);
 
@@ -3474,8 +3483,6 @@ Phaser.TilemapLayer.prototype.render = function () {
         return;
     }
 
-    this.context.save();
-
     if (this.dirty || this.layer.dirty)
     {
         this.layer.dirty = false;
@@ -3501,6 +3508,8 @@ Phaser.TilemapLayer.prototype.render = function () {
         return;
     }
 
+    this.context.save();
+    
     mc.scrollX = scrollX;
     mc.scrollY = scrollY;
 
@@ -3760,8 +3769,22 @@ Object.defineProperty(Phaser.TilemapLayer.prototype, "collisionHeight", {
 * Phaser.TilemapParser parses data objects from Phaser.Loader that need more preparation before they can be inserted into a Tilemap.
 *
 * @class Phaser.TilemapParser
+* @static
 */
 Phaser.TilemapParser = {
+
+    /**
+     * When scanning the Tiled map data the TilemapParser can either insert a null value (true) or 
+     * a Phaser.Tile instance with an index of -1 (false, the default). Depending on your game type
+     * depends how this should be configured. If you've a large sparsely populated map and the tile
+     * data doesn't need to change then setting this value to `true` will help with memory consumption.
+     * However if your map is small, or you need to update the tiles (perhaps the map dynamically changes
+     * during the game) then leave the default value set.
+     *
+     * @constant
+     * @type {boolean}
+     */
+    INSERT_NULL: false,
 
     /**
     * Parse tilemap data from the cache and creates a Tilemap object.
@@ -3777,12 +3800,12 @@ Phaser.TilemapParser = {
     */
     parse: function (game, key, tileWidth, tileHeight, width, height) {
 
-        if (typeof tileWidth === 'undefined') { tileWidth = 32; }
-        if (typeof tileHeight === 'undefined') { tileHeight = 32; }
-        if (typeof width === 'undefined') { width = 10; }
-        if (typeof height === 'undefined') { height = 10; }
+        if (tileWidth === undefined) { tileWidth = 32; }
+        if (tileHeight === undefined) { tileHeight = 32; }
+        if (width === undefined) { width = 10; }
+        if (height === undefined) { height = 10; }
 
-        if (typeof key === 'undefined')
+        if (key === undefined)
         {
             return this.getEmptyData();
         }
@@ -3969,17 +3992,19 @@ Phaser.TilemapParser = {
                 continue;
             }
 
+            var curl = json.layers[i];
+
             var layer = {
 
-                name: json.layers[i].name,
-                x: json.layers[i].x,
-                y: json.layers[i].y,
-                width: json.layers[i].width,
-                height: json.layers[i].height,
-                widthInPixels: json.layers[i].width * json.tilewidth,
-                heightInPixels: json.layers[i].height * json.tileheight,
-                alpha: json.layers[i].opacity,
-                visible: json.layers[i].visible,
+                name: curl.name,
+                x: curl.x,
+                y: curl.y,
+                width: curl.width,
+                height: curl.height,
+                widthInPixels: curl.width * json.tilewidth,
+                heightInPixels: curl.height * json.tileheight,
+                alpha: curl.opacity,
+                visible: curl.visible,
                 properties: {},
                 indexes: [],
                 callbacks: [],
@@ -3987,9 +4012,9 @@ Phaser.TilemapParser = {
 
             };
 
-            if (json.layers[i].properties)
+            if (curl.properties)
             {
-                layer.properties = json.layers[i].properties;
+                layer.properties = curl.properties;
             }
 
             var x = 0;
@@ -4003,11 +4028,11 @@ Phaser.TilemapParser = {
             //  If the map contains multiple tilesets then the indexes are relative to that which the set starts from.
             //  Need to set which tileset in the cache = which tileset in the JSON, if you do this manually it means you can use the same map data but a new tileset.
 
-            for (var t = 0, len = json.layers[i].data.length; t < len; t++)
+            for (var t = 0, len = curl.data.length; t < len; t++)
             {
                 rotation = 0;
                 flipped = false;
-                gid = json.layers[i].data[t];
+                gid = curl.data[t];
 
                 //  If true the current tile is flipped or rotated (Tiled TMX format) 
                 if (gid > 0x20000000)
@@ -4074,12 +4099,19 @@ Phaser.TilemapParser = {
                 }
                 else
                 {
-                    row.push(new Phaser.Tile(layer, -1, x, output.length, json.tilewidth, json.tileheight));
+                    if (Phaser.TilemapParser.INSERT_NULL)
+                    {
+                        row.push(null);
+                    }
+                    else
+                    {
+                        row.push(new Phaser.Tile(layer, -1, x, output.length, json.tilewidth, json.tileheight));
+                    }
                 }
 
                 x++;
 
-                if (x === json.layers[i].width)
+                if (x === curl.width)
                 {
                     output.push(row);
                     x = 0;
@@ -4105,21 +4137,23 @@ Phaser.TilemapParser = {
                 continue;
             }
 
+            var curi = json.layers[i];
+
             var image = {
 
-                name: json.layers[i].name,
-                image: json.layers[i].image,
-                x: json.layers[i].x,
-                y: json.layers[i].y,
-                alpha: json.layers[i].opacity,
-                visible: json.layers[i].visible,
+                name: curi.name,
+                image: curi.image,
+                x: curi.x,
+                y: curi.y,
+                alpha: curi.opacity,
+                visible: curi.visible,
                 properties: {}
 
             };
 
-            if (json.layers[i].properties)
+            if (curi.properties)
             {
-                image.properties = json.layers[i].properties;
+                image.properties = curi.properties;
             }
 
             images.push(image);
@@ -4198,95 +4232,97 @@ Phaser.TilemapParser = {
                 continue;
             }
 
-            objects[json.layers[i].name] = [];
-            collision[json.layers[i].name] = [];
+            var curo = json.layers[i];
 
-            for (var v = 0, len = json.layers[i].objects.length; v < len; v++)
+            objects[curo.name] = [];
+            collision[curo.name] = [];
+
+            for (var v = 0, len = curo.objects.length; v < len; v++)
             {
                 //  Object Tiles
-                if (json.layers[i].objects[v].gid)
+                if (curo.objects[v].gid)
                 {
                     var object = {
 
-                        gid: json.layers[i].objects[v].gid,
-                        name: json.layers[i].objects[v].name,
-                        type: json.layers[i].objects[v].hasOwnProperty("type") ? json.layers[i].objects[v].type : "",
-                        x: json.layers[i].objects[v].x,
-                        y: json.layers[i].objects[v].y,
-                        visible: json.layers[i].objects[v].visible,
-                        properties: json.layers[i].objects[v].properties
+                        gid: curo.objects[v].gid,
+                        name: curo.objects[v].name,
+                        type: curo.objects[v].hasOwnProperty("type") ? curo.objects[v].type : "",
+                        x: curo.objects[v].x,
+                        y: curo.objects[v].y,
+                        visible: curo.objects[v].visible,
+                        properties: curo.objects[v].properties
 
                     };
 
-                    if (json.layers[i].objects[v].rotation)
+                    if (curo.objects[v].rotation)
                     {
-                        object.rotation = json.layers[i].objects[v].rotation;
+                        object.rotation = curo.objects[v].rotation;
                     }
 
-                    objects[json.layers[i].name].push(object);
+                    objects[curo.name].push(object);
                 }
-                else if (json.layers[i].objects[v].polyline)
+                else if (curo.objects[v].polyline)
                 {
                     var object = {
 
-                        name: json.layers[i].objects[v].name,
-                        type: json.layers[i].objects[v].type,
-                        x: json.layers[i].objects[v].x,
-                        y: json.layers[i].objects[v].y,
-                        width: json.layers[i].objects[v].width,
-                        height: json.layers[i].objects[v].height,
-                        visible: json.layers[i].objects[v].visible,
-                        properties: json.layers[i].objects[v].properties
+                        name: curo.objects[v].name,
+                        type: curo.objects[v].type,
+                        x: curo.objects[v].x,
+                        y: curo.objects[v].y,
+                        width: curo.objects[v].width,
+                        height: curo.objects[v].height,
+                        visible: curo.objects[v].visible,
+                        properties: curo.objects[v].properties
 
                     };
 
-                    if (json.layers[i].objects[v].rotation)
+                    if (curo.objects[v].rotation)
                     {
-                        object.rotation = json.layers[i].objects[v].rotation;
+                        object.rotation = curo.objects[v].rotation;
                     }
 
                     object.polyline = [];
 
                     //  Parse the polyline into an array
-                    for (var p = 0; p < json.layers[i].objects[v].polyline.length; p++)
+                    for (var p = 0; p < curo.objects[v].polyline.length; p++)
                     {
-                        object.polyline.push([ json.layers[i].objects[v].polyline[p].x, json.layers[i].objects[v].polyline[p].y ]);
+                        object.polyline.push([ curo.objects[v].polyline[p].x, curo.objects[v].polyline[p].y ]);
                     }
 
-                    collision[json.layers[i].name].push(object);
-                    objects[json.layers[i].name].push(object);
+                    collision[curo.name].push(object);
+                    objects[curo.name].push(object);
                 }
                 // polygon
-                else if (json.layers[i].objects[v].polygon)
+                else if (curo.objects[v].polygon)
                 {
-                    var object = slice(json.layers[i].objects[v],
+                    var object = slice(curo.objects[v],
                                        ["name", "type", "x", "y", "visible", "rotation", "properties" ]);
 
                     //  Parse the polygon into an array
                     object.polygon = [];
 
-                    for (var p = 0; p < json.layers[i].objects[v].polygon.length; p++)
+                    for (var p = 0; p < curo.objects[v].polygon.length; p++)
                     {
-                        object.polygon.push([ json.layers[i].objects[v].polygon[p].x, json.layers[i].objects[v].polygon[p].y ]);
+                        object.polygon.push([ curo.objects[v].polygon[p].x, curo.objects[v].polygon[p].y ]);
                     }
 
-                    objects[json.layers[i].name].push(object);
+                    objects[curo.name].push(object);
 
                 }
                 // ellipse
-                else if (json.layers[i].objects[v].ellipse)
+                else if (curo.objects[v].ellipse)
                 {
-                    var object = slice(json.layers[i].objects[v],
+                    var object = slice(curo.objects[v],
                                        ["name", "type", "ellipse", "x", "y", "width", "height", "visible", "rotation", "properties" ]);
-                    objects[json.layers[i].name].push(object);
+                    objects[curo.name].push(object);
                 }
                 // otherwise it's a rectangle
                 else
                 {
-                    var object = slice(json.layers[i].objects[v],
+                    var object = slice(curo.objects[v],
                                        ["name", "type", "x", "y", "width", "height", "visible", "rotation", "properties" ]);
                     object.rectangle = true;
-                    objects[json.layers[i].name].push(object);
+                    objects[curo.name].push(object);
                 }
             }
         }
@@ -4363,7 +4399,7 @@ Phaser.TilemapParser = {
                 {
                     tile = row[k];
 
-                    if (tile.index < 0)
+                    if (tile === null || tile.index < 0)
                     {
                         continue;
                     }
@@ -4412,10 +4448,10 @@ Phaser.TilemapParser = {
 */
 Phaser.Tileset = function (name, firstgid, width, height, margin, spacing, properties) {
 
-    if (typeof width === 'undefined' || width <= 0) { width = 32; }
-    if (typeof height === 'undefined' || height <= 0) { height = 32; }
-    if (typeof margin === 'undefined') { margin = 0; }
-    if (typeof spacing === 'undefined') { spacing = 0; }
+    if (width === undefined || width <= 0) { width = 32; }
+    if (height === undefined || height <= 0) { height = 32; }
+    if (margin === undefined) { margin = 0; }
+    if (spacing === undefined) { spacing = 0; }
 
     /**
     * The name of the Tileset.

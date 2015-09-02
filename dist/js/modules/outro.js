@@ -43,8 +43,6 @@ if (PIXI.Graphics.POLY === undefined)
 
 PIXI.TextureSilentFail = true;
 
-PIXI.BitmapText = { fonts: {} };
-
 /**
 * @author       Richard Davey <rich@photonstorm.com>
 * @copyright    2015 Photon Storm Ltd.
@@ -57,10 +55,12 @@ PIXI.BitmapText = { fonts: {} };
         }
         exports.Phaser = Phaser;
     } else if (typeof define !== 'undefined' && define.amd) {
-        define('Phaser', (function() { return root.Phaser = Phaser; }) ());
+        define('Phaser', (function() { return root.Phaser = Phaser; })() );
     } else {
         root.Phaser = Phaser;
     }
+
+    return Phaser;
 }).call(this);
 
 /*

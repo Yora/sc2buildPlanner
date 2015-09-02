@@ -770,7 +770,7 @@ Phaser.Component.Crop.prototype = {
     */
     crop: function(rect, copy) {
 
-        if (typeof copy === 'undefined') { copy = false; }
+        if (copy === undefined) { copy = false; }
 
         if (rect)
         {
@@ -943,7 +943,7 @@ Phaser.Component.Destroy.prototype = {
 
         if (this.game === null || this.destroyPhase) { return; }
 
-        if (typeof destroyChildren === 'undefined') { destroyChildren = true; }
+        if (destroyChildren === undefined) { destroyChildren = true; }
 
         this.destroyPhase = true;
 
@@ -1043,6 +1043,8 @@ Phaser.Component.Destroy.prototype = {
         this._bounds = null;
         this._currentBounds = null;
         this._mask = null;
+
+
 
         this._destroyCachedSprite();
 
@@ -1736,7 +1738,7 @@ Phaser.Component.LifeSpan.prototype = {
     */
     revive: function (health) {
 
-        if (typeof health === 'undefined') { health = 1; }
+        if (health === undefined) { health = 1; }
 
         this.alive = true;
         this.exists = true;
@@ -1831,13 +1833,14 @@ Phaser.Component.LoadTexture.prototype = {
 
         frame = frame || 0;
 
-        if ((stopAnimation || typeof stopAnimation === 'undefined') && this.animations)
+        if ((stopAnimation || stopAnimation === undefined) && this.animations)
         {
             this.animations.stop();
         }
 
         this.key = key;
         this.customRender = false;
+        var cache = this.game.cache;
 
         var setFrame = true;
         var smoothed = !this.texture.baseTexture.scaleMode;
@@ -1851,12 +1854,11 @@ Phaser.Component.LoadTexture.prototype = {
         {
             this.customRender = true;
 
-            //  This works from a reference, which probably isn't what we need here
             this.setTexture(key.texture);
 
-            if (this.game.cache.getFrameData(key.key, Phaser.Cache.BITMAPDATA))
+            if (cache.hasFrameData(key.key, Phaser.Cache.BITMAPDATA))
             {
-                setFrame = !this.animations.loadFrameData(this.game.cache.getFrameData(key.key, Phaser.Cache.BITMAPDATA), frame);
+                setFrame = !this.animations.loadFrameData(cache.getFrameData(key.key, Phaser.Cache.BITMAPDATA), frame);
             }
         }
         else if (Phaser.Video && key instanceof Phaser.Video)
@@ -1876,23 +1878,12 @@ Phaser.Component.LoadTexture.prototype = {
         }
         else
         {
-            if (key === null || typeof key === 'undefined')
-            {
-                this.key = '__default';
-                this.setTexture(PIXI.TextureCache[this.key]);
-            }
-            else if (typeof key === 'string' && !this.game.cache.checkImageKey(key))
-            {
-                console.warn("Texture with key '" + key + "' not found.");
-                this.key = '__missing';
-                this.setTexture(PIXI.TextureCache[this.key]);
-            }
-            else
-            {
-                this.setTexture(new PIXI.Texture(PIXI.BaseTextureCache[key]));
+            var img = cache.getImage(key, true);
 
-                setFrame = !this.animations.loadFrameData(this.game.cache.getFrameData(key), frame);
-            }
+            this.key = img.key;
+            this.setTexture(new PIXI.Texture(img.base));
+
+            setFrame = !this.animations.loadFrameData(img.frameData, frame);
         }
         
         if (setFrame)
@@ -2266,7 +2257,7 @@ Phaser.Component.Reset = function () {};
 */
 Phaser.Component.Reset.prototype.reset = function (x, y, health) {
 
-    if (typeof health === 'undefined') { health = 1; }
+    if (health === undefined) { health = 1; }
 
     this.world.set(x, y);
     this.position.set(x, y);
@@ -2410,12 +2401,12 @@ Phaser.Component.ScaleMinMax.prototype = {
      */
     setScaleMinMax: function (minX, minY, maxX, maxY) {
 
-        if (typeof minY === 'undefined')
+        if (minY === undefined)
         {
             //  1 parameter, set all to it
             minY = maxX = maxY = minX;
         }
-        else if (typeof maxX === 'undefined')
+        else if (maxX === undefined)
         {
             //  2 parameters, the first is min, the second max
             maxX = maxY = minY;

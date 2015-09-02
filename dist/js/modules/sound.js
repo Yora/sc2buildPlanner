@@ -84,7 +84,7 @@ Phaser.AudioSprite.prototype = {
      */
     play: function (marker, volume) {
 
-        if (typeof volume === 'undefined') { volume = 1; }
+        if (volume === undefined) { volume = 1; }
 
         return this.sounds[marker].play(marker, null, volume);
 
@@ -147,9 +147,9 @@ Phaser.AudioSprite.prototype.constructor = Phaser.AudioSprite;
 */
 Phaser.Sound = function (game, key, volume, loop, connect) {
 
-    if (typeof volume === 'undefined') { volume = 1; }
-    if (typeof loop === 'undefined') { loop = false; }
-    if (typeof connect === 'undefined') { connect = game.sound.connectToMaster; }
+    if (volume === undefined) { volume = 1; }
+    if (loop === undefined) { loop = false; }
+    if (connect === undefined) { connect = game.sound.connectToMaster; }
 
     /**
     * A reference to the currently running Game.
@@ -316,7 +316,7 @@ Phaser.Sound = function (game, key, volume, loop, connect) {
         this.context = this.game.sound.context;
         this.masterGainNode = this.game.sound.masterGain;
 
-        if (typeof this.context.createGain === 'undefined')
+        if (this.context.createGain === undefined)
         {
             this.gainNode = this.context.createGainNode();
         }
@@ -488,8 +488,8 @@ Phaser.Sound.prototype = {
     */
     addMarker: function (name, start, duration, volume, loop) {
 
-        if (typeof volume === 'undefined' || volume === null) { volume = 1; }
-        if (typeof loop === 'undefined') { loop = false; }
+        if (volume === undefined || volume === null) { volume = 1; }
+        if (loop === undefined) { loop = false; }
 
         this.markers[name] = {
             name: name,
@@ -534,6 +534,12 @@ Phaser.Sound.prototype = {
     * @protected
     */
     update: function () {
+
+        if (!this.game.cache.checkSoundKey(this.key))
+        {
+            this.destroy();
+            return;
+        }
 
         if (this.isDecoded && !this._onDecodedEventDispatched)
         {
@@ -622,8 +628,8 @@ Phaser.Sound.prototype = {
     */
     play: function (marker, position, volume, loop, forceRestart) {
 
-        if (typeof marker === 'undefined' || marker === false || marker === null) { marker = ''; }
-        if (typeof forceRestart === 'undefined') { forceRestart = true; }
+        if (marker === undefined || marker === false || marker === null) { marker = ''; }
+        if (forceRestart === undefined) { forceRestart = true; }
 
         if (this.isPlaying && !this.allowMultiple && !forceRestart && !this.override)
         {
@@ -644,7 +650,7 @@ Phaser.Sound.prototype = {
                     this._sound.disconnect(this.gainNode);
                 }
 
-                if (typeof this._sound.stop === 'undefined')
+                if (this._sound.stop === undefined)
                 {
                     this._sound.noteOff(0);
                 }
@@ -709,8 +715,8 @@ Phaser.Sound.prototype = {
         {
             position = position || 0;
 
-            if (typeof volume === 'undefined') { volume = this._volume; }
-            if (typeof loop === 'undefined') { loop = this.loop; }
+            if (volume === undefined) { volume = this._volume; }
+            if (loop === undefined) { loop = this.loop; }
 
             this.position = position;
             this.volume = volume;
@@ -762,7 +768,7 @@ Phaser.Sound.prototype = {
                 }
 
                 //  Useful to cache this somewhere perhaps?
-                if (typeof this._sound.start === 'undefined')
+                if (this._sound.start === undefined)
                 {
                     this._sound.noteGrainOn(0, this.position, this.duration);
                 }
@@ -858,7 +864,7 @@ Phaser.Sound.prototype = {
         marker = marker || '';
         position = position || 0;
         volume = volume || 1;
-        if (typeof loop === 'undefined') { loop = false; }
+        if (loop === undefined) { loop = false; }
 
         this.play(marker, position, volume, loop, true);
 
@@ -919,7 +925,7 @@ Phaser.Sound.prototype = {
 
                 var duration = this.duration - (this.pausedPosition / 1000);
 
-                if (typeof this._sound.start === 'undefined')
+                if (this._sound.start === undefined)
                 {
                     this._sound.noteGrainOn(0, p, duration);
                     //this._sound.noteOn(0); // the zero is vitally important, crashes iOS6 without it
@@ -977,7 +983,7 @@ Phaser.Sound.prototype = {
                     this._sound.disconnect(this.gainNode);
                 }
 
-                if (typeof this._sound.stop === 'undefined')
+                if (this._sound.stop === undefined)
                 {
                     this._sound.noteOff(0);
                 }
@@ -1036,8 +1042,8 @@ Phaser.Sound.prototype = {
      */
     fadeIn: function (duration, loop, marker) {
 
-        if (typeof loop === 'undefined') { loop = false; }
-        if (typeof marker === 'undefined') { marker = this.currentMarker; }
+        if (loop === undefined) { loop = false; }
+        if (marker === undefined) { marker = this.currentMarker; }
 
         if (this.paused)
         {
@@ -1080,9 +1086,9 @@ Phaser.Sound.prototype = {
             return;
         }
 
-        if (typeof duration === 'undefined') { duration = 1000; }
+        if (duration === undefined) { duration = 1000; }
 
-        if (typeof volume === 'undefined')
+        if (volume === undefined)
         {
             console.warn("Phaser.Sound.fadeTo: No Volume Specified.");
             return;
@@ -1119,7 +1125,7 @@ Phaser.Sound.prototype = {
     */
     destroy: function (remove) {
 
-        if (typeof remove === 'undefined') { remove = true; }
+        if (remove === undefined) { remove = true; }
 
         this.stop();
 
@@ -1506,7 +1512,7 @@ Phaser.SoundManager.prototype = {
         {
             this.usingWebAudio = true;
 
-            if (typeof this.context.createGain === 'undefined')
+            if (this.context.createGain === undefined)
             {
                 this.masterGain = this.context.createGainNode();
             }
@@ -1572,7 +1578,7 @@ Phaser.SoundManager.prototype = {
             this._unlockSource.buffer = buffer;
             this._unlockSource.connect(this.context.destination);
 
-            if (typeof this._unlockSource.start === 'undefined')
+            if (this._unlockSource.start === undefined)
             {
                 this._unlockSource.noteOn(0);
             }
@@ -1799,9 +1805,9 @@ Phaser.SoundManager.prototype = {
     */
     add: function (key, volume, loop, connect) {
 
-        if (typeof volume === 'undefined') { volume = 1; }
-        if (typeof loop === 'undefined') { loop = false; }
-        if (typeof connect === 'undefined') { connect = this.connectToMaster; }
+        if (volume === undefined) { volume = 1; }
+        if (loop === undefined) { loop = false; }
+        if (connect === undefined) { connect = this.connectToMaster; }
 
         var sound = new Phaser.Sound(this.game, key, volume, loop, connect);
 

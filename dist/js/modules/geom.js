@@ -79,7 +79,7 @@ Phaser.Circle.prototype = {
     */
     random: function (out) {
 
-        if (typeof out === 'undefined') { out = new Phaser.Point(); }
+        if (out === undefined) { out = new Phaser.Point(); }
 
         var t = 2 * Math.PI * Math.random();
         var u = Math.random() + Math.random();
@@ -176,7 +176,7 @@ Phaser.Circle.prototype = {
     */
     clone: function (output) {
 
-        if (typeof output === "undefined" || output === null)
+        if (output === undefined || output === null)
         {
             output = new Phaser.Circle(this.x, this.y, this.diameter);
         }
@@ -514,8 +514,8 @@ Phaser.Circle.intersects = function (a, b) {
 */
 Phaser.Circle.circumferencePoint = function (a, angle, asDegrees, out) {
 
-    if (typeof asDegrees === "undefined") { asDegrees = false; }
-    if (typeof out === "undefined") { out = new Phaser.Point(); }
+    if (asDegrees === undefined) { asDegrees = false; }
+    if (out === undefined) { out = new Phaser.Point(); }
 
     if (asDegrees === true)
     {
@@ -696,7 +696,7 @@ Phaser.Ellipse.prototype = {
     */
     clone: function(output) {
 
-        if (typeof output === "undefined" || output === null)
+        if (output === undefined || output === null)
         {
             output = new Phaser.Ellipse(this.x, this.y, this.width, this.height);
         }
@@ -733,7 +733,7 @@ Phaser.Ellipse.prototype = {
     */
     random: function (out) {
 
-        if (typeof out === 'undefined') { out = new Phaser.Point(); }
+        if (out === undefined) { out = new Phaser.Point(); }
 
         var p = Math.random() * Math.PI * 2;
         var r = Math.random();
@@ -973,7 +973,7 @@ Phaser.Line.prototype = {
     */
     fromSprite: function (startSprite, endSprite, useCenter) {
 
-        if (typeof useCenter === 'undefined') { useCenter = false; }
+        if (useCenter === undefined) { useCenter = false; }
 
         if (useCenter)
         {
@@ -1007,8 +1007,9 @@ Phaser.Line.prototype = {
     * Rotates the line by the amount specified in `angle`.
     * 
     * Rotation takes place from the center of the line.
+    * If you wish to rotate around a different point see Line.rotateAround.
     * 
-    * If you wish to rotate from either end see Line.start.rotate or Line.end.rotate.
+    * If you wish to rotate the ends of the Line then see Line.start.rotate or Line.end.rotate.
     * 
     * @method Phaser.Line#rotate
     * @param {number} angle - The angle in radians (unless asDegrees is true) to rotate the line by.
@@ -1017,11 +1018,30 @@ Phaser.Line.prototype = {
     */
     rotate: function (angle, asDegrees) {
 
-        var x = this.start.x;
-        var y = this.start.y;
+        var cx = (this.start.x + this.end.x) / 2;
+        var cy = (this.start.y + this.end.y) / 2;
 
-        this.start.rotate(this.end.x, this.end.y, angle, asDegrees, this.length);
-        this.end.rotate(x, y, angle, asDegrees, this.length);
+        this.start.rotate(cx, cy, angle, asDegrees);
+        this.end.rotate(cx, cy, angle, asDegrees);
+
+        return this;
+
+    },
+
+    /**
+    * Rotates the line by the amount specified in `angle`.
+    * 
+    * Rotation takes place around the coordinates given.
+    * 
+    * @method Phaser.Line#rotateAround
+    * @param {number} angle - The angle in radians (unless asDegrees is true) to rotate the line by.
+    * @param {boolean} [asDegrees=false] - Is the given angle in radians (false) or degrees (true)?
+    * @return {Phaser.Line} This line object
+    */
+    rotateAround: function (x, y, angle, asDegrees) {
+
+        this.start.rotate(x, y, angle, asDegrees);
+        this.end.rotate(x, y, angle, asDegrees);
 
         return this;
 
@@ -1055,6 +1075,48 @@ Phaser.Line.prototype = {
     reflect: function (line) {
 
         return Phaser.Line.reflect(this, line);
+
+    },
+
+    /**
+    * Returns a Point object where the x and y values correspond to the center (or midpoint) of the Line segment.
+    * 
+    * @method Phaser.Line#midPoint
+    * @param {Phaser.Point} [out] - A Phaser.Point object into which the result will be populated. If not given a new Point object is created.
+    * @return {Phaser.Point} A Phaser.Point object with the x and y values set to the center of the line segment.
+    */
+    midPoint: function (out) {
+
+        if (out === undefined) { out = new Phaser.Point(); }
+
+        out.x = (this.start.x + this.end.x) / 2;
+        out.y = (this.start.y + this.end.y) / 2;
+
+        return out;
+
+    },
+
+    /**
+    * Centers this Line on the given coordinates.
+    * 
+    * The line is centered by positioning the start and end points so that the lines midpoint matches
+    * the coordinates given.
+    * 
+    * @method Phaser.Line#centerOn
+    * @param {number} x - The x position to center the line on.
+    * @param {number} y - The y position to center the line on.
+    * @return {Phaser.Line} This line object
+    */
+    centerOn: function (x, y) {
+
+        var cx = (this.start.x + this.end.x) / 2;
+        var cy = (this.start.y + this.end.y) / 2;
+
+        var tx = x - cx;
+        var ty = y - cy;
+
+        this.start.add(tx, ty);
+        this.end.add(tx, ty);
 
     },
 
@@ -1101,7 +1163,7 @@ Phaser.Line.prototype = {
     */
     random: function (out) {
 
-        if (typeof out === 'undefined') { out = new Phaser.Point(); }
+        if (out === undefined) { out = new Phaser.Point(); }
 
         var t = Math.random();
 
@@ -1123,8 +1185,8 @@ Phaser.Line.prototype = {
     */
     coordinatesOnLine: function (stepRate, results) {
 
-        if (typeof stepRate === 'undefined') { stepRate = 1; }
-        if (typeof results === 'undefined') { results = []; }
+        if (stepRate === undefined) { stepRate = 1; }
+        if (results === undefined) { results = []; }
 
         var x1 = Math.round(this.start.x);
         var y1 = Math.round(this.start.y);
@@ -1178,7 +1240,7 @@ Phaser.Line.prototype = {
      */
     clone: function (output) {
 
-        if (typeof output === "undefined" || output === null)
+        if (output === undefined || output === null)
         {
             output = new Phaser.Line(this.start.x, this.start.y, this.end.x, this.end.y);
         }
@@ -1405,8 +1467,8 @@ Object.defineProperty(Phaser.Line.prototype, "normalAngle", {
 */
 Phaser.Line.intersectsPoints = function (a, b, e, f, asSegment, result) {
 
-    if (typeof asSegment === 'undefined') { asSegment = true; }
-    if (typeof result === 'undefined') { result = new Phaser.Point(); }
+    if (asSegment === undefined) { asSegment = true; }
+    if (result === undefined) { result = new Phaser.Point(); }
 
     var a1 = b.y - a.y;
     var a2 = f.y - e.y;
@@ -1617,7 +1679,7 @@ Phaser.Matrix.prototype = {
      */
     clone: function (output) {
 
-        if (typeof output === "undefined" || output === null)
+        if (output === undefined || output === null)
         {
             output = new Phaser.Matrix(this.a, this.b, this.c, this.d, this.tx, this.ty);
         }
@@ -1680,7 +1742,7 @@ Phaser.Matrix.prototype = {
     */
     toArray: function (transpose, array) {
 
-        if (typeof array === 'undefined') { array = new PIXI.Float32Array(9); }
+        if (array === undefined) { array = new PIXI.Float32Array(9); }
 
         if (transpose)
         {
@@ -1723,7 +1785,7 @@ Phaser.Matrix.prototype = {
     */
     apply: function (pos, newPos) {
 
-        if (typeof newPos === 'undefined') { newPos = new Phaser.Point(); }
+        if (newPos === undefined) { newPos = new Phaser.Point(); }
 
         newPos.x = this.a * pos.x + this.c * pos.y + this.tx;
         newPos.y = this.b * pos.x + this.d * pos.y + this.ty;
@@ -1744,7 +1806,7 @@ Phaser.Matrix.prototype = {
     */
     applyInverse: function (pos, newPos) {
 
-        if (typeof newPos === 'undefined') { newPos = new Phaser.Point(); }
+        if (newPos === undefined) { newPos = new Phaser.Point(); }
 
         var id = 1 / (this.a * this.d + this.c * -this.b);
         var x = pos.x;
@@ -1852,12 +1914,13 @@ Phaser.Matrix.prototype = {
     /**
     * Resets this Matrix to an identity (default) matrix.
     * 
-    * @method identity
+    * @method Phaser.Matrix#identity
     * @return {Phaser.Matrix} This Matrix object.
     */
     identity: function () {
 
         return this.setTo(1, 0, 0, 1, 0, 0);
+
     }
 
 };
@@ -2092,7 +2155,7 @@ Phaser.Point.prototype = {
     */
     clone: function (output) {
 
-        if (typeof output === "undefined" || output === null)
+        if (output === undefined || output === null)
         {
             output = new Phaser.Point(this.x, this.y);
         }
@@ -2158,7 +2221,7 @@ Phaser.Point.prototype = {
     */
     angle: function (a, asDegrees) {
 
-        if (typeof asDegrees === 'undefined') { asDegrees = false; }
+        if (asDegrees === undefined) { asDegrees = false; }
 
         if (asDegrees)
         {
@@ -2369,7 +2432,7 @@ Phaser.Point.prototype.constructor = Phaser.Point;
 */
 Phaser.Point.add = function (a, b, out) {
 
-    if (typeof out === "undefined") { out = new Phaser.Point(); }
+    if (out === undefined) { out = new Phaser.Point(); }
 
     out.x = a.x + b.x;
     out.y = a.y + b.y;
@@ -2389,7 +2452,7 @@ Phaser.Point.add = function (a, b, out) {
 */
 Phaser.Point.subtract = function (a, b, out) {
 
-    if (typeof out === "undefined") { out = new Phaser.Point(); }
+    if (out === undefined) { out = new Phaser.Point(); }
 
     out.x = a.x - b.x;
     out.y = a.y - b.y;
@@ -2409,7 +2472,7 @@ Phaser.Point.subtract = function (a, b, out) {
 */
 Phaser.Point.multiply = function (a, b, out) {
 
-    if (typeof out === "undefined") { out = new Phaser.Point(); }
+    if (out === undefined) { out = new Phaser.Point(); }
 
     out.x = a.x * b.x;
     out.y = a.y * b.y;
@@ -2429,7 +2492,7 @@ Phaser.Point.multiply = function (a, b, out) {
 */
 Phaser.Point.divide = function (a, b, out) {
 
-    if (typeof out === "undefined") { out = new Phaser.Point(); }
+    if (out === undefined) { out = new Phaser.Point(); }
 
     out.x = a.x / b.x;
     out.y = a.y / b.y;
@@ -2477,7 +2540,7 @@ Phaser.Point.angle = function (a, b) {
 */
 Phaser.Point.negative = function (a, out) {
 
-    if (typeof out === "undefined") { out = new Phaser.Point(); }
+    if (out === undefined) { out = new Phaser.Point(); }
 
     return out.setTo(-a.x, -a.y);
 
@@ -2495,7 +2558,7 @@ Phaser.Point.negative = function (a, out) {
 */
 Phaser.Point.multiplyAdd = function (a, b, s, out) {
 
-    if (typeof out === "undefined") { out = new Phaser.Point(); }
+    if (out === undefined) { out = new Phaser.Point(); }
 
     return out.setTo(a.x + b.x * s, a.y + b.y * s);
 
@@ -2513,7 +2576,7 @@ Phaser.Point.multiplyAdd = function (a, b, s, out) {
 */
 Phaser.Point.interpolate = function (a, b, f, out) {
 
-    if (typeof out === "undefined") { out = new Phaser.Point(); }
+    if (out === undefined) { out = new Phaser.Point(); }
 
     return out.setTo(a.x + (b.x - a.x) * f, a.y + (b.y - a.y) * f);
 
@@ -2529,7 +2592,7 @@ Phaser.Point.interpolate = function (a, b, f, out) {
 */
 Phaser.Point.perp = function (a, out) {
 
-    if (typeof out === "undefined") { out = new Phaser.Point(); }
+    if (out === undefined) { out = new Phaser.Point(); }
 
     return out.setTo(-a.y, a.x);
 
@@ -2545,7 +2608,7 @@ Phaser.Point.perp = function (a, out) {
 */
 Phaser.Point.rperp = function (a, out) {
 
-    if (typeof out === "undefined") { out = new Phaser.Point(); }
+    if (out === undefined) { out = new Phaser.Point(); }
 
     return out.setTo(a.y, -a.x);
 
@@ -2578,7 +2641,7 @@ Phaser.Point.distance = function (a, b, round) {
 */
 Phaser.Point.project = function (a, b, out) {
 
-    if (typeof out === "undefined") { out = new Phaser.Point(); }
+    if (out === undefined) { out = new Phaser.Point(); }
 
     var amt = a.dot(b) / b.getMagnitudeSq();
 
@@ -2602,7 +2665,7 @@ Phaser.Point.project = function (a, b, out) {
 */
 Phaser.Point.projectUnit = function (a, b, out) {
 
-    if (typeof out === "undefined") { out = new Phaser.Point(); }
+    if (out === undefined) { out = new Phaser.Point(); }
 
     var amt = a.dot(b);
 
@@ -2625,7 +2688,7 @@ Phaser.Point.projectUnit = function (a, b, out) {
 */
 Phaser.Point.normalRightHand = function (a, out) {
 
-    if (typeof out === "undefined") { out = new Phaser.Point(); }
+    if (out === undefined) { out = new Phaser.Point(); }
 
     return out.setTo(a.y * -1, a.x);
 
@@ -2641,7 +2704,7 @@ Phaser.Point.normalRightHand = function (a, out) {
 */
 Phaser.Point.normalize = function (a, out) {
 
-    if (typeof out === "undefined") { out = new Phaser.Point(); }
+    if (out === undefined) { out = new Phaser.Point(); }
 
     var m = a.getMagnitude();
 
@@ -2673,24 +2736,27 @@ Phaser.Point.normalize = function (a, out) {
 */
 Phaser.Point.rotate = function (a, x, y, angle, asDegrees, distance) {
 
-    if (typeof asDegrees === 'undefined') { asDegrees = false; }
-    if (typeof distance === 'undefined') { distance = null; }
+    if (asDegrees) { angle = Phaser.Math.degToRad(angle); }
 
-    if (asDegrees)
+    if (distance === undefined)
     {
-        angle = Phaser.Math.degToRad(angle);
-    }
+        a.subtract(x, y);
 
-    if (distance === null)
+        var s = Math.sin(angle);
+        var c = Math.cos(angle);
+
+        var tx = c * a.x - s * a.y;
+        var ty = s * a.x + c * a.y;
+
+        a.x = tx + x;
+        a.y = ty + y;
+    }
+    else
     {
-        //  Get distance from origin (cx/cy) to this point
-        distance = Math.sqrt(((x - a.x) * (x - a.x)) + ((y - a.y) * (y - a.y)));
+        var t = angle + Math.atan2(a.y - y, a.x - x);
+        a.x = x + distance * Math.cos(t);
+        a.y = y + distance * Math.sin(t);
     }
-
-    var t = angle + Math.atan2(a.y - y, a.x - x);
-
-    a.x = x + distance * Math.cos(t);
-    a.y = y + distance * Math.sin(t);
 
     return a;
 
@@ -2706,7 +2772,7 @@ Phaser.Point.rotate = function (a, x, y, angle, asDegrees, distance) {
 */
 Phaser.Point.centroid = function (points, out) {
 
-    if (typeof out === "undefined") { out = new Phaser.Point(); }
+    if (out === undefined) { out = new Phaser.Point(); }
 
     if (Object.prototype.toString.call(points) !== '[object Array]')
     {
@@ -2836,7 +2902,7 @@ Phaser.Polygon.prototype = {
      */
     toNumberArray: function (output) {
 
-        if (typeof output === 'undefined') { output = []; }
+        if (output === undefined) { output = []; }
 
         for (var i = 0; i < this._points.length; i++)
         {
@@ -2883,7 +2949,7 @@ Phaser.Polygon.prototype = {
 
         var points = this._points.slice();
 
-        if (typeof output === "undefined" || output === null)
+        if (output === undefined || output === null)
         {
             output = new Phaser.Polygon(points);
         }
@@ -3178,7 +3244,7 @@ Phaser.Rectangle.prototype = {
     */
     scale: function (x, y) {
 
-        if (typeof y === 'undefined') { y = x; }
+        if (y === undefined) { y = x; }
 
         this.width *= x;
         this.height *= y;
@@ -3442,7 +3508,7 @@ Phaser.Rectangle.prototype = {
     */
     random: function (out) {
 
-        if (typeof out === 'undefined') { out = new Phaser.Point(); }
+        if (out === undefined) { out = new Phaser.Point(); }
 
         out.x = this.randomX;
         out.y = this.randomY;
@@ -3814,7 +3880,7 @@ Phaser.Rectangle.inflatePoint = function (a, point) {
 */
 Phaser.Rectangle.size = function (a, output) {
 
-    if (typeof output === "undefined" || output === null)
+    if (output === undefined || output === null)
     {
         output = new Phaser.Point(a.width, a.height);
     }
@@ -3836,7 +3902,7 @@ Phaser.Rectangle.size = function (a, output) {
 */
 Phaser.Rectangle.clone = function (a, output) {
 
-    if (typeof output === "undefined" || output === null)
+    if (output === undefined || output === null)
     {
         output = new Phaser.Rectangle(a.x, a.y, a.width, a.height);
     }
@@ -3955,7 +4021,7 @@ Phaser.Rectangle.sameDimensions = function (a, b) {
 */
 Phaser.Rectangle.intersection = function (a, b, output) {
 
-    if (typeof output === "undefined")
+    if (output === undefined)
     {
         output = new Phaser.Rectangle();
     }
@@ -4003,7 +4069,7 @@ Phaser.Rectangle.intersects = function (a, b) {
 */
 Phaser.Rectangle.intersectsRaw = function (a, left, right, top, bottom, tolerance) {
 
-    if (typeof tolerance === "undefined") { tolerance = 0; }
+    if (tolerance === undefined) { tolerance = 0; }
 
     return !(left > a.right + tolerance || right < a.left - tolerance || top > a.bottom + tolerance || bottom < a.top - tolerance);
 
@@ -4019,7 +4085,7 @@ Phaser.Rectangle.intersectsRaw = function (a, left, right, top, bottom, toleranc
 */
 Phaser.Rectangle.union = function (a, b, output) {
 
-    if (typeof output === "undefined")
+    if (output === undefined)
     {
         output = new Phaser.Rectangle();
     }
@@ -4039,7 +4105,7 @@ Phaser.Rectangle.union = function (a, b, output) {
 */
 Phaser.Rectangle.aabb = function(points, out) {
 
-    if (typeof out === "undefined") {
+    if (out === undefined) {
         out = new Phaser.Rectangle();
     }
 
@@ -4074,55 +4140,55 @@ PIXI.Rectangle = Phaser.Rectangle;
 PIXI.EmptyRectangle = new Phaser.Rectangle(0, 0, 0, 0);
 
 /**
- * @author Mat Groves http://matgroves.com/
- */
+* @author       Mat Groves http://matgroves.com/
+* @author       Richard Davey <rich@photonstorm.com>
+* @copyright    2015 Photon Storm Ltd.
+* @license      {@link https://github.com/photonstorm/phaser/blob/master/license.txt|MIT License}
+*/
 
 /**
- * The Rounded Rectangle object is an area defined by its position and has nice rounded corners, as indicated by its top-left corner point (x, y) and by its width and its height.
- *
- * @class RoundedRectangle
- * @constructor
- * @param x {Number} The X coordinate of the upper-left corner of the rounded rectangle
- * @param y {Number} The Y coordinate of the upper-left corner of the rounded rectangle
- * @param width {Number} The overall width of this rounded rectangle
- * @param height {Number} The overall height of this rounded rectangle
- * @param radius {Number} Controls the radius of the rounded corners 
- */
+* The Rounded Rectangle object is an area defined by its position and has nice rounded corners, 
+* as indicated by its top-left corner point (x, y) and by its width and its height.
+*
+* @class Phaser.RoundedRectangle
+* @constructor
+* @param {number} [x=0] - The x coordinate of the top-left corner of the Rectangle.
+* @param {number} [y=0] - The y coordinate of the top-left corner of the Rectangle.
+* @param {number} [width=0] - The width of the Rectangle. Should always be either zero or a positive value.
+* @param {number} [height=0] - The height of the Rectangle. Should always be either zero or a positive value.
+* @param {number} [radius=20] - Controls the radius of the rounded corners.
+*/
 Phaser.RoundedRectangle = function(x, y, width, height, radius)
 {
-    /**
-     * @property x
-     * @type Number
-     * @default 0
-     */
-    this.x = x || 0;
+    if (x === undefined) { x = 0; }
+    if (y === undefined) { y = 0; }
+    if (width === undefined) { width = 0; }
+    if (height === undefined) { height = 0; }
+    if (radius === undefined) { radius = 20; }
 
     /**
-     * @property y
-     * @type Number
-     * @default 0
-     */
-    this.y = y || 0;
+    * @property {number} x - The x coordinate of the top-left corner of the Rectangle.
+    */
+    this.x = x;
 
     /**
-     * @property width
-     * @type Number
-     * @default 0
-     */
-    this.width = width || 0;
+    * @property {number} y - The y coordinate of the top-left corner of the Rectangle.
+    */
+    this.y = y;
 
     /**
-     * @property height
-     * @type Number
-     * @default 0
-     */
-    this.height = height || 0;
+    * @property {number} width - The width of the Rectangle. This value should never be set to a negative.
+    */
+    this.width = width;
 
     /**
-     * @property radius
-     * @type Number
-     * @default 20
-     */
+    * @property {number} height - The height of the Rectangle. This value should never be set to a negative.
+    */
+    this.height = height;
+
+    /**
+    * @property {number} radius - The radius of the rounded corners.
+    */
     this.radius = radius || 20;
 
     /**
@@ -4132,48 +4198,54 @@ Phaser.RoundedRectangle = function(x, y, width, height, radius)
     this.type = Phaser.ROUNDEDRECTANGLE;
 };
 
-/**
- * Creates a clone of this Rounded Rectangle
- *
- * @method clone
- * @return {RoundedRectangle} a copy of the rounded rectangle
- */
-Phaser.RoundedRectangle.prototype.clone = function()
-{
-    return new Phaser.RoundedRectangle(this.x, this.y, this.width, this.height, this.radius);
-};
+Phaser.RoundedRectangle.prototype = {
 
-/**
- * Checks whether the x and y coordinates given are contained within this Rounded Rectangle
- *
- * @method contains
- * @param x {Number} The X coordinate of the point to test
- * @param y {Number} The Y coordinate of the point to test
- * @return {Boolean} Whether the x/y coordinates are within this Rounded Rectangle
- */
-Phaser.RoundedRectangle.prototype.contains = function(x, y)
-{
-    if (this.width <= 0 || this.height <= 0)
-    {
-        return false;
-    }
+    /**
+    * Returns a new RoundedRectangle object with the same values for the x, y, width, height and
+    * radius properties as this RoundedRectangle object.
+    * 
+    * @method Phaser.RoundedRectangle#clone
+    * @return {Phaser.RoundedRectangle}
+    */
+    clone: function () {
 
-    var x1 = this.x;
+        return new Phaser.RoundedRectangle(this.x, this.y, this.width, this.height, this.radius);
 
-    if (x >= x1 && x <= x1 + this.width)
-    {
-        var y1 = this.y;
+    },
 
-        if (y >= y1 && y <= y1 + this.height)
+    /**
+    * Determines whether the specified coordinates are contained within the region defined by this Rounded Rectangle object.
+    * 
+    * @method Phaser.RoundedRectangle#contains
+    * @param {number} x - The x coordinate of the point to test.
+    * @param {number} y - The y coordinate of the point to test.
+    * @return {boolean} A value of true if the RoundedRectangle Rectangle object contains the specified point; otherwise false.
+    */
+    contains: function (x, y) {
+
+        if (this.width <= 0 || this.height <= 0)
         {
-            return true;
+            return false;
         }
+
+        var x1 = this.x;
+
+        if (x >= x1 && x <= x1 + this.width)
+        {
+            var y1 = this.y;
+
+            if (y >= y1 && y <= y1 + this.height)
+            {
+                return true;
+            }
+        }
+
+        return false;
+
     }
 
-    return false;
 };
 
-// constructor
 Phaser.RoundedRectangle.prototype.constructor = Phaser.RoundedRectangle;
 
 //  Because PIXI uses its own type, we'll replace it with ours to avoid duplicating code or confusion.

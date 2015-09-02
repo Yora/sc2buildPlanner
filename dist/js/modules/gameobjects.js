@@ -63,7 +63,7 @@ Phaser.GameObjectFactory.prototype = {
     */
     image: function (x, y, key, frame, group) {
 
-        if (typeof group === 'undefined') { group = this.world; }
+        if (group === undefined) { group = this.world; }
 
         return group.add(new Phaser.Image(this.game, x, y, key, frame));
 
@@ -86,9 +86,42 @@ Phaser.GameObjectFactory.prototype = {
     */
     sprite: function (x, y, key, frame, group) {
 
-        if (typeof group === 'undefined') { group = this.world; }
+        if (group === undefined) { group = this.world; }
 
         return group.create(x, y, key, frame);
+
+    },
+
+    /**
+    * Create a new Creature Animation object.
+    *
+    * Creature is a custom Game Object used in conjunction with the Creature Runtime libraries by Kestrel Moon Studios.
+    * 
+    * It allows you to display animated Game Objects that were created with the [Creature Automated Animation Tool](http://www.kestrelmoon.com/creature/).
+    * 
+    * Note 1: You can only use Phaser.Creature objects in WebGL enabled games. They do not work in Canvas mode games.
+    *
+    * Note 2: You must use a build of Phaser that includes the CreatureMeshBone.js runtime and gl-matrix.js, or have them
+    * loaded before your Phaser game boots.
+    * 
+    * See the Phaser custom build process for more details.
+    *
+    * @method Phaser.GameObjectFactory#creature
+    * @param {number} [x=0] - The x coordinate of the creature. The coordinate is relative to any parent container this creature may be in.
+    * @param {number} [y=0] - The y coordinate of the creature. The coordinate is relative to any parent container this creature may be in.
+    * @param {string|PIXI.Texture} [key] - The image used as a texture by this creature object during rendering. If a string Phaser will get for an entry in the Image Cache. Or it can be an instance of a PIXI.Texture.
+    * @param {Phaser.Group} [group] - Optional Group to add the object to. If not specified it will be added to the World group.
+    * @returns {Phaser.Creature} The newly created Sprite object.
+    */
+    creature: function (x, y, key, mesh, group) {
+
+        if (group === undefined) { group = this.world; }
+
+        var obj = new Phaser.Creature(this.game, x, y, key, mesh);
+
+        group.add(obj);
+
+        return obj;
 
     },
 
@@ -156,9 +189,9 @@ Phaser.GameObjectFactory.prototype = {
     */
     spriteBatch: function (parent, name, addToStage) {
 
-        if (typeof parent === 'undefined') { parent = null; }
-        if (typeof name === 'undefined') { name = 'group'; }
-        if (typeof addToStage === 'undefined') { addToStage = false; }
+        if (parent === undefined) { parent = null; }
+        if (name === undefined) { name = 'group'; }
+        if (addToStage === undefined) { addToStage = false; }
 
         return new Phaser.SpriteBatch(this.game, parent, name, addToStage);
 
@@ -224,7 +257,7 @@ Phaser.GameObjectFactory.prototype = {
     */
     tileSprite: function (x, y, width, height, key, frame, group) {
 
-        if (typeof group === 'undefined') { group = this.world; }
+        if (group === undefined) { group = this.world; }
 
         return group.add(new Phaser.TileSprite(this.game, x, y, width, height, key, frame));
 
@@ -246,7 +279,7 @@ Phaser.GameObjectFactory.prototype = {
     */
     rope: function (x, y, key, frame, points, group) {
 
-        if (typeof group === 'undefined') { group = this.world; }
+        if (group === undefined) { group = this.world; }
 
         return group.add(new Phaser.Rope(this.game, x, y, key, frame, points));
 
@@ -265,7 +298,7 @@ Phaser.GameObjectFactory.prototype = {
     */
     text: function (x, y, text, style, group) {
 
-        if (typeof group === 'undefined') { group = this.world; }
+        if (group === undefined) { group = this.world; }
 
         return group.add(new Phaser.Text(this.game, x, y, text, style));
 
@@ -289,7 +322,7 @@ Phaser.GameObjectFactory.prototype = {
     */
     button: function (x, y, key, callback, callbackContext, overFrame, outFrame, downFrame, upFrame, group) {
 
-        if (typeof group === 'undefined') { group = this.world; }
+        if (group === undefined) { group = this.world; }
 
         return group.add(new Phaser.Button(this.game, x, y, key, callback, callbackContext, overFrame, outFrame, downFrame, upFrame));
 
@@ -306,7 +339,7 @@ Phaser.GameObjectFactory.prototype = {
     */
     graphics: function (x, y, group) {
 
-        if (typeof group === 'undefined') { group = this.world; }
+        if (group === undefined) { group = this.world; }
 
         return group.add(new Phaser.Graphics(this.game, x, y));
 
@@ -389,7 +422,7 @@ Phaser.GameObjectFactory.prototype = {
     */
     bitmapText: function (x, y, font, text, size, group) {
 
-        if (typeof group === 'undefined') { group = this.world; }
+        if (group === undefined) { group = this.world; }
 
         return group.add(new Phaser.BitmapText(this.game, x, y, font, text, size));
 
@@ -430,8 +463,8 @@ Phaser.GameObjectFactory.prototype = {
     */
     renderTexture: function (width, height, key, addToCache) {
 
-        if (typeof key === 'undefined' || key === '') { key = this.game.rnd.uuid(); }
-        if (typeof addToCache === 'undefined') { addToCache = false; }
+        if (key === undefined || key === '') { key = this.game.rnd.uuid(); }
+        if (addToCache === undefined) { addToCache = false; }
 
         var texture = new Phaser.RenderTexture(this.game, width, height, key);
 
@@ -474,8 +507,8 @@ Phaser.GameObjectFactory.prototype = {
     */
     bitmapData: function (width, height, key, addToCache) {
 
-        if (typeof addToCache === 'undefined') { addToCache = false; }
-        if (typeof key === 'undefined' || key === '') { key = this.game.rnd.uuid(); }
+        if (addToCache === undefined) { addToCache = false; }
+        if (key === undefined || key === '') { key = this.game.rnd.uuid(); }
 
         var texture = new Phaser.BitmapData(this.game, key, width, height);
 
@@ -623,7 +656,7 @@ Phaser.GameObjectCreator.prototype = {
     */
     group: function (parent, name, addToStage, enableBody, physicsBodyType) {
 
-        return new Phaser.Group(this.game, null, name, addToStage, enableBody, physicsBodyType);
+        return new Phaser.Group(this.game, parent, name, addToStage, enableBody, physicsBodyType);
 
     },
 
@@ -638,8 +671,8 @@ Phaser.GameObjectCreator.prototype = {
     */
     spriteBatch: function (parent, name, addToStage) {
 
-        if (typeof name === 'undefined') { name = 'group'; }
-        if (typeof addToStage === 'undefined') { addToStage = false; }
+        if (name === undefined) { name = 'group'; }
+        if (addToStage === undefined) { addToStage = false; }
 
         return new Phaser.SpriteBatch(this.game, parent, name, addToStage);
 
@@ -892,8 +925,8 @@ Phaser.GameObjectCreator.prototype = {
     */
     renderTexture: function (width, height, key, addToCache) {
 
-        if (typeof key === 'undefined' || key === '') { key = this.game.rnd.uuid(); }
-        if (typeof addToCache === 'undefined') { addToCache = false; }
+        if (key === undefined || key === '') { key = this.game.rnd.uuid(); }
+        if (addToCache === undefined) { addToCache = false; }
 
         var texture = new Phaser.RenderTexture(this.game, width, height, key);
 
@@ -920,8 +953,8 @@ Phaser.GameObjectCreator.prototype = {
     */
     bitmapData: function (width, height, key, addToCache) {
 
-        if (typeof addToCache === 'undefined') { addToCache = false; }
-        if (typeof key === 'undefined' || key === '') { key = this.game.rnd.uuid(); }
+        if (addToCache === undefined) { addToCache = false; }
+        if (key === undefined || key === '') { key = this.game.rnd.uuid(); }
 
         var texture = new Phaser.BitmapData(this.game, key, width, height);
 
@@ -1180,9 +1213,15 @@ Phaser.Image.prototype.preUpdate = function() {
 * 
 * TileSprites have no input handler or physics bodies by default, both need enabling in the same way as for normal Sprites.
 *
+* You shouldn't ever create a TileSprite any larger than your actual screen size. If you want to create a large repeating background
+* that scrolls across the whole map of your game, then you create a TileSprite that fits the screen size and then use the `tilePosition`
+* property to scroll the texture as the player moves. If you create a TileSprite that is thousands of pixels in size then it will 
+* consume huge amounts of memory and cause performance issues. Remember: use `tilePosition` to scroll your texture and `tileScale` to
+* adjust the scale of the texture - don't resize the sprite itself or make it larger than it needs.
+*
 * An important note about texture dimensions:
 *
-* When running under Canvas a TileSprite can use any texture size without issue. When running under WebGL the texture should be
+* When running under Canvas a TileSprite can use any texture size without issue. When running under WebGL the texture should ideally be
 * a power of two in size (i.e. 4, 8, 16, 32, 64, 128, 256, 512, etch pixels width by height). If the texture isn't a power of two
 * it will be rendered to a blank canvas that is the correct size, which means you may have 'blank' areas appearing to the right and
 * bottom of your frame. To avoid this ensure your textures are perfect powers of two.
@@ -1247,7 +1286,9 @@ Phaser.TileSprite = function (game, x, y, width, height, key, frame) {
     */
     this._scroll = new Phaser.Point();
 
-    PIXI.TilingSprite.call(this, PIXI.TextureCache['__default'], width, height);
+    var def = game.cache.getImage('__default', true);
+
+    PIXI.TilingSprite.call(this, new PIXI.Texture(def.base), width, height);
 
     Phaser.Component.Core.init.call(this, game, x, y, key, frame);
 
@@ -2210,7 +2251,7 @@ Phaser.Button.prototype.onInputUpHandler = function (sprite, pointer, isOver) {
 */
 Phaser.SpriteBatch = function (game, parent, name, addToStage) {
 
-    if (typeof parent === 'undefined' || parent === null) { parent = game.world; }
+    if (parent === undefined || parent === null) { parent = game.world; }
 
     PIXI.SpriteBatch.call(this);
 

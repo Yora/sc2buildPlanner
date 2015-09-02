@@ -145,6 +145,11 @@ Phaser.Camera.FOLLOW_TOPDOWN_TIGHT = 3;
 
 Phaser.Camera.prototype = {
 
+    /**
+    * Camera preUpdate. Sets the total view counter to zero.
+    *
+    * @method Phaser.Camera#preUpdate
+    */
     preUpdate: function () {
 
         this.totalInView = 0;
@@ -163,7 +168,7 @@ Phaser.Camera.prototype = {
     */
     follow: function (target, style) {
 
-        if (typeof style === "undefined") { style = Phaser.Camera.FOLLOW_LOCKON; }
+        if (style === undefined) { style = Phaser.Camera.FOLLOW_LOCKON; }
 
         this.target = target;
 
@@ -310,10 +315,7 @@ Phaser.Camera.prototype = {
     */
     setBoundsToWorld: function () {
 
-        if (this.bounds)
-        {
-            this.bounds.setTo(this.game.world.bounds.x, this.game.world.bounds.y, this.game.world.bounds.width, this.game.world.bounds.height);
-        }
+        this.bounds.copyFrom(this.game.world.bounds);
 
     },
 
@@ -516,12 +518,12 @@ Object.defineProperty(Phaser.Camera.prototype, "height", {
 */
 
 /**
+* The Phaser.Create class is a collection of smaller helper methods that allow you to generate game content
+* quickly and easily, without the need for any external files. You can create textures for sprites and in
+* coming releases we'll add dynamic sound effect generation support as well (like sfxr).
 *
-* TODO: Gradient generator
-* TODO: Look at sfxr for audio gen
-* TODO: Dither support
-* TODO: Sprite Sheet generator
-*
+* Access this via `State.create` (or `this.create` from within a State object)
+* 
 * @class Phaser.Create
 * @constructor
 * @param {Phaser.Game} game - Game reference to the currently running game.
@@ -533,15 +535,24 @@ Phaser.Create = function (game) {
     */
     this.game = game;
 
+    /**
+    * @property {Phaser.BitmapData} bmd - The internal BitmapData Create uses to generate textures from.
+    */
     this.bmd = game.make.bitmapData();
 
+    /**
+    * @property {HTMLCanvasElement} canvas - The canvas the BitmapData uses.
+    */
     this.canvas = this.bmd.canvas;
+
+    /**
+    * @property {CanvasRenderingContext2D} context - The 2d context of the canvas.
+    */
     this.ctx = this.bmd.context;
 
-    // http://androidarts.com/palette/16pal.htm
-
-    // { 0: '#000', 1: '#', 2: '#', 3: '#', 4: '#', 5: '#', 6: '#', 7: '#', 8: '#', 9: '#', A: '#', B: '#', C: '#', D: '#', E: '#', F: '#' }
-
+    /**
+    * @property {array} palettes - A range of 16 color palettes for use with sprite generation.
+    */
     this.palettes = [
         { 0: '#000', 1: '#9D9D9D', 2: '#FFF', 3: '#BE2633', 4: '#E06F8B', 5: '#493C2B', 6: '#A46422', 7: '#EB8931', 8: '#F7E26B', 9: '#2F484E', A: '#44891A', B: '#A3CE27', C: '#1B2632', D: '#005784', E: '#31A2F2', F: '#B2DCEF' },
         { 0: '#000', 1: '#191028', 2: '#46af45', 3: '#a1d685', 4: '#453e78', 5: '#7664fe', 6: '#833129', 7: '#9ec2e8', 8: '#dc534b', 9: '#e18d79', A: '#d6b97b', B: '#e9d8a1', C: '#216c4b', D: '#d365c8', E: '#afaab9', F: '#f5f4eb' },
@@ -552,19 +563,79 @@ Phaser.Create = function (game) {
 
 };
 
+/**
+* A 16 color palette by [Arne](http://androidarts.com/palette/16pal.htm)
+* @constant
+* @type {number}
+*/
 Phaser.Create.PALETTE_ARNE = 0;
+
+/**
+* A 16 color JMP inspired palette.
+* @constant
+* @type {number}
+*/
 Phaser.Create.PALETTE_JMP = 1;
+
+/**
+* A 16 color CGA inspired palette.
+* @constant
+* @type {number}
+*/
 Phaser.Create.PALETTE_CGA = 2;
+
+/**
+* A 16 color C64 inspired palette.
+* @constant
+* @type {number}
+*/
 Phaser.Create.PALETTE_C64 = 3;
+
+/**
+* A 16 color palette inspired by Japanese computers like the MSX.
+* @constant
+* @type {number}
+*/
 Phaser.Create.PALETTE_JAPANESE_MACHINE = 4;
 
 Phaser.Create.prototype = {
 
+    /**
+     * Generates a new PIXI.Texture from the given data, which can be applied to a Sprite.
+     *
+     * This allows you to create game graphics quickly and easily, with no external files but that use actual proper images
+     * rather than Phaser.Graphics objects, which are expensive to render and limited in scope.
+     *
+     * Each element of the array is a string holding the pixel color values, as mapped to one of the Phaser.Create PALETTE consts.
+     *
+     * For example:
+     *
+     * `var data = [
+     *   ' 333 ',
+     *   ' 777 ',
+     *   'E333E',
+     *   ' 333 ',
+     *   ' 3 3 '
+     * ];`
+     *
+     * `game.create.texture('bob', data);`
+     *
+     * The above will create a new texture called `bob`, which will look like a little man wearing a hat. You can then use it
+     * for sprites the same way you use any other texture: `game.add.sprite(0, 0, 'bob');`
+     *
+     * @method Phaser.Create#texture
+     * @param {string} key - The key used to store this texture in the Phaser Cache.
+     * @param {array} data - An array of pixel data.
+     * @param {integer} [pixelWidth=8] - The width of each pixel.
+     * @param {integer} [pixelHeight=8] - The height of each pixel.
+     * @param {integer} [palette=0] - The palette to use when rendering the texture. One of the Phaser.Create.PALETTE consts.
+     * @return {PIXI.Texture} The newly generated texture.
+     */
     texture: function (key, data, pixelWidth, pixelHeight, palette) {
 
-        if (typeof pixelWidth === 'undefined') { pixelWidth = 8; }
-        if (typeof pixelHeight === 'undefined') { pixelHeight = pixelWidth; }
-        if (typeof palette === 'undefined') { palette = 0; }
+        if (pixelWidth === undefined) { pixelWidth = 8; }
+        if (pixelHeight === undefined) { pixelHeight = pixelWidth; }
+        if (palette === undefined) { palette = 0; }
 
         var w = data[0].length * pixelWidth;
         var h = data.length * pixelHeight;
@@ -593,6 +664,18 @@ Phaser.Create.prototype = {
 
     },
 
+    /**
+     * Creates a grid texture based on the given dimensions.
+     *
+     * @method Phaser.Create#grid
+     * @param {string} key - The key used to store this texture in the Phaser Cache.
+     * @param {integer} width - The width of the grid in pixels.
+     * @param {integer} height - The height of the grid in pixels.
+     * @param {integer} cellWidth - The width of the grid cells in pixels.
+     * @param {integer} cellHeight - The height of the grid cells in pixels.
+     * @param {string} color - The color to draw the grid lines in. Should be a Canvas supported color string like `#ff5500` or `rgba(200,50,3,0.5)`.
+     * @return {PIXI.Texture} The newly generated texture.
+     */
     grid: function (key, width, height, cellWidth, cellHeight, color) {
 
         this.bmd.resize(width, height);
@@ -616,139 +699,6 @@ Phaser.Create.prototype = {
 };
 
 Phaser.Create.prototype.constructor = Phaser.Create;
-
-/* 
- * RIFFWAVE.js v0.03 - Audio encoder for HTML5 <audio> elements.
- * Copyleft 2011 by Pedro Ladaria <pedro.ladaria at Gmail dot com>
- *
- * Public Domain
- *
- * Changelog:
- *
- * 0.01 - First release
- * 0.02 - New faster base64 encoding
- * 0.03 - Support for 16bit samples
- *
- * Notes:
- *
- * 8 bit data is unsigned: 0..255
- * 16 bit data is signed: âˆ’32,768..32,767
- *
- */
-
-/*
-var FastBase64 = {
-
-    chars: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
-    encLookup: [],
-
-    Init: function() {
-        for (var i=0; i<4096; i++) {
-            this.encLookup[i] = this.chars[i >> 6] + this.chars[i & 0x3F];
-        }
-    },
-
-    Encode: function(src) {
-        var len = src.length;
-        var dst = '';
-        var i = 0;
-        while (len > 2) {
-            n = (src[i] << 16) | (src[i+1]<<8) | src[i+2];
-            dst+= this.encLookup[n >> 12] + this.encLookup[n & 0xFFF];
-            len-= 3;
-            i+= 3;
-        }
-        if (len > 0) {
-            var n1= (src[i] & 0xFC) >> 2;
-            var n2= (src[i] & 0x03) << 4;
-            if (len > 1) n2 |= (src[++i] & 0xF0) >> 4;
-            dst+= this.chars[n1];
-            dst+= this.chars[n2];
-            if (len == 2) {
-                var n3= (src[i++] & 0x0F) << 2;
-                n3 |= (src[i] & 0xC0) >> 6;
-                dst+= this.chars[n3];
-            }
-            if (len == 1) dst+= '=';
-            dst+= '=';
-        }
-        return dst;
-    } // end Encode
-
-}
-
-FastBase64.Init();
-
-var RIFFWAVE = function(data) {
-
-    this.data = [];        // Array containing audio samples
-    this.wav = [];         // Array containing the generated wave file
-    this.dataURI = '';     // http://en.wikipedia.org/wiki/Data_URI_scheme
-
-    this.header = {                         // OFFS SIZE NOTES
-        chunkId      : [0x52,0x49,0x46,0x46], // 0    4    "RIFF" = 0x52494646
-        chunkSize    : 0,                     // 4    4    36+SubChunk2Size = 4+(8+SubChunk1Size)+(8+SubChunk2Size)
-        format       : [0x57,0x41,0x56,0x45], // 8    4    "WAVE" = 0x57415645
-        subChunk1Id  : [0x66,0x6d,0x74,0x20], // 12   4    "fmt " = 0x666d7420
-        subChunk1Size: 16,                    // 16   4    16 for PCM
-        audioFormat  : 1,                     // 20   2    PCM = 1
-        numChannels  : 1,                     // 22   2    Mono = 1, Stereo = 2...
-        sampleRate   : 8000,                  // 24   4    8000, 44100...
-        byteRate     : 0,                     // 28   4    SampleRate*NumChannels*BitsPerSample/8
-        blockAlign   : 0,                     // 32   2    NumChannels*BitsPerSample/8
-        bitsPerSample: 8,                     // 34   2    8 bits = 8, 16 bits = 16
-        subChunk2Id  : [0x64,0x61,0x74,0x61], // 36   4    "data" = 0x64617461
-        subChunk2Size: 0                      // 40   4    data size = NumSamples*NumChannels*BitsPerSample/8
-    };
-
-    function u32ToArray(i) {
-        return [i&0xFF, (i>>8)&0xFF, (i>>16)&0xFF, (i>>24)&0xFF];
-    }
-
-    function u16ToArray(i) {
-        return [i&0xFF, (i>>8)&0xFF];
-    }
-
-    function split16bitArray(data) {
-        var r = [];
-        var j = 0;
-        var len = data.length;
-        for (var i=0; i<len; i++) {
-            r[j++] = data[i] & 0xFF;
-            r[j++] = (data[i]>>8) & 0xFF;
-        }
-        return r;
-    }
-
-    this.Make = function(data) {
-        if (data instanceof Array) this.data = data;
-        this.header.blockAlign = (this.header.numChannels * this.header.bitsPerSample) >> 3;
-        this.header.byteRate = this.header.blockAlign * this.sampleRate;
-        this.header.subChunk2Size = this.data.length * (this.header.bitsPerSample >> 3);
-        this.header.chunkSize = 36 + this.header.subChunk2Size;
-
-        this.wav = this.header.chunkId.concat(
-            u32ToArray(this.header.chunkSize),
-            this.header.format,
-            this.header.subChunk1Id,
-            u32ToArray(this.header.subChunk1Size),
-            u16ToArray(this.header.audioFormat),
-            u16ToArray(this.header.numChannels),
-            u32ToArray(this.header.sampleRate),
-            u32ToArray(this.header.byteRate),
-            u16ToArray(this.header.blockAlign),
-            u16ToArray(this.header.bitsPerSample),    
-            this.header.subChunk2Id,
-            u32ToArray(this.header.subChunk2Size),
-            (this.header.bitsPerSample == 16) ? split16bitArray(this.data) : this.data
-        );
-        this.dataURI = 'data:audio/wav;base64,'+FastBase64.Encode(this.wav);
-    };
-
-    if (data instanceof Array) this.Make(data);
-
-}; // end RIFFWAVE
-*/
 
 /**
 * @author       Richard Davey <rich@photonstorm.com>
@@ -1171,7 +1121,7 @@ Phaser.StateManager.prototype = {
     */
     add: function (key, state, autoStart) {
 
-        if (typeof autoStart === "undefined") { autoStart = false; }
+        if (autoStart === undefined) { autoStart = false; }
 
         var newState;
 
@@ -1249,8 +1199,8 @@ Phaser.StateManager.prototype = {
     */
     start: function (key, clearWorld, clearCache) {
 
-        if (typeof clearWorld === "undefined") { clearWorld = true; }
-        if (typeof clearCache === "undefined") { clearCache = false; }
+        if (clearWorld === undefined) { clearWorld = true; }
+        if (clearCache === undefined) { clearCache = false; }
 
         if (this.checkState(key))
         {
@@ -1277,8 +1227,8 @@ Phaser.StateManager.prototype = {
     */
     restart: function (clearWorld, clearCache) {
 
-        if (typeof clearWorld === "undefined") { clearWorld = true; }
-        if (typeof clearCache === "undefined") { clearCache = false; }
+        if (clearWorld === undefined) { clearWorld = true; }
+        if (clearCache === undefined) { clearCache = false; }
 
         //  Place the state in the queue. It will be started the next time the game loop starts.
         this._pendingState = this.current;
@@ -1769,7 +1719,7 @@ Object.defineProperty(Phaser.StateManager.prototype, "created", {
 */
 
 /**
-* A Signal is an event dispatch mechansim that supports broadcasting to multiple listeners.
+* A Signal is an event dispatch mechanism that supports broadcasting to multiple listeners.
 *
 * Event listeners are uniquely identified by the listener/callback function and the context.
 * 
@@ -1916,7 +1866,7 @@ Phaser.Signal.prototype = {
             return -1;
         }
 
-        if (typeof context === 'undefined') { context = null; }
+        if (context === undefined) { context = null; }
 
         var n = this._bindings.length;
         var cur;
@@ -2054,7 +2004,7 @@ Phaser.Signal.prototype = {
     */
     removeAll: function (context) {
 
-        if (typeof context === 'undefined') { context = null; }
+        if (context === undefined) { context = null; }
 
         if (!this._bindings)
         {
@@ -2437,7 +2387,7 @@ Phaser.SignalBinding.prototype.constructor = Phaser.SignalBinding;
 * @constructor
 * @param {Phaser.Game} game - A reference to the currently running game.
 * @param {object} uniforms - Uniform mappings object
-* @param {Array} fragmentSrc - The fragment shader code.
+* @param {Array|string} fragmentSrc - The fragment shader code. Either an array, one element per line of code, or a string.
 */
 Phaser.Filter = function (game, uniforms, fragmentSrc) {
 
@@ -2516,9 +2466,9 @@ Phaser.Filter = function (game, uniforms, fragmentSrc) {
     }
 
     /**
-    * @property {array} fragmentSrc - The fragment shader code.
+    * @property {array|string} fragmentSrc - The fragment shader code.
     */
-    this.fragmentSrc = fragmentSrc || [];
+    this.fragmentSrc = fragmentSrc || '';
 
 };
 
@@ -2631,7 +2581,7 @@ Object.defineProperty(Phaser.Filter.prototype, 'height', {
 */
 Phaser.Plugin = function (game, parent) {
 
-    if (typeof parent === 'undefined') { parent = null; }
+    if (parent === undefined) { parent = null; }
 
     /**
     * @property {Phaser.Game} game - A reference to the currently running game.
@@ -3446,9 +3396,9 @@ Object.defineProperty(Phaser.Stage.prototype, "smoothed", {
 */
 Phaser.Group = function (game, parent, name, addToStage, enableBody, physicsBodyType) {
 
-    if (typeof addToStage === 'undefined') { addToStage = false; }
-    if (typeof enableBody === 'undefined') { enableBody = false; }
-    if (typeof physicsBodyType === 'undefined') { physicsBodyType = Phaser.Physics.ARCADE; }
+    if (addToStage === undefined) { addToStage = false; }
+    if (enableBody === undefined) { enableBody = false; }
+    if (physicsBodyType === undefined) { physicsBodyType = Phaser.Physics.ARCADE; }
 
     /**
     * A reference to the currently running Game.
@@ -3457,7 +3407,7 @@ Phaser.Group = function (game, parent, name, addToStage, enableBody, physicsBody
     */
     this.game = game;
 
-    if (typeof parent === 'undefined')
+    if (parent === undefined)
     {
         parent = game.world;
     }
@@ -3704,7 +3654,7 @@ Phaser.Group.SORT_DESCENDING = 1;
 */
 Phaser.Group.prototype.add = function (child, silent) {
 
-    if (typeof silent === 'undefined') { silent = false; }
+    if (silent === undefined) { silent = false; }
 
     if (child.parent !== this)
     {
@@ -3830,7 +3780,7 @@ Phaser.Group.prototype.addMultiple = function (children, silent) {
 */
 Phaser.Group.prototype.addAt = function (child, index, silent) {
 
-    if (typeof silent === 'undefined') { silent = false; }
+    if (silent === undefined) { silent = false; }
 
     if (child.parent !== this)
     {
@@ -3897,7 +3847,7 @@ Phaser.Group.prototype.getAt = function (index) {
 */
 Phaser.Group.prototype.create = function (x, y, key, frame, exists) {
 
-    if (typeof exists === 'undefined') { exists = true; }
+    if (exists === undefined) { exists = true; }
 
     var child = new this.classType(this.game, x, y, key, frame);
 
@@ -3944,7 +3894,7 @@ Phaser.Group.prototype.create = function (x, y, key, frame, exists) {
 */
 Phaser.Group.prototype.createMultiple = function (quantity, key, frame, exists) {
 
-    if (typeof exists === 'undefined') { exists = false; }
+    if (exists === undefined) { exists = false; }
 
     for (var i = 0; i < quantity; i++)
     {
@@ -3983,7 +3933,7 @@ Phaser.Group.prototype.updateZ = function () {
 */
 Phaser.Group.prototype.resetCursor = function (index) {
 
-    if (typeof index === 'undefined') { index = 0; }
+    if (index === undefined) { index = 0; }
 
     if (index > this.children.length - 1)
     {
@@ -4298,7 +4248,7 @@ Phaser.Group.prototype.hasProperty = function (child, key) {
 */
 Phaser.Group.prototype.setProperty = function (child, key, value, operation, force) {
 
-    if (typeof force === 'undefined') { force = false; }
+    if (force === undefined) { force = false; }
 
     operation = operation || 0;
 
@@ -4368,7 +4318,7 @@ Phaser.Group.prototype.setProperty = function (child, key, value, operation, for
 */
 Phaser.Group.prototype.checkProperty = function (child, key, value, force) {
 
-    if (typeof force === 'undefined') { force = false; }
+    if (force === undefined) { force = false; }
 
     //  We can't force a property in and the child doesn't have it, so abort.
     if (!Phaser.Utils.getProperty(child, key) && force)
@@ -4402,12 +4352,12 @@ Phaser.Group.prototype.checkProperty = function (child, key, value, force) {
 */
 Phaser.Group.prototype.set = function (child, key, value, checkAlive, checkVisible, operation, force) {
 
-    if (typeof force === 'undefined') { force = false; }
+    if (force === undefined) { force = false; }
 
     key = key.split('.');
 
-    if (typeof checkAlive === 'undefined') { checkAlive = false; }
-    if (typeof checkVisible === 'undefined') { checkVisible = false; }
+    if (checkAlive === undefined) { checkAlive = false; }
+    if (checkVisible === undefined) { checkVisible = false; }
 
     if ((checkAlive === false || (checkAlive && child.alive)) && (checkVisible === false || (checkVisible && child.visible)))
     {
@@ -4434,9 +4384,9 @@ Phaser.Group.prototype.set = function (child, key, value, checkAlive, checkVisib
 */
 Phaser.Group.prototype.setAll = function (key, value, checkAlive, checkVisible, operation, force) {
 
-    if (typeof checkAlive === 'undefined') { checkAlive = false; }
-    if (typeof checkVisible === 'undefined') { checkVisible = false; }
-    if (typeof force === 'undefined') { force = false; }
+    if (checkAlive === undefined) { checkAlive = false; }
+    if (checkVisible === undefined) { checkVisible = false; }
+    if (force === undefined) { force = false; }
 
     key = key.split('.');
     operation = operation || 0;
@@ -4469,9 +4419,9 @@ Phaser.Group.prototype.setAll = function (key, value, checkAlive, checkVisible, 
 */
 Phaser.Group.prototype.setAllChildren = function (key, value, checkAlive, checkVisible, operation, force) {
 
-    if (typeof checkAlive === 'undefined') { checkAlive = false; }
-    if (typeof checkVisible === 'undefined') { checkVisible = false; }
-    if (typeof force === 'undefined') { force = false; }
+    if (checkAlive === undefined) { checkAlive = false; }
+    if (checkVisible === undefined) { checkVisible = false; }
+    if (force === undefined) { force = false; }
 
     operation = operation || 0;
 
@@ -4506,9 +4456,9 @@ Phaser.Group.prototype.setAllChildren = function (key, value, checkAlive, checkV
 */
 Phaser.Group.prototype.checkAll = function (key, value, checkAlive, checkVisible, force) {
 
-    if (typeof checkAlive === 'undefined') { checkAlive = false; }
-    if (typeof checkVisible === 'undefined') { checkVisible = false; }
-    if (typeof force === 'undefined') { force = false; }
+    if (checkAlive === undefined) { checkAlive = false; }
+    if (checkVisible === undefined) { checkVisible = false; }
+    if (force === undefined) { force = false; }
 
     for (var i = 0; i < this.children.length; i++)
     {
@@ -4693,7 +4643,7 @@ Phaser.Group.prototype.callbackFromArray = function (child, callback, length) {
 */
 Phaser.Group.prototype.callAll = function (method, context) {
 
-    if (typeof method === 'undefined')
+    if (method === undefined)
     {
         return;
     }
@@ -4703,7 +4653,7 @@ Phaser.Group.prototype.callAll = function (method, context) {
 
     var methodLength = method.length;
 
-    if (typeof context === 'undefined' || context === null || context === '')
+    if (context === undefined || context === null || context === '')
     {
         context = null;
     }
@@ -4882,7 +4832,7 @@ Phaser.Group.prototype.filter = function (predicate, checkExists) {
 */
 Phaser.Group.prototype.forEach = function (callback, callbackContext, checkExists) {
 
-    if (typeof checkExists === 'undefined') { checkExists = false; }
+    if (checkExists === undefined) { checkExists = false; }
 
     if (arguments.length <= 3)
     {
@@ -5019,8 +4969,8 @@ Phaser.Group.prototype.sort = function (key, order) {
         return;
     }
 
-    if (typeof key === 'undefined') { key = 'z'; }
-    if (typeof order === 'undefined') { order = Phaser.Group.SORT_ASCENDING; }
+    if (key === undefined) { key = 'z'; }
+    if (order === undefined) { order = Phaser.Group.SORT_ASCENDING; }
 
     this._sortProperty = key;
 
@@ -5332,8 +5282,8 @@ Phaser.Group.prototype.getRandom = function (startIndex, length) {
 */
 Phaser.Group.prototype.remove = function (child, destroy, silent) {
 
-    if (typeof destroy === 'undefined') { destroy = false; }
-    if (typeof silent === 'undefined') { silent = false; }
+    if (destroy === undefined) { destroy = false; }
+    if (silent === undefined) { silent = false; }
 
     if (this.children.length === 0 || this.children.indexOf(child) === -1)
     {
@@ -5375,7 +5325,7 @@ Phaser.Group.prototype.remove = function (child, destroy, silent) {
 */
 Phaser.Group.prototype.moveAll = function (group, silent) {
 
-    if (typeof silent === 'undefined') { silent = false; }
+    if (silent === undefined) { silent = false; }
 
     if (this.children.length > 0 && group instanceof Phaser.Group)
     {
@@ -5403,8 +5353,8 @@ Phaser.Group.prototype.moveAll = function (group, silent) {
 */
 Phaser.Group.prototype.removeAll = function (destroy, silent) {
 
-    if (typeof destroy === 'undefined') { destroy = false; }
-    if (typeof silent === 'undefined') { silent = false; }
+    if (destroy === undefined) { destroy = false; }
+    if (silent === undefined) { silent = false; }
 
     if (this.children.length === 0)
     {
@@ -5446,9 +5396,9 @@ Phaser.Group.prototype.removeAll = function (destroy, silent) {
 */
 Phaser.Group.prototype.removeBetween = function (startIndex, endIndex, destroy, silent) {
 
-    if (typeof endIndex === 'undefined') { endIndex = this.children.length - 1; }
-    if (typeof destroy === 'undefined') { destroy = false; }
-    if (typeof silent === 'undefined') { silent = false; }
+    if (endIndex === undefined) { endIndex = this.children.length - 1; }
+    if (destroy === undefined) { destroy = false; }
+    if (silent === undefined) { silent = false; }
 
     if (this.children.length === 0)
     {
@@ -5503,8 +5453,8 @@ Phaser.Group.prototype.destroy = function (destroyChildren, soft) {
 
     if (this.game === null || this.ignoreDestroy) { return; }
 
-    if (typeof destroyChildren === 'undefined') { destroyChildren = true; }
-    if (typeof soft === 'undefined') { soft = false; }
+    if (destroyChildren === undefined) { destroyChildren = true; }
+    if (soft === undefined) { soft = false; }
 
     this.onDestroy.dispatch(this, destroyChildren, soft);
 
@@ -5688,6 +5638,8 @@ Phaser.World = function (game) {
     */
     this._height = game.height;
 
+    this.game.state.onStateChange.add(this.stateChange, this);
+
 };
 
 Phaser.World.prototype = Object.create(Phaser.Group.prototype);
@@ -5710,6 +5662,24 @@ Phaser.World.prototype.boot = function () {
     this.game.camera = this.camera;
 
     this.game.stage.addChild(this);
+
+};
+
+/**
+* Called whenever the State changes or resets.
+* 
+* It resets the world.x and world.y coordinates back to zero,
+* then resets the Camera.
+*
+* @method Phaser.World#stateChange
+* @protected
+*/
+Phaser.World.prototype.stateChange = function () {
+
+    this.x = 0;
+    this.y = 0;
+
+    this.camera.reset();
 
 };
 
@@ -5803,10 +5773,10 @@ Phaser.World.prototype.shutdown = function () {
 */
 Phaser.World.prototype.wrap = function (sprite, padding, useBounds, horizontal, vertical) {
 
-    if (typeof padding === 'undefined') { padding = 0; }
-    if (typeof useBounds === 'undefined') { useBounds = false; }
-    if (typeof horizontal === 'undefined') { horizontal = true; }
-    if (typeof vertical === 'undefined') { vertical = true; }
+    if (padding === undefined) { padding = 0; }
+    if (useBounds === undefined) { useBounds = false; }
+    if (horizontal === undefined) { horizontal = true; }
+    if (vertical === undefined) { vertical = true; }
 
     if (!useBounds)
     {
@@ -6093,7 +6063,7 @@ Phaser.FlexGrid.prototype = {
      */
     createCustomLayer: function (width, height, children, addToWorld) {
 
-        if (typeof addToWorld === 'undefined') { addToWorld = true; }
+        if (addToWorld === undefined) { addToWorld = true; }
 
         this.customWidth = width;
         this.customHeight = height;
@@ -6128,7 +6098,7 @@ Phaser.FlexGrid.prototype = {
      */
     createFluidLayer: function (children, addToWorld) {
 
-        if (typeof addToWorld === 'undefined') { addToWorld = true; }
+        if (addToWorld === undefined) { addToWorld = true; }
 
         var layer = new Phaser.FlexLayer(this, this.positionFluid, this.boundsFluid, this.scaleFluid);
 
@@ -7580,7 +7550,7 @@ Phaser.ScaleManager.prototype = {
     */
     forceOrientation: function (forceLandscape, forcePortrait) {
 
-        if (typeof forcePortrait === 'undefined') { forcePortrait = false; }
+        if (forcePortrait === undefined) { forcePortrait = false; }
 
         this.forceLandscape = forceLandscape;
         this.forcePortrait = forcePortrait;
@@ -8002,8 +7972,8 @@ Phaser.ScaleManager.prototype = {
     */
     resetCanvas: function (cssWidth, cssHeight) {
 
-        if (typeof cssWidth === 'undefined') { cssWidth = this.width + 'px'; }
-        if (typeof cssHeight === 'undefined') { cssHeight = this.height + 'px'; }
+        if (cssWidth === undefined) { cssWidth = this.width + 'px'; }
+        if (cssHeight === undefined) { cssHeight = this.height + 'px'; }
 
         var canvas = this.game.canvas;
 
@@ -8347,8 +8317,6 @@ Phaser.ScaleManager.prototype = {
 
             this.updateLayout();
             this.queueUpdate(true);
-
-            this.enterFullScreen.dispatch(this.width, this.height);
         }
         else
         {
@@ -8358,11 +8326,9 @@ Phaser.ScaleManager.prototype = {
 
             this.updateLayout();
             this.queueUpdate(true);
-
-            this.leaveFullScreen.dispatch(this.width, this.height);
         }
 
-        this.onFullScreenChange.dispatch(this);
+        this.onFullScreenChange.dispatch(this, this.width, this.height);
 
     },
 
@@ -8403,9 +8369,9 @@ Phaser.ScaleManager.prototype = {
     */
     scaleSprite: function (sprite, width, height, letterBox) {
 
-        if (typeof width === 'undefined') { width = this.width; }
-        if (typeof height === 'undefined') { height = this.height; }
-        if (typeof letterBox === 'undefined') { letterBox = false; }
+        if (width === undefined) { width = this.width; }
+        if (height === undefined) { height = this.height; }
+        if (letterBox === undefined) { letterBox = false; }
 
         if (!sprite || !sprite['scale'])
         {
@@ -9234,7 +9200,7 @@ Phaser.Game.prototype = {
 
         this.config = config;
 
-        if (typeof config['enableDebug'] === 'undefined')
+        if (config['enableDebug'] === undefined)
         {
             this.config.enableDebug = true;
         }
@@ -9466,14 +9432,7 @@ Phaser.Game.prototype = {
     */
     setUpRenderer: function () {
 
-        if (this.config['canvasID'])
-        {
-            this.canvas = Phaser.Canvas.create(this.width, this.height, this.config['canvasID']);
-        }
-        else
-        {
-            this.canvas = Phaser.Canvas.create(this.width, this.height);
-        }
+        this.canvas = Phaser.Canvas.create(this, this.width, this.height, this.config['canvasID'], true);
 
         if (this.config['canvasStyle'])
         {
@@ -9528,6 +9487,9 @@ Phaser.Game.prototype = {
                                                                                 "antialias": this.antialias,
                                                                                 "preserveDrawingBuffer": this.preserveDrawingBuffer });
             this.context = null;
+
+            this.canvas.addEventListener('webglcontextlost', this.contextLost.bind(this), false);
+            this.canvas.addEventListener('webglcontextrestored', this.contextRestored.bind(this), false);
         }
 
         if (this.renderType !== Phaser.HEADLESS)
@@ -9537,6 +9499,37 @@ Phaser.Game.prototype = {
             Phaser.Canvas.addToDOM(this.canvas, this.parent, false);
             Phaser.Canvas.setTouchAction(this.canvas);
         }
+
+    },
+
+    /**
+    * Handles WebGL context loss.
+    *
+    * @method Phaser.Game#contextLost
+    * @private
+    * @param {Event} event - The webglcontextlost event.
+    */
+    contextLost: function (event) {
+
+        event.preventDefault();
+
+        this.renderer.contextLost = true;
+
+    },
+
+    /**
+    * Handles WebGL context restoration.
+    *
+    * @method Phaser.Game#contextRestored
+    * @private
+    */
+    contextRestored: function () {
+
+        this.renderer.initContext();
+
+        this.cache.clearGLTextures();
+
+        this.renderer.contextLost = false;
 
     },
 

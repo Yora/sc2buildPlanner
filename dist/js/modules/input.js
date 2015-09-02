@@ -228,7 +228,9 @@ Phaser.Input = function (game) {
     this.mouse = null;
 
     /**
-    * @property {Phaser.Keyboard} keyboard - The Keyboard Input manager.
+    * The Keyboard Input manager.
+    * 
+    * @property {Phaser.Keyboard} keyboard
     */
     this.keyboard = null;
 
@@ -253,38 +255,48 @@ Phaser.Input = function (game) {
     this.mspointer = null;
 
     /**
-    * @property {Phaser.Gamepad} gamepad - The Gamepad Input manager.
+    * The Gamepad Input manager.
+    * 
+    * @property {Phaser.Gamepad} gamepad
     */
     this.gamepad = null;
 
     /**
-    * @property {boolean} resetLocked - If the Input Manager has been reset locked then all calls made to InputManager.reset, such as from a State change, are ignored.
+    * If the Input Manager has been reset locked then all calls made to InputManager.reset, 
+    * such as from a State change, are ignored.
+    * @property {boolean} resetLocked
     * @default
     */
     this.resetLocked = false;
 
     /**
-    * @property {Phaser.Signal} onDown - A Signal that is dispatched each time a pointer is pressed down.
+    * A Signal that is dispatched each time a pointer is pressed down.
+    * @property {Phaser.Signal} onDown
     */
     this.onDown = null;
 
     /**
-    * @property {Phaser.Signal} onUp - A Signal that is dispatched each time a pointer is released.
+    * A Signal that is dispatched each time a pointer is released.
+    * @property {Phaser.Signal} onUp
     */
     this.onUp = null;
 
     /**
-    * @property {Phaser.Signal} onTap - A Signal that is dispatched each time a pointer is tapped.
+    * A Signal that is dispatched each time a pointer is tapped.
+    * @property {Phaser.Signal} onTap
     */
     this.onTap = null;
 
     /**
-    * @property {Phaser.Signal} onHold - A Signal that is dispatched each time a pointer is held down.
+    * A Signal that is dispatched each time a pointer is held down.
+    * @property {Phaser.Signal} onHold
     */
     this.onHold = null;
 
     /**
-    * @property {number} minPriorityID - You can tell all Pointers to ignore any object with a priorityID lower than the minPriorityID. Useful when stacking UI layers. Set to zero to disable.
+    * You can tell all Pointers to ignore any Game Object with a `priorityID` lower than this value.
+    * This is useful when stacking UI layers. Set to zero to disable.
+    * @property {number} minPriorityID
     * @default
     */
     this.minPriorityID = 0;
@@ -394,9 +406,7 @@ Phaser.Input.prototype = {
 
         this.activePointer = this.mousePointer;
 
-        this.hitCanvas = document.createElement('canvas');
-        this.hitCanvas.width = 1;
-        this.hitCanvas.height = 1;
+        this.hitCanvas = PIXI.CanvasPool.create(this, 1, 1);
         this.hitContext = this.hitCanvas.getContext('2d');
 
         this.mouse.start();
@@ -441,6 +451,8 @@ Phaser.Input.prototype = {
         }
 
         this.moveCallbacks = [];
+
+        PIXI.CanvasPool.remove(this);
 
         this.game.canvas.removeEventListener('click', this._onClickTrampoline);
 
@@ -571,7 +583,7 @@ Phaser.Input.prototype = {
             return;
         }
 
-        if (typeof hard === 'undefined') { hard = false; }
+        if (hard === undefined) { hard = false; }
 
         this.mousePointer.reset();
 
@@ -745,7 +757,7 @@ Phaser.Input.prototype = {
     */
     countActivePointers: function (limit) {
 
-        if (typeof limit === 'undefined') { limit = this.pointers.length; }
+        if (limit === undefined) { limit = this.pointers.length; }
 
         var count = limit;
 
@@ -772,7 +784,7 @@ Phaser.Input.prototype = {
     */
     getPointer: function (isActive) {
 
-        if (typeof isActive === 'undefined') { isActive = false; }
+        if (isActive === undefined) { isActive = false; }
 
         for (var i = 0; i < this.pointers.length; i++)
         {
@@ -851,7 +863,7 @@ Phaser.Input.prototype = {
     */
     getLocalPosition: function (displayObject, pointer, output) {
 
-        if (typeof output === 'undefined') { output = new Phaser.Point(); }
+        if (output === undefined) { output = new Phaser.Point(); }
 
         var wt = displayObject.worldTransform;
         var id = 1 / (wt.a * wt.d + wt.c * -wt.b);
@@ -1102,6 +1114,12 @@ Phaser.Mouse = function (game) {
     this.game = game;
 
     /**
+    * @property {Phaser.Input} input - A reference to the Phaser Input Manager.
+    * @protected
+    */
+    this.input = game.input;
+
+    /**
     * @property {object} callbackContext - The context under which callbacks are called.
     */
     this.callbackContext = this.game;
@@ -1139,13 +1157,15 @@ Phaser.Mouse = function (game) {
     /**
     * This property was removed in Phaser 2.4 and should no longer be used.
     * Instead please see the Pointer button properties such as `Pointer.leftButton`, `Pointer.rightButton` and so on.
+    * Or Pointer.button holds the DOM event button value if you require that.
     * @property {number} button
     * @default
     */
     this.button = -1;
 
     /**
-     * @property {number} wheelDelta - The direction of the _last_ mousewheel usage 1 for up -1 for down
+     * The direction of the _last_ mousewheel usage 1 for up -1 for down.
+     * @property {number} wheelDelta
      */
     this.wheelDelta = 0;
 
@@ -1228,6 +1248,42 @@ Phaser.Mouse = function (game) {
 };
 
 /**
+* @constant
+* @type {number}
+*/
+Phaser.Mouse.NO_BUTTON = -1;
+
+/**
+* @constant
+* @type {number}
+*/
+Phaser.Mouse.LEFT_BUTTON = 0;
+
+/**
+* @constant
+* @type {number}
+*/
+Phaser.Mouse.MIDDLE_BUTTON = 1;
+
+/**
+* @constant
+* @type {number}
+*/
+Phaser.Mouse.RIGHT_BUTTON = 2;
+
+/**
+* @constant
+* @type {number}
+*/
+Phaser.Mouse.BACK_BUTTON = 3;
+
+/**
+* @constant
+* @type {number}
+*/
+Phaser.Mouse.FORWARD_BUTTON = 4;
+
+/**
  * @constant
  * @type {number}
  */
@@ -1289,22 +1345,24 @@ Phaser.Mouse.prototype = {
             return _this.onMouseWheel(event);
         };
 
-        this.game.canvas.addEventListener('mousedown', this._onMouseDown, true);
-        this.game.canvas.addEventListener('mousemove', this._onMouseMove, true);
-        this.game.canvas.addEventListener('mouseup', this._onMouseUp, true);
+        var canvas = this.game.canvas;
+
+        canvas.addEventListener('mousedown', this._onMouseDown, true);
+        canvas.addEventListener('mousemove', this._onMouseMove, true);
+        canvas.addEventListener('mouseup', this._onMouseUp, true);
 
         if (!this.game.device.cocoonJS)
         {
             window.addEventListener('mouseup', this._onMouseUpGlobal, true);
-            this.game.canvas.addEventListener('mouseover', this._onMouseOver, true);
-            this.game.canvas.addEventListener('mouseout', this._onMouseOut, true);
+            canvas.addEventListener('mouseover', this._onMouseOver, true);
+            canvas.addEventListener('mouseout', this._onMouseOut, true);
         }
 
         var wheelEvent = this.game.device.wheelEvent;
 
         if (wheelEvent)
         {
-            this.game.canvas.addEventListener(wheelEvent, this._onMouseWheel, true);
+            canvas.addEventListener(wheelEvent, this._onMouseWheel, true);
 
             if (wheelEvent === 'mousewheel')
             {
@@ -1337,14 +1395,14 @@ Phaser.Mouse.prototype = {
             this.mouseDownCallback.call(this.callbackContext, event);
         }
 
-        if (!this.game.input.enabled || !this.enabled)
+        if (!this.input.enabled || !this.enabled)
         {
             return;
         }
 
         event['identifier'] = 0;
 
-        this.game.input.mousePointer.start(event);
+        this.input.mousePointer.start(event);
 
     },
 
@@ -1367,14 +1425,14 @@ Phaser.Mouse.prototype = {
             this.mouseMoveCallback.call(this.callbackContext, event);
         }
 
-        if (!this.game.input.enabled || !this.enabled)
+        if (!this.input.enabled || !this.enabled)
         {
             return;
         }
 
         event['identifier'] = 0;
 
-        this.game.input.mousePointer.move(event);
+        this.input.mousePointer.move(event);
 
     },
 
@@ -1397,14 +1455,14 @@ Phaser.Mouse.prototype = {
             this.mouseUpCallback.call(this.callbackContext, event);
         }
 
-        if (!this.game.input.enabled || !this.enabled)
+        if (!this.input.enabled || !this.enabled)
         {
             return;
         }
 
         event['identifier'] = 0;
 
-        this.game.input.mousePointer.stop(event);
+        this.input.mousePointer.stop(event);
 
     },
 
@@ -1416,7 +1474,7 @@ Phaser.Mouse.prototype = {
     */
     onMouseUpGlobal: function (event) {
 
-        if (!this.game.input.mousePointer.withinGame)
+        if (!this.input.mousePointer.withinGame)
         {
             if (this.mouseUpCallback)
             {
@@ -1425,7 +1483,7 @@ Phaser.Mouse.prototype = {
 
             event['identifier'] = 0;
 
-            this.game.input.mousePointer.stop(event);
+            this.input.mousePointer.stop(event);
         }
 
     },
@@ -1445,14 +1503,14 @@ Phaser.Mouse.prototype = {
             event.preventDefault();
         }
 
-        this.game.input.mousePointer.withinGame = false;
+        this.input.mousePointer.withinGame = false;
 
         if (this.mouseOutCallback)
         {
             this.mouseOutCallback.call(this.callbackContext, event);
         }
 
-        if (!this.game.input.enabled || !this.enabled)
+        if (!this.input.enabled || !this.enabled)
         {
             return;
         }
@@ -1461,7 +1519,31 @@ Phaser.Mouse.prototype = {
         {
             event['identifier'] = 0;
 
-            this.game.input.mousePointer.stop(event);
+            this.input.mousePointer.stop(event);
+        }
+
+    },
+
+    /**
+    * The internal method that handles the mouse over event from the browser.
+    *
+    * @method Phaser.Mouse#onMouseOver
+    * @param {MouseEvent} event - The native event from the browser. This gets stored in Mouse.event.
+    */
+    onMouseOver: function (event) {
+
+        this.event = event;
+
+        if (this.capture)
+        {
+            event.preventDefault();
+        }
+
+        this.input.mousePointer.withinGame = true;
+
+        if (this.mouseOverCallback)
+        {
+            this.mouseOverCallback.call(this.callbackContext, event);
         }
 
     },
@@ -1491,35 +1573,6 @@ Phaser.Mouse.prototype = {
         if (this.mouseWheelCallback)
         {
             this.mouseWheelCallback.call(this.callbackContext, event);
-        }
-
-    },
-
-    /**
-    * The internal method that handles the mouse over event from the browser.
-    *
-    * @method Phaser.Mouse#onMouseOver
-    * @param {MouseEvent} event - The native event from the browser. This gets stored in Mouse.event.
-    */
-    onMouseOver: function (event) {
-
-        this.event = event;
-
-        if (this.capture)
-        {
-            event.preventDefault();
-        }
-
-        this.game.input.mousePointer.withinGame = true;
-
-        if (this.mouseOverCallback)
-        {
-            this.mouseOverCallback.call(this.callbackContext, event);
-        }
-
-        if (!this.game.input.enabled || !this.enabled)
-        {
-            return;
         }
 
     },
@@ -1600,16 +1653,19 @@ Phaser.Mouse.prototype = {
     */
     stop: function () {
 
-        this.game.canvas.removeEventListener('mousedown', this._onMouseDown, true);
-        this.game.canvas.removeEventListener('mousemove', this._onMouseMove, true);
-        this.game.canvas.removeEventListener('mouseup', this._onMouseUp, true);
-        this.game.canvas.removeEventListener('mouseover', this._onMouseOver, true);
-        this.game.canvas.removeEventListener('mouseout', this._onMouseOut, true);
+        var canvas = this.game.canvas;
+
+        canvas.removeEventListener('mousedown', this._onMouseDown, true);
+        canvas.removeEventListener('mousemove', this._onMouseMove, true);
+        canvas.removeEventListener('mouseup', this._onMouseUp, true);
+        canvas.removeEventListener('mouseover', this._onMouseOver, true);
+        canvas.removeEventListener('mouseout', this._onMouseOut, true);
 
         var wheelEvent = this.game.device.wheelEvent;
+
         if (wheelEvent)
         {
-            this.game.canvas.removeEventListener(wheelEvent, this._onMouseWheel, true);
+            canvas.removeEventListener(wheelEvent, this._onMouseWheel, true);
         }
 
         window.removeEventListener('mouseup', this._onMouseUpGlobal, true);
@@ -1655,6 +1711,7 @@ function WheelEventProxy (scaleFactor, deltaMode) {
     * @private
     */
     this.originalEvent = null;
+
 }
 
 WheelEventProxy.prototype = {};
@@ -1716,11 +1773,14 @@ Object.defineProperties(WheelEventProxy.prototype, {
 /**
 * The MSPointer class handles Microsoft touch interactions with the game and the resulting Pointer objects.
 *
-* It will work only in Internet Explorer 10 and Windows Store or Windows Phone 8 apps using JavaScript.
+* It will work only in Internet Explorer 10+ and Windows Store or Windows Phone 8 apps using JavaScript.
 * http://msdn.microsoft.com/en-us/library/ie/hh673557(v=vs.85).aspx
 *
 * You should not normally access this class directly, but instead use a Phaser.Pointer object which 
 * normalises all game input for you including accurate button handling.
+*
+* Please note that at the current time of writing Phaser does not yet support chorded button interactions:
+* http://www.w3.org/TR/pointerevents/#chorded-button-interactions
 *
 * @class Phaser.MSPointer
 * @constructor
@@ -1732,6 +1792,12 @@ Phaser.MSPointer = function (game) {
     * @property {Phaser.Game} game - A reference to the currently running game.
     */
     this.game = game;
+
+    /**
+    * @property {Phaser.Input} input - A reference to the Phaser Input Manager.
+    * @protected
+    */
+    this.input = game.input;
 
     /**
     * @property {object} callbackContext - The context under which callbacks are called (defaults to game).
@@ -1761,6 +1827,7 @@ Phaser.MSPointer = function (game) {
     /**
     * This property was removed in Phaser 2.4 and should no longer be used.
     * Instead please see the Pointer button properties such as `Pointer.leftButton`, `Pointer.rightButton` and so on.
+    * Or Pointer.button holds the DOM event button value if you require that.
     * @property {number} button
     */
     this.button = -1;
@@ -1798,6 +1865,24 @@ Phaser.MSPointer = function (game) {
     */
     this._onMSPointerUp = null;
 
+    /**
+    * @property {function} _onMSPointerUpGlobal - Internal function to handle MSPointer events.
+    * @private
+    */
+    this._onMSPointerUpGlobal = null;
+
+    /**
+    * @property {function} _onMSPointerOut - Internal function to handle MSPointer events.
+    * @private
+    */
+    this._onMSPointerOut = null;
+
+    /**
+    * @property {function} _onMSPointerOver - Internal function to handle MSPointer events.
+    * @private
+    */
+    this._onMSPointerOver = null;
+
 };
 
 Phaser.MSPointer.prototype = {
@@ -1830,17 +1915,43 @@ Phaser.MSPointer.prototype = {
                 return _this.onPointerUp(event);
             };
 
-            this.game.canvas.addEventListener('MSPointerDown', this._onMSPointerDown, false);
-            this.game.canvas.addEventListener('MSPointerMove', this._onMSPointerMove, false);
-            this.game.canvas.addEventListener('MSPointerUp', this._onMSPointerUp, false);
+            this._onMSPointerUpGlobal = function (event) {
+                return _this.onPointerUpGlobal(event);
+            };
+
+            this._onMSPointerOut = function (event) {
+                return _this.onPointerOut(event);
+            };
+
+            this._onMSPointerOver = function (event) {
+                return _this.onPointerOver(event);
+            };
+
+            var canvas = this.game.canvas;
+
+            canvas.addEventListener('MSPointerDown', this._onMSPointerDown, false);
+            canvas.addEventListener('MSPointerMove', this._onMSPointerMove, false);
+            canvas.addEventListener('MSPointerUp', this._onMSPointerUp, false);
 
             //  IE11+ uses non-prefix events
-            this.game.canvas.addEventListener('pointerDown', this._onMSPointerDown, false);
-            this.game.canvas.addEventListener('pointerMove', this._onMSPointerMove, false);
-            this.game.canvas.addEventListener('pointerUp', this._onMSPointerUp, false);
+            canvas.addEventListener('pointerdown', this._onMSPointerDown, false);
+            canvas.addEventListener('pointermove', this._onMSPointerMove, false);
+            canvas.addEventListener('pointerup', this._onMSPointerUp, false);
 
-            this.game.canvas.style['-ms-content-zooming'] = 'none';
-            this.game.canvas.style['-ms-touch-action'] = 'none';
+            canvas.style['-ms-content-zooming'] = 'none';
+            canvas.style['-ms-touch-action'] = 'none';
+
+            if (!this.game.device.cocoonJS)
+            {
+                window.addEventListener('MSPointerUp', this._onMSPointerUpGlobal, true);
+                canvas.addEventListener('MSPointerOver', this._onMSPointerOver, true);
+                canvas.addEventListener('MSPointerOut', this._onMSPointerOut, true);
+
+                //  IE11+ uses non-prefix events
+                window.addEventListener('pointerup', this._onMSPointerUpGlobal, true);
+                canvas.addEventListener('pointerover', this._onMSPointerOver, true);
+                canvas.addEventListener('pointerout', this._onMSPointerOut, true);
+            }
         }
 
     },
@@ -1865,14 +1976,21 @@ Phaser.MSPointer.prototype = {
             this.pointerDownCallback.call(this.callbackContext, event);
         }
 
-        if (!this.game.input.enabled || !this.enabled)
+        if (!this.input.enabled || !this.enabled)
         {
             return;
         }
 
         event.identifier = event.pointerId;
 
-        this.game.input.startPointer(event);
+        if (event.pointerType === 'mouse' || event.pointerType === 0x00000004)
+        {
+            this.input.mousePointer.start(event);
+        }
+        else
+        {
+            this.input.startPointer(event);
+        }
 
     },
 
@@ -1895,14 +2013,21 @@ Phaser.MSPointer.prototype = {
             this.pointerMoveCallback.call(this.callbackContext, event);
         }
 
-        if (!this.game.input.enabled || !this.enabled)
+        if (!this.input.enabled || !this.enabled)
         {
             return;
         }
 
         event.identifier = event.pointerId;
 
-        this.game.input.updatePointer(event);
+        if (event.pointerType === 'mouse' || event.pointerType === 0x00000004)
+        {
+            this.input.mousePointer.move(event);
+        }
+        else
+        {
+            this.input.updatePointer(event);
+        }
 
     },
 
@@ -1925,14 +2050,136 @@ Phaser.MSPointer.prototype = {
             this.pointerUpCallback.call(this.callbackContext, event);
         }
 
-        if (!this.game.input.enabled || !this.enabled)
+        if (!this.input.enabled || !this.enabled)
         {
             return;
         }
 
         event.identifier = event.pointerId;
 
-        this.game.input.stopPointer(event);
+        if (event.pointerType === 'mouse' || event.pointerType === 0x00000004)
+        {
+            this.input.mousePointer.stop(event);
+        }
+        else
+        {
+            this.input.stopPointer(event);
+        }
+
+    },
+
+    /**
+    * The internal method that handles the mouse up event from the window.
+    * 
+    * @method Phaser.MSPointer#onPointerUpGlobal
+    * @param {PointerEvent} event - The native event from the browser. This gets stored in MSPointer.event.
+    */
+    onPointerUpGlobal: function (event) {
+
+        if ((event.pointerType === 'mouse' || event.pointerType === 0x00000004) && !this.input.mousePointer.withinGame)
+        {
+            this.onPointerUp(event);
+        }
+        else
+        {
+            var pointer = this.input.getPointerFromIdentifier(event.identifier);
+
+            if (pointer && pointer.withinGame)
+            {
+                this.onPointerUp(event);
+            }
+        }
+
+    },
+
+    /**
+    * The internal method that handles the pointer out event from the browser.
+    *
+    * @method Phaser.MSPointer#onPointerOut
+    * @param {PointerEvent} event - The native event from the browser. This gets stored in MSPointer.event.
+    */
+    onPointerOut: function (event) {
+
+        this.event = event;
+
+        if (this.capture)
+        {
+            event.preventDefault();
+        }
+
+        if (event.pointerType === 'mouse' || event.pointerType === 0x00000004)
+        {
+            this.input.mousePointer.withinGame = false;
+        }
+        else
+        {
+            var pointer = this.input.getPointerFromIdentifier(event.identifier);
+
+            if (pointer)
+            {
+                pointer.withinGame = false;
+            }
+        }
+
+        if (this.input.mouse.mouseOutCallback)
+        {
+            this.input.mouse.mouseOutCallback.call(this.input.mouse.callbackContext, event);
+        }
+
+        if (!this.input.enabled || !this.enabled)
+        {
+            return;
+        }
+
+        if (this.input.mouse.stopOnGameOut)
+        {
+            event['identifier'] = 0;
+
+            if (pointer)
+            {
+                pointer.stop(event);
+            }
+            else
+            {
+                this.input.mousePointer.stop(event);
+            }
+        }
+
+    },
+
+    /**
+    * The internal method that handles the pointer out event from the browser.
+    *
+    * @method Phaser.MSPointer#onPointerOut
+    * @param {PointerEvent} event - The native event from the browser. This gets stored in MSPointer.event.
+    */
+    onPointerOver: function (event) {
+
+        this.event = event;
+
+        if (this.capture)
+        {
+            event.preventDefault();
+        }
+
+        if (event.pointerType === 'mouse' || event.pointerType === 0x00000004)
+        {
+            this.input.mousePointer.withinGame = true;
+        }
+        else
+        {
+            var pointer = this.input.getPointerFromIdentifier(event.identifier);
+
+            if (pointer)
+            {
+                pointer.withinGame = true;
+            }
+        }
+
+        if (this.input.mouse.mouseOverCallback)
+        {
+            this.input.mouse.mouseOverCallback.call(this.input.mouse.callbackContext, event);
+        }
 
     },
 
@@ -1942,19 +2189,361 @@ Phaser.MSPointer.prototype = {
     */
     stop: function () {
 
-        this.game.canvas.removeEventListener('MSPointerDown', this._onMSPointerDown);
-        this.game.canvas.removeEventListener('MSPointerMove', this._onMSPointerMove);
-        this.game.canvas.removeEventListener('MSPointerUp', this._onMSPointerUp);
+        var canvas = this.game.canvas;
 
-        this.game.canvas.removeEventListener('pointerDown', this._onMSPointerDown);
-        this.game.canvas.removeEventListener('pointerMove', this._onMSPointerMove);
-        this.game.canvas.removeEventListener('pointerUp', this._onMSPointerUp);
+        canvas.removeEventListener('MSPointerDown', this._onMSPointerDown);
+        canvas.removeEventListener('MSPointerMove', this._onMSPointerMove);
+        canvas.removeEventListener('MSPointerUp', this._onMSPointerUp);
+        canvas.removeEventListener('MSPointerOver', this._onMSPointerOver);
+        canvas.removeEventListener('MSPointerOut', this._onMSPointerOut);
+
+        canvas.removeEventListener('pointerdown', this._onMSPointerDown);
+        canvas.removeEventListener('pointermove', this._onMSPointerMove);
+        canvas.removeEventListener('pointerup', this._onMSPointerUp);
+        canvas.removeEventListener('pointerover', this._onMSPointerOver);
+        canvas.removeEventListener('pointerout', this._onMSPointerOut);
+
+        window.removeEventListener('MSPointerUp', this._onMSPointerUpGlobal);
+        window.removeEventListener('pointerup', this._onMSPointerUpGlobal);
 
     }
 
 };
 
 Phaser.MSPointer.prototype.constructor = Phaser.MSPointer;
+
+/**
+* @author       Richard Davey <rich@photonstorm.com>
+* @author       @karlmacklin <tacklemcclean@gmail.com>
+* @copyright    2015 Photon Storm Ltd.
+* @license      {@link https://github.com/photonstorm/phaser/blob/master/license.txt|MIT License}
+*/
+
+/**
+* DeviceButtons belong to both `Phaser.Pointer` and `Phaser.SinglePad` (Gamepad) instances.
+*
+* For Pointers they represent the various buttons that can exist on mice and pens, such as the left button, right button,
+* middle button and advanced buttons like back and forward.
+*
+* Access them via `Pointer.leftbutton`, `Pointer.rightButton` and so on.
+*
+* On Gamepads they represent all buttons on the pad: from shoulder buttons to action buttons.
+*
+* At the time of writing this there are device limitations you should be aware of:
+*
+* - On Windows, if you install a mouse driver, and its utility software allows you to customize button actions 
+*   (e.g., IntelliPoint and SetPoint), the middle (wheel) button, the 4th button, and the 5th button might not be set, 
+*   even when they are pressed.
+* - On Linux (GTK), the 4th button and the 5th button are not supported.
+* - On Mac OS X 10.5 there is no platform API for implementing any advanced buttons.
+* 
+* @class Phaser.DeviceButton
+* @constructor
+* @param {Phaser.Pointer|Phaser.SinglePad} parent - A reference to the parent of this button. Either a Pointer or a Gamepad.
+* @param {number} buttonCode - The button code this DeviceButton is responsible for.
+*/
+Phaser.DeviceButton = function (parent, buttonCode) {
+
+    /**
+    * @property {Phaser.Pointer|Phaser.SinglePad} parent - A reference to the Pointer or Gamepad that owns this button.
+    */
+    this.parent = parent;
+
+    /**
+    * @property {Phaser.Game} game - A reference to the currently running game.
+    */
+    this.game = parent.game;
+
+    /**
+    * @property {object} event - The DOM event that caused the change in button state.
+    * @default
+    */
+    this.event = null;
+
+    /**
+    * @property {boolean} isDown - The "down" state of the button.
+    * @default
+    */
+    this.isDown = false;
+
+    /**
+    * @property {boolean} isUp - The "up" state of the button.
+    * @default
+    */
+    this.isUp = true;
+
+    /**
+    * @property {number} timeDown - The timestamp when the button was last pressed down.
+    * @default
+    */
+    this.timeDown = 0;
+
+    /**
+    * If the button is down this value holds the duration of that button press and is constantly updated.
+    * If the button is up it holds the duration of the previous down session.
+    * The value is stored in milliseconds.
+    * @property {number} duration
+    * @default
+    */
+    this.duration = 0;
+
+    /**
+    * @property {number} timeUp - The timestamp when the button was last released.
+    * @default
+    */
+    this.timeUp = 0;
+
+    /**
+    * Gamepad only.
+    * If a button is held down this holds down the number of times the button has 'repeated'.
+    * @property {number} repeats
+    * @default
+    */
+    this.repeats = 0;
+
+    /**
+    * True if the alt key was held down when this button was last pressed or released.
+    * Not supported on Gamepads.
+    * @property {boolean} altKey
+    * @default
+    */
+    this.altKey = false;
+
+    /**
+    * True if the shift key was held down when this button was last pressed or released.
+    * Not supported on Gamepads.
+    * @property {boolean} shiftKey
+    * @default
+    */
+    this.shiftKey = false;
+
+    /**
+    * True if the control key was held down when this button was last pressed or released.
+    * Not supported on Gamepads.
+    * @property {boolean} ctrlKey
+    * @default
+    */
+    this.ctrlKey = false;
+
+    /**
+    * @property {number} value - Button value. Mainly useful for checking analog buttons (like shoulder triggers) on Gamepads.
+    * @default
+    */
+    this.value = 0;
+
+    /**
+    * @property {number} buttonCode - The buttoncode of this button if a Gamepad, or the DOM button event value if a Pointer.
+    */
+    this.buttonCode = buttonCode;
+
+    /**
+    * This Signal is dispatched every time this DeviceButton is pressed down.
+    * It is only dispatched once (until the button is released again).
+    * When dispatched it sends 2 arguments: A reference to this DeviceButton and the value of the button.
+    * @property {Phaser.Signal} onDown
+    */
+    this.onDown = new Phaser.Signal();
+
+    /**
+    * This Signal is dispatched every time this DeviceButton is released from a down state.
+    * It is only dispatched once (until the button is pressed again).
+    * When dispatched it sends 2 arguments: A reference to this DeviceButton and the value of the button.
+    * @property {Phaser.Signal} onUp
+    */
+    this.onUp = new Phaser.Signal();
+
+    /**
+    * Gamepad only.
+    * This Signal is dispatched every time this DeviceButton changes floating value (between, but not exactly, 0 and 1).
+    * When dispatched it sends 2 arguments: A reference to this DeviceButton and the value of the button.
+    * @property {Phaser.Signal} onFloat
+    */
+    this.onFloat = new Phaser.Signal();
+
+};
+
+Phaser.DeviceButton.prototype = {
+
+    /**
+    * Called automatically by Phaser.Pointer and Phaser.SinglePad.
+    * Handles the button down state.
+    * 
+    * @method Phaser.DeviceButton#start
+    * @protected
+    * @param {object} [event] - The DOM event that triggered the button change.
+    * @param {number} [value] - The button value. Only get for Gamepads.
+    */
+    start: function (event, value) {
+
+        if (this.isDown)
+        {
+            return;
+        }
+
+        this.isDown = true;
+        this.isUp = false;
+        this.timeDown = this.game.time.time;
+        this.duration = 0;
+        this.repeats = 0;
+
+        this.event = event;
+        this.value = value;
+
+        if (event)
+        {
+            this.altKey = event.altKey;
+            this.shiftKey = event.shiftKey;
+            this.ctrlKey = event.ctrlKey;
+        }
+
+        this.onDown.dispatch(this, value);
+
+    },
+
+    /**
+    * Called automatically by Phaser.Pointer and Phaser.SinglePad.
+    * Handles the button up state.
+    * 
+    * @method Phaser.DeviceButton#stop
+    * @protected
+    * @param {object} [event] - The DOM event that triggered the button change.
+    * @param {number} [value] - The button value. Only get for Gamepads.
+    */
+    stop: function (event, value) {
+
+        if (this.isUp)
+        {
+            return;
+        }
+
+        this.isDown = false;
+        this.isUp = true;
+        this.timeUp = this.game.time.time;
+
+        this.event = event;
+        this.value = value;
+
+        if (event)
+        {
+            this.altKey = event.altKey;
+            this.shiftKey = event.shiftKey;
+            this.ctrlKey = event.ctrlKey;
+        }
+
+        this.onUp.dispatch(this, value);
+
+    },
+
+    /**
+    * Called automatically by Phaser.SinglePad.
+    * 
+    * @method Phaser.DeviceButton#padFloat
+    * @protected
+    * @param {number} value - Button value
+    */
+    padFloat: function (value) {
+
+        this.value = value;
+
+        this.onFloat.dispatch(this, value);
+
+    },
+
+    /**
+    * Returns the "just pressed" state of this button.
+    * Just pressed is considered true if the button was pressed down within the duration given (default 250ms).
+    * 
+    * @method Phaser.DeviceButton#justPressed
+    * @param {number} [duration=250] - The duration in ms below which the button is considered as being just pressed.
+    * @return {boolean} True if the button is just pressed otherwise false.
+    */
+    justPressed: function (duration) {
+
+        duration = duration || 250;
+
+        return (this.isDown && (this.timeDown + duration) > this.game.time.time);
+
+    },
+
+    /**
+    * Returns the "just released" state of this button.
+    * Just released is considered as being true if the button was released within the duration given (default 250ms).
+    * 
+    * @method Phaser.DeviceButton#justReleased
+    * @param {number} [duration=250] - The duration in ms below which the button is considered as being just released.
+    * @return {boolean} True if the button is just released otherwise false.
+    */
+    justReleased: function (duration) {
+
+        duration = duration || 250;
+
+        return (this.isUp && (this.timeUp + duration) > this.game.time.time);
+
+    },
+
+    /**
+    * Resets this DeviceButton, changing it to an isUp state and resetting the duration and repeats counters.
+    * 
+    * @method Phaser.DeviceButton#reset
+    */
+    reset: function () {
+
+        this.isDown = false;
+        this.isUp = true;
+
+        this.timeDown = this.game.time.time;
+        this.duration = 0;
+        this.repeats = 0;
+
+        this.altKey = false;
+        this.shiftKey = false;
+        this.ctrlKey = false;
+
+    },
+
+    /**
+    * Destroys this DeviceButton, this disposes of the onDown, onUp and onFloat signals 
+    * and clears the parent and game references.
+    * 
+    * @method Phaser.DeviceButton#destroy
+    */
+    destroy: function () {
+
+        this.onDown.dispose();
+        this.onUp.dispose();
+        this.onFloat.dispose();
+
+        this.parent = null;
+        this.game = null;
+
+    }
+
+};
+
+Phaser.DeviceButton.prototype.constructor = Phaser.DeviceButton;
+
+/**
+* How long the button has been held down.
+* If not currently down it returns -1.
+* 
+* @name Phaser.DeviceButton#duration
+* @property {number} duration
+* @readonly
+*/
+Object.defineProperty(Phaser.DeviceButton.prototype, "duration", {
+
+    get: function () {
+
+        if (this.isUp)
+        {
+            return -1;
+        }
+
+        return this.game.time.time - this.timeDown;
+
+    }
+
+});
 
 /**
 * @author       Richard Davey <rich@photonstorm.com>
@@ -2022,48 +2611,80 @@ Phaser.Pointer = function (game, id) {
     this.button = null;
 
     /**
-    * True if the left mouse button is being held down, or in PointerEvent based devices it represents a Touch contact or Pen contact.
-    * @property {boolean} leftButton
+    * If this Pointer is a Mouse or Pen / Stylus then you can access its left button directly through this property.
+    * 
+    * The DeviceButton has its own properties such as `isDown`, `duration` and methods like `justReleased` for more fine-grained
+    * button control.
+    * 
+    * @property {Phaser.DeviceButton} leftButton
     * @default
     */
-    this.leftButton = false;
+    this.leftButton = new Phaser.DeviceButton(this, Phaser.Pointer.LEFT_BUTTON);
 
     /**
-    * True if the middle mouse button is being held down.
-    * @property {boolean} middleButton
+    * If this Pointer is a Mouse or Pen / Stylus then you can access its middle button directly through this property.
+    * 
+    * The DeviceButton has its own properties such as `isDown`, `duration` and methods like `justReleased` for more fine-grained
+    * button control.
+    *
+    * Please see the DeviceButton docs for details on browser button limitations.
+    * 
+    * @property {Phaser.DeviceButton} middleButton
     * @default
     */
-    this.middleButton = false;
+    this.middleButton = new Phaser.DeviceButton(this, Phaser.Pointer.MIDDLE_BUTTON);
 
     /**
-    * True if the right mouse button is being held down, or in PointerEvent based devices it represents a Pen contact with a barrel button.
-    * @property {boolean} rightButton
+    * If this Pointer is a Mouse or Pen / Stylus then you can access its right button directly through this property.
+    * 
+    * The DeviceButton has its own properties such as `isDown`, `duration` and methods like `justReleased` for more fine-grained
+    * button control.
+    *
+    * Please see the DeviceButton docs for details on browser button limitations.
+    * 
+    * @property {Phaser.DeviceButton} rightButton
     * @default
     */
-    this.rightButton = false;
+    this.rightButton = new Phaser.DeviceButton(this, Phaser.Pointer.RIGHT_BUTTON);
 
     /**
-    * True if the X1 (back) mouse button is being held down. On Linux (GTK) this is unsupported.
-    * On Windows if advanced pointer software (such as IntelliPoint) is installed this doesn't register.
-    * @property {boolean} backButton
+    * If this Pointer is a Mouse or Pen / Stylus then you can access its X1 (back) button directly through this property.
+    * 
+    * The DeviceButton has its own properties such as `isDown`, `duration` and methods like `justReleased` for more fine-grained
+    * button control.
+    *
+    * Please see the DeviceButton docs for details on browser button limitations.
+    * 
+    * @property {Phaser.DeviceButton} backButton
     * @default
     */
-    this.backButton = false;
+    this.backButton = new Phaser.DeviceButton(this, Phaser.Pointer.BACK_BUTTON);
 
     /**
-    * True if the X2 (forward) mouse button is being held down. On Linux (GTK) this is unsupported.
-    * On Windows if advanced pointer software (such as IntelliPoint) is installed this doesn't register.
-    * @property {boolean} forwardButton
+    * If this Pointer is a Mouse or Pen / Stylus then you can access its X2 (forward) button directly through this property.
+    * 
+    * The DeviceButton has its own properties such as `isDown`, `duration` and methods like `justReleased` for more fine-grained
+    * button control.
+    *
+    * Please see the DeviceButton docs for details on browser button limitations.
+    * 
+    * @property {Phaser.DeviceButton} forwardButton
     * @default
     */
-    this.forwardButton = false;
+    this.forwardButton = new Phaser.DeviceButton(this, Phaser.Pointer.FORWARD_BUTTON);
 
     /**
-    * True if the Eraser pen button is being held down. Only works on PointerEvent supported devices.
-    * @property {boolean} eraserButton
+    * If this Pointer is a Pen / Stylus then you can access its eraser button directly through this property.
+    * 
+    * The DeviceButton has its own properties such as `isDown`, `duration` and methods like `justReleased` for more fine-grained
+    * button control.
+    *
+    * Please see the DeviceButton docs for details on browser button limitations.
+    * 
+    * @property {Phaser.DeviceButton} eraserButton
     * @default
     */
-    this.eraserButton = false;
+    this.eraserButton = new Phaser.DeviceButton(this, Phaser.Pointer.ERASER_BUTTON);
 
     /**
     * @property {boolean} _holdSent - Local private variable to store the status of dispatching a hold event.
@@ -2162,19 +2783,22 @@ Phaser.Pointer = function (game, id) {
     this.y = -1;
 
     /**
-    * @property {boolean} isMouse - If the Pointer is a mouse this is true, otherwise false.
-    * @default
+    * @property {boolean} isMouse - If the Pointer is a mouse or pen / stylus this is true, otherwise false.
     */
-    this.isMouse = false;
+    this.isMouse = (id === 0);
 
     /**
-    * @property {boolean} isDown - If the Pointer is touching the touchscreen, or *any* mouse button is held down, isDown is set to true.
+    * If the Pointer is touching the touchscreen, or *any* mouse or pen button is held down, isDown is set to true.
+    * If you need to check a specific mouse or pen button then use the button properties, i.e. Pointer.rightButton.isDown.
+    * @property {boolean} isDown
     * @default
     */
     this.isDown = false;
 
     /**
-    * @property {boolean} isUp - If the Pointer is not touching the touchscreen, or *all* mouse buttons are up, isUp is set to true.
+    * If the Pointer is not touching the touchscreen, or *all* mouse or pen buttons are up, isUp is set to true.
+    * If you need to check a specific mouse or pen button then use the button properties, i.e. Pointer.rightButton.isUp.
+    * @property {boolean} isUp
     * @default
     */
     this.isUp = true;
@@ -2248,11 +2872,6 @@ Phaser.Pointer = function (game, id) {
     * @property {Phaser.Circle} circle
     */
     this.circle = new Phaser.Circle(0, 0, 44);
-
-    if (id === 0)
-    {
-        this.isMouse = true;
-    }
 
     /**
     * Click trampolines associated with this pointer. See `addClickTrampoline`.
@@ -2332,15 +2951,106 @@ Phaser.Pointer.prototype = {
     */
     resetButtons: function () {
 
-        this.leftButton = false;
-        this.middleButton = false;
-        this.rightButton = false;
-        this.backButton = false;
-        this.forwardButton = false;
-        this.eraserButton = false;
-
-        this.isUp = true;
         this.isDown = false;
+        this.isUp = true;
+
+        if (this.isMouse)
+        {
+            this.leftButton.reset();
+            this.middleButton.reset();
+            this.rightButton.reset();
+            this.backButton.reset();
+            this.forwardButton.reset();
+            this.eraserButton.reset();
+        }
+
+    },
+
+    /**
+    * Called by updateButtons.
+    * 
+    * @method Phaser.Pointer#processButtonsDown
+    * @private
+    * @param {integer} buttons - The DOM event.buttons property.
+    * @param {MouseEvent} event - The DOM event.
+    */
+    processButtonsDown: function (buttons, event) {
+
+        //  Note: These are bitwise checks, not booleans
+
+        if (Phaser.Pointer.LEFT_BUTTON & buttons)
+        {
+            this.leftButton.start(event);
+        }
+
+        if (Phaser.Pointer.RIGHT_BUTTON & buttons)
+        {
+            this.rightButton.start(event);
+        }
+                
+        if (Phaser.Pointer.MIDDLE_BUTTON & buttons)
+        {
+            this.middleButton.start(event);
+        }
+
+        if (Phaser.Pointer.BACK_BUTTON & buttons)
+        {
+            this.backButton.start(event);
+        }
+
+        if (Phaser.Pointer.FORWARD_BUTTON & buttons)
+        {
+            this.forwardButton.start(event);
+        }
+
+        if (Phaser.Pointer.ERASER_BUTTON & buttons)
+        {
+            this.eraserButton.start(event);
+        }
+
+    },
+
+    /**
+    * Called by updateButtons.
+    * 
+    * @method Phaser.Pointer#processButtonsUp
+    * @private
+    * @param {integer} buttons - The DOM event.buttons property.
+    * @param {MouseEvent} event - The DOM event.
+    */
+    processButtonsUp: function (button, event) {
+
+        //  Note: These are bitwise checks, not booleans
+
+        if (button === Phaser.Mouse.LEFT_BUTTON)
+        {
+            this.leftButton.stop(event);
+        }
+
+        if (button === Phaser.Mouse.RIGHT_BUTTON)
+        {
+            this.rightButton.stop(event);
+        }
+                
+        if (button === Phaser.Mouse.MIDDLE_BUTTON)
+        {
+            this.middleButton.stop(event);
+        }
+
+        if (button === Phaser.Mouse.BACK_BUTTON)
+        {
+            this.backButton.stop(event);
+        }
+
+        if (button === Phaser.Mouse.FORWARD_BUTTON)
+        {
+            this.forwardButton.stop(event);
+        }
+
+        if (button === 5)
+        {
+            this.eraserButton.stop(event);
+        }
 
     },
 
@@ -2356,31 +3066,45 @@ Phaser.Pointer.prototype = {
 
         this.button = event.button;
 
-        var buttons = event.buttons;
+        var down = (event.type.toLowerCase().substr(-4) === 'down');
 
-        if (typeof buttons === 'undefined')
+        if (event.buttons !== undefined)
         {
-            return;
+            if (down)
+            {
+                this.processButtonsDown(event.buttons, event);
+            }
+            else
+            {
+                this.processButtonsUp(event.button, event);
+            }
         }
-
-        this.leftButton = (Phaser.Pointer.LEFT_BUTTON & buttons) ? true : false;
-        this.rightButton = (Phaser.Pointer.RIGHT_BUTTON & buttons) ? true : false;
-        this.middleButton = (Phaser.Pointer.MIDDLE_BUTTON & buttons) ? true : false;
-        this.backButton = (Phaser.Pointer.BACK_BUTTON & buttons) ? true : false;
-        this.forwardButton = (Phaser.Pointer.FORWARD_BUTTON & buttons) ? true : false;
-        this.eraserButton = (Phaser.Pointer.ERASER_BUTTON & buttons) ? true : false;
+        else
+        {
+            //  No buttons property (like Safari on OSX when using a trackpad)
+            if (down)
+            {
+                this.leftButton.start(event);
+            }
+            else
+            {
+                this.leftButton.stop(event);
+                this.rightButton.stop(event);
+            }
+        }
 
         //  On OS X (and other devices with trackpads) you have to press CTRL + the pad
         //  to initiate a right-click event, so we'll check for that here
-        if (event.ctrlKey && this.leftButton)
+
+        if (event.ctrlKey && this.leftButton.isDown)
         {
-            this.rightButton = true;
+            this.rightButton.start(event);
         }
 
         this.isUp = true;
         this.isDown = false;
 
-        if (this.leftButton || this.rightButton || this.middleButton || this.backButton || this.forwardButton || this.eraserButton)
+        if (this.leftButton.isDown || this.rightButton.isDown || this.middleButton.isDown || this.backButton.isDown || this.forwardButton.isDown || this.eraserButton.isDown)
         {
             this.isUp = false;
             this.isDown = true;
@@ -2403,12 +3127,21 @@ Phaser.Pointer.prototype = {
         this.identifier = event.identifier;
         this.target = event.target;
 
-        this.updateButtons(event);
+        if (this.isMouse)
+        {
+            this.updateButtons(event);
+        }
+        else
+        {
+            this.isDown = true;
+            this.isUp = false;
+        }
 
-        this._history = [];
         this.active = true;
         this.withinGame = true;
         this.dirty = false;
+
+        this._history = [];
         this._clickTrampolines = null;
         this._trampolineTargetObject = null;
 
@@ -2505,14 +3238,21 @@ Phaser.Pointer.prototype = {
     */
     move: function (event, fromClick) {
 
-        if (this.game.input.pollLocked)
+        var input = this.game.input;
+
+        if (input.pollLocked)
         {
             return;
         }
 
-        if (typeof fromClick === 'undefined') { fromClick = false; }
+        if (fromClick === undefined) { fromClick = false; }
 
-        if (fromClick)
+        if (event.button !== undefined)
+        {
+            this.button = event.button;
+        }
+
+        if (fromClick && this.isMouse)
         {
             this.updateButtons(event);
         }
@@ -2526,7 +3266,7 @@ Phaser.Pointer.prototype = {
         this.screenX = event.screenX;
         this.screenY = event.screenY;
 
-        if (this.isMouse && this.game.input.mouse.locked && !fromClick)
+        if (this.isMouse && input.mouse.locked && !fromClick)
         {
             this.rawMovementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
             this.rawMovementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
@@ -2535,23 +3275,23 @@ Phaser.Pointer.prototype = {
             this.movementY += this.rawMovementY;
         }
 
-        this.x = (this.pageX - this.game.scale.offset.x) * this.game.input.scale.x;
-        this.y = (this.pageY - this.game.scale.offset.y) * this.game.input.scale.y;
+        this.x = (this.pageX - this.game.scale.offset.x) * input.scale.x;
+        this.y = (this.pageY - this.game.scale.offset.y) * input.scale.y;
 
         this.position.setTo(this.x, this.y);
         this.circle.x = this.x;
         this.circle.y = this.y;
 
-        if (this.game.input.multiInputOverride === Phaser.Input.MOUSE_OVERRIDES_TOUCH ||
-            this.game.input.multiInputOverride === Phaser.Input.MOUSE_TOUCH_COMBINE ||
-            (this.game.input.multiInputOverride === Phaser.Input.TOUCH_OVERRIDES_MOUSE && this.game.input.totalActivePointers === 0))
+        if (input.multiInputOverride === Phaser.Input.MOUSE_OVERRIDES_TOUCH ||
+            input.multiInputOverride === Phaser.Input.MOUSE_TOUCH_COMBINE ||
+            (input.multiInputOverride === Phaser.Input.TOUCH_OVERRIDES_MOUSE && input.totalActivePointers === 0))
         {
-            this.game.input.activePointer = this;
-            this.game.input.x = this.x;
-            this.game.input.y = this.y;
-            this.game.input.position.setTo(this.game.input.x, this.game.input.y);
-            this.game.input.circle.x = this.game.input.x;
-            this.game.input.circle.y = this.game.input.y;
+            input.activePointer = this;
+            input.x = this.x;
+            input.y = this.y;
+            input.position.setTo(input.x, input.y);
+            input.circle.x = input.x;
+            input.circle.y = input.y;
         }
 
         this.withinGame = this.game.scale.bounds.contains(this.pageX, this.pageY);
@@ -2562,11 +3302,11 @@ Phaser.Pointer.prototype = {
             return this;
         }
 
-        var i = this.game.input.moveCallbacks.length;
+        var i = input.moveCallbacks.length;
 
         while (i--)
         {
-            this.game.input.moveCallbacks[i].callback.call(this.game.input.moveCallbacks[i].context, this, this.x, this.y, fromClick);
+            input.moveCallbacks[i].callback.call(input.moveCallbacks[i].context, this, this.x, this.y, fromClick);
         }
 
         //  Easy out if we're dragging something and it still exists
@@ -2577,7 +3317,7 @@ Phaser.Pointer.prototype = {
                 this.targetObject = null;
             }
         }
-        else if (this.game.input.interactiveItems.total > 0)
+        else if (input.interactiveItems.total > 0)
         {
             this.processInteractiveObjects(fromClick);
         }
@@ -2723,8 +3463,6 @@ Phaser.Pointer.prototype = {
             return;
         }
 
-        this.updateButtons(event);
-
         this.timeUp = this.game.time.time;
 
         if (this.game.input.multiInputOverride === Phaser.Input.MOUSE_OVERRIDES_TOUCH ||
@@ -2752,13 +3490,23 @@ Phaser.Pointer.prototype = {
             }
         }
 
+        if (this.isMouse)
+        {
+            this.updateButtons(event);
+        }
+        else
+        {
+            this.isDown = false;
+            this.isUp = true;
+        }
+
         //  Mouse is always active
         if (this.id > 0)
         {
             this.active = false;
         }
 
-        this.withinGame = false;
+        this.withinGame = this.game.scale.bounds.contains(event.pageX, event.pageY);
         this.pointerId = null;
         this.identifier = null;
         
@@ -2936,6 +3684,7 @@ Phaser.Pointer.prototype.constructor = Phaser.Pointer;
 /**
 * How long the Pointer has been depressed on the touchscreen or *any* of the mouse buttons have been held down.
 * If not currently down it returns -1.
+* If you need to test a specific mouse or pen button then access the buttons directly, i.e. `Pointer.rightButton.duration`.
 * 
 * @name Phaser.Pointer#duration
 * @property {number} duration
@@ -3696,7 +4445,7 @@ Phaser.InputHandler.prototype = {
     start: function (priority, useHandCursor) {
 
         priority = priority || 0;
-        if (typeof useHandCursor === 'undefined') { useHandCursor = false; }
+        if (useHandCursor === undefined) { useHandCursor = false; }
 
         //  Turning on
         if (this.enabled === false)
@@ -3873,7 +4622,7 @@ Phaser.InputHandler.prototype = {
     */
     validForInput: function (highestID, highestRenderID, includePixelPerfect) {
 
-        if (typeof includePixelPerfect === 'undefined') { includePixelPerfect = true; }
+        if (includePixelPerfect === undefined) { includePixelPerfect = true; }
 
         if (this.sprite.scale.x === 0 || this.sprite.scale.y === 0 || this.priorityID < this.game.input.minPriorityID)
         {
@@ -4009,7 +4758,7 @@ Phaser.InputHandler.prototype = {
 
         if (this.enabled)
         {
-            if (typeof index === 'undefined')
+            if (index === undefined)
             {
                 for (var i = 0; i < 10; i++)
                 {
@@ -4039,7 +4788,7 @@ Phaser.InputHandler.prototype = {
 
         if (this.enabled)
         {
-            if (typeof index === 'undefined')
+            if (index === undefined)
             {
                 for (var i = 0; i < 10; i++)
                 {
@@ -4120,7 +4869,10 @@ Phaser.InputHandler.prototype = {
         //  Need to pass it a temp point, in case we need it again for the pixel check
         if (this.game.input.hitTest(this.sprite, pointer, this._tempPoint))
         {
-            if (typeof fastTest === 'undefined') { fastTest = false; }
+            if (fastTest === undefined)
+            {
+                fastTest = false;
+            }
 
             if (!fastTest && this.pixelPerfectClick)
             {
@@ -4155,7 +4907,10 @@ Phaser.InputHandler.prototype = {
         //  Need to pass it a temp point, in case we need it again for the pixel check
         if (this.game.input.hitTest(this.sprite, pointer, this._tempPoint))
         {
-            if (typeof fastTest === 'undefined') { fastTest = false; }
+            if (fastTest === undefined)
+            {
+                fastTest = false;
+            }
 
             if (!fastTest && this.pixelPerfectOver)
             {
@@ -4285,7 +5040,7 @@ Phaser.InputHandler.prototype = {
     * 
     * @method Phaser.InputHandler#_pointerOverHandler
     * @private
-    * @param {Phaser.Pointer} pointer
+    * @param {Phaser.Pointer} pointer - The pointer that triggered the event
     */
     _pointerOverHandler: function (pointer) {
 
@@ -4295,15 +5050,17 @@ Phaser.InputHandler.prototype = {
             return;
         }
 
-        if (this._pointerData[pointer.id].isOver === false || pointer.dirty)
-        {
-            this._pointerData[pointer.id].isOver = true;
-            this._pointerData[pointer.id].isOut = false;
-            this._pointerData[pointer.id].timeOver = this.game.time.time;
-            this._pointerData[pointer.id].x = pointer.x - this.sprite.x;
-            this._pointerData[pointer.id].y = pointer.y - this.sprite.y;
+        var data = this._pointerData[pointer.id];
 
-            if (this.useHandCursor && this._pointerData[pointer.id].isDragged === false)
+        if (data.isOver === false || pointer.dirty)
+        {
+            data.isOver = true;
+            data.isOut = false;
+            data.timeOver = this.game.time.time;
+            data.x = pointer.x - this.sprite.x;
+            data.y = pointer.y - this.sprite.y;
+
+            if (this.useHandCursor && data.isDragged === false)
             {
                 this.game.canvas.style.cursor = "pointer";
                 this._setHandCursor = true;
@@ -4322,7 +5079,7 @@ Phaser.InputHandler.prototype = {
     * 
     * @method Phaser.InputHandler#_pointerOutHandler
     * @private
-    * @param {Phaser.Pointer} pointer
+    * @param {Phaser.Pointer} pointer - The pointer that triggered the event.
     */
     _pointerOutHandler: function (pointer) {
 
@@ -4332,11 +5089,13 @@ Phaser.InputHandler.prototype = {
             return;
         }
 
-        this._pointerData[pointer.id].isOver = false;
-        this._pointerData[pointer.id].isOut = true;
-        this._pointerData[pointer.id].timeOut = this.game.time.time;
+        var data = this._pointerData[pointer.id];
 
-        if (this.useHandCursor && this._pointerData[pointer.id].isDragged === false)
+        data.isOver = false;
+        data.isOut = true;
+        data.timeOut = this.game.time.time;
+
+        if (this.useHandCursor && data.isDragged === false)
         {
             this.game.canvas.style.cursor = "default";
             this._setHandCursor = false;
@@ -4350,10 +5109,11 @@ Phaser.InputHandler.prototype = {
     },
 
     /**
-    * Internal method handling the touched event.
+    * Internal method handling the touched / clicked event.
+    * 
     * @method Phaser.InputHandler#_touchedHandler
     * @private
-    * @param {Phaser.Pointer} pointer
+    * @param {Phaser.Pointer} pointer - The pointer that triggered the event.
     */
     _touchedHandler: function (pointer) {
 
@@ -4363,16 +5123,18 @@ Phaser.InputHandler.prototype = {
             return;
         }
 
-        if (!this._pointerData[pointer.id].isDown && this._pointerData[pointer.id].isOver)
+        var data = this._pointerData[pointer.id];
+
+        if (!data.isDown && data.isOver)
         {
             if (this.pixelPerfectClick && !this.checkPixel(null, null, pointer))
             {
                 return;
             }
 
-            this._pointerData[pointer.id].isDown = true;
-            this._pointerData[pointer.id].isUp = false;
-            this._pointerData[pointer.id].timeDown = this.game.time.time;
+            data.isDown = true;
+            data.isUp = false;
+            data.timeDown = this.game.time.time;
 
             if (this.sprite && this.sprite.events)
             {
@@ -4413,40 +5175,39 @@ Phaser.InputHandler.prototype = {
             return;
         }
 
+        var data = this._pointerData[pointer.id];
+
         //  If was previously touched by this Pointer, check if still is AND still over this item
-        if (this._pointerData[pointer.id].isDown && pointer.isUp)
+        if (data.isDown && pointer.isUp)
         {
-            this._pointerData[pointer.id].isDown = false;
-            this._pointerData[pointer.id].isUp = true;
-            this._pointerData[pointer.id].timeUp = this.game.time.time;
-            this._pointerData[pointer.id].downDuration = this._pointerData[pointer.id].timeUp - this._pointerData[pointer.id].timeDown;
+            data.isDown = false;
+            data.isUp = true;
+            data.timeUp = this.game.time.time;
+            data.downDuration = data.timeUp - data.timeDown;
 
             //  Only release the InputUp signal if the pointer is still over this sprite
-            if (this.checkPointerOver(pointer))
+            var isOver = this.checkPointerOver(pointer);
+
+            if (this.sprite && this.sprite.events)
             {
-                //  Release the inputUp signal and provide optional parameter if pointer is still over the sprite or not
-                if (this.sprite && this.sprite.events)
+                this.sprite.events.onInputUp$dispatch(this.sprite, pointer, isOver);
+
+                //  The onInputUp event may have changed the sprite so that checkPointerOver is no longer true, so update it.
+                if (isOver)
                 {
-                    this.sprite.events.onInputUp$dispatch(this.sprite, pointer, true);
+                    isOver = this.checkPointerOver(pointer);
                 }
             }
-            else
-            {
-                //  Release the inputUp signal and provide optional parameter if pointer is still over the sprite or not
-                if (this.sprite && this.sprite.events)
-                {
-                    this.sprite.events.onInputUp$dispatch(this.sprite, pointer, false);
-                }
+            
+            data.isOver = isOver;
 
-                //  Pointer outside the sprite? Reset the cursor
-                if (this.useHandCursor)
-                {
-                    this.game.canvas.style.cursor = "default";
-                    this._setHandCursor = false;
-                }
+            if (!isOver && this.useHandCursor)
+            {
+                this.game.canvas.style.cursor = "default";
+                this._setHandCursor = false;
             }
 
-            //  It's possible the onInputUp event created a new Sprite that is on-top of this one, so we ought to force a Pointer update
+            //  It's possible the onInputUp event created a new Sprite that is on-top of this one, so force a Pointer update
             pointer.dirty = true;
 
             //  Stop drag
@@ -4662,12 +5423,12 @@ Phaser.InputHandler.prototype = {
     */
     enableDrag: function (lockCenter, bringToTop, pixelPerfect, alphaThreshold, boundsRect, boundsSprite) {
 
-        if (typeof lockCenter === 'undefined') { lockCenter = false; }
-        if (typeof bringToTop === 'undefined') { bringToTop = false; }
-        if (typeof pixelPerfect === 'undefined') { pixelPerfect = false; }
-        if (typeof alphaThreshold === 'undefined') { alphaThreshold = 255; }
-        if (typeof boundsRect === 'undefined') { boundsRect = null; }
-        if (typeof boundsSprite === 'undefined') { boundsSprite = null; }
+        if (lockCenter === undefined) { lockCenter = false; }
+        if (bringToTop === undefined) { bringToTop = false; }
+        if (pixelPerfect === undefined) { pixelPerfect = false; }
+        if (alphaThreshold === undefined) { alphaThreshold = 255; }
+        if (boundsRect === undefined) { boundsRect = null; }
+        if (boundsSprite === undefined) { boundsSprite = null; }
 
         this._dragPoint = new Phaser.Point();
         this.draggable = true;
@@ -4839,8 +5600,8 @@ Phaser.InputHandler.prototype = {
     */
     setDragLock: function (allowHorizontal, allowVertical) {
 
-        if (typeof allowHorizontal === 'undefined') { allowHorizontal = true; }
-        if (typeof allowVertical === 'undefined') { allowVertical = true; }
+        if (allowHorizontal === undefined) { allowHorizontal = true; }
+        if (allowVertical === undefined) { allowVertical = true; }
 
         this.allowHorizontalDrag = allowHorizontal;
         this.allowVerticalDrag = allowVertical;
@@ -4860,10 +5621,10 @@ Phaser.InputHandler.prototype = {
     */
     enableSnap: function (snapX, snapY, onDrag, onRelease, snapOffsetX, snapOffsetY) {
 
-        if (typeof onDrag === 'undefined') { onDrag = true; }
-        if (typeof onRelease === 'undefined') { onRelease = false; }
-        if (typeof snapOffsetX === 'undefined') { snapOffsetX = 0; }
-        if (typeof snapOffsetY === 'undefined') { snapOffsetY = 0; }
+        if (onDrag === undefined) { onDrag = true; }
+        if (onRelease === undefined) { onRelease = false; }
+        if (snapOffsetX === undefined) { snapOffsetX = 0; }
+        if (snapOffsetY === undefined) { snapOffsetY = 0; }
 
         this.snapX = snapX;
         this.snapY = snapY;

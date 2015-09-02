@@ -190,7 +190,7 @@ Phaser.ArraySet.prototype = {
     */
     removeAll: function (destroy) {
 
-        if (typeof destroy === 'undefined') { destroy = false; }
+        if (destroy === undefined) { destroy = false; }
 
         var i = this.list.length;
 
@@ -298,7 +298,7 @@ Phaser.ArrayUtils = {
     * Fetch a random entry from the given array.
     *
     * Will return null if there are no array items that fall within the specified range
-    * or if there is no item for the randomly choosen index.
+    * or if there is no item for the randomly chosen index.
     *
     * @method
     * @param {any[]} objects - An array of objects.
@@ -308,14 +308,12 @@ Phaser.ArrayUtils = {
     */
     getRandomItem: function (objects, startIndex, length) {
 
-        if (objects == null) { // undefined or null
-            return null;
-        }
-
-        if (typeof startIndex === 'undefined') { startIndex = 0; }
-        if (typeof length === 'undefined') { length = objects.length; }
+        if (objects === null) { return null; }
+        if (startIndex === undefined) { startIndex = 0; }
+        if (length === undefined) { length = objects.length; }
 
         var randomIndex = startIndex + Math.floor(Math.random() * length);
+
         return objects[randomIndex] === undefined ? null : objects[randomIndex];
 
     },
@@ -324,7 +322,7 @@ Phaser.ArrayUtils = {
     * Removes a random object from the given array and returns it.
     *
     * Will return null if there are no array items that fall within the specified range
-    * or if there is no item for the randomly choosen index.
+    * or if there is no item for the randomly chosen index.
     *
     * @method
     * @param {any[]} objects - An array of objects.
@@ -338,8 +336,8 @@ Phaser.ArrayUtils = {
             return null;
         }
 
-        if (typeof startIndex === 'undefined') { startIndex = 0; }
-        if (typeof length === 'undefined') { length = objects.length; }
+        if (startIndex === undefined) { startIndex = 0; }
+        if (length === undefined) { length = objects.length; }
 
         var randomIndex = startIndex + Math.floor(Math.random() * length);
         if (randomIndex < objects.length)
@@ -410,7 +408,7 @@ Phaser.ArrayUtils = {
     *
     * @method
     * @param {Array<any[]>} matrix - The array to rotate; this matrix _may_ be altered.
-    * @param {number|string} direction - The amount to rotate: the roation in degrees (90, -90, 270, -270, 180) or a string command ('rotateLeft', 'rotateRight' or 'rotate180').
+    * @param {number|string} direction - The amount to rotate: the rotation in degrees (90, -90, 270, -270, 180) or a string command ('rotateLeft', 'rotateRight' or 'rotate180').
     * @return {Array<any[]>} The rotated matrix. The source matrix should be discarded for the returned matrix.
     */
     rotateMatrix: function (matrix, direction) {
@@ -519,14 +517,14 @@ Phaser.ArrayUtils = {
     * Create an array of numbers (positive and/or negative) progressing from `start`
     * up to but not including `end` by advancing by `step`.
     *
-    * If `start` is less than `stop` a zero-length range is created unless a negative `step` is specified.
+    * If `start` is less than `end` a zero-length range is created unless a negative `step` is specified.
     *
     * Certain values for `start` and `end` (eg. NaN/undefined/null) are currently coerced to 0;
     * for forward compatibility make sure to pass in actual numbers.
     *
     * @method Phaser.ArrayUtils#numberArrayStep
     * @param {number} start - The start of the range.
-    * @param {number} end - The end of the range.
+    * @param {number} [end] - The end of the range.
     * @param {number} [step=1] - The value to increment or decrement by.
     * @returns {Array} Returns the new array of numbers.
     * @example
@@ -548,39 +546,24 @@ Phaser.ArrayUtils = {
     * Phaser.ArrayUtils.numberArrayStep(0);
     * // => []
     */
-    numberArrayStep: function(start, end, step) {
+    numberArrayStep: function (start, end, step) {
 
-        start = +start || 0;
+        if (start === undefined || start === null) { start = 0; }
 
-        // enables use as a callback for functions like `_.map`
-        var type = typeof end;
-
-        if ((type === 'number' || type === 'string') && step && step[end] === start)
-        {
-            end = step = null;
-        }
-
-        step = step == null ? 1 : (+step || 0);
-
-        if (end === null)
+        if (end === undefined || end === null)
         {
             end = start;
             start = 0;
         }
-        else
-        {
-            end = +end || 0;
-        }
 
-        // use `Array(length)` so engines like Chakra and V8 avoid slower modes
-        // http://youtu.be/XAqIpGU8ZZk#t=17m25s
-        var index = -1;
-        var length = Math.max(Phaser.Math.roundAwayFromZero((end - start) / (step || 1)), 0);
-        var result = new Array(length);
+        if (step === undefined) { step = 1; }
 
-        while (++index < length)
+        var result = [];
+        var total = Math.max(Phaser.Math.roundAwayFromZero((end - start) / (step || 1)), 0);
+
+        for (var i = 0; i < total; i++)
         {
-            result[index] = start;
+            result.push(start);
             start += step;
         }
 
@@ -650,9 +633,9 @@ Phaser.Color = {
     */
     unpackPixel: function (rgba, out, hsl, hsv) {
 
-        if (typeof out === 'undefined' || out === null) { out = Phaser.Color.createColor(); }
-        if (typeof hsl === 'undefined' || hsl === null) { hsl = false; }
-        if (typeof hsv === 'undefined' || hsv === null) { hsv = false; }
+        if (out === undefined || out === null) { out = Phaser.Color.createColor(); }
+        if (hsl === undefined || hsl === null) { hsl = false; }
+        if (hsv === undefined || hsv === null) { hsv = false; }
 
         if (Phaser.Device.LITTLE_ENDIAN)
         {
@@ -915,7 +898,7 @@ Phaser.Color = {
     */
     HSVtoRGB: function (h, s, v, out) {
 
-        if (typeof out === 'undefined') { out = Phaser.Color.createColor(0, 0, 0, 1, h, s, 0, v); }
+        if (out === undefined) { out = Phaser.Color.createColor(0, 0, 0, 1, h, s, 0, v); }
 
         var r, g, b;
         var i = Math.floor(h * 6);
@@ -1103,8 +1086,8 @@ Phaser.Color = {
     */
     RGBtoString: function (r, g, b, a, prefix) {
 
-        if (typeof a === 'undefined') { a = 255; }
-        if (typeof prefix === 'undefined') { prefix = '#'; }
+        if (a === undefined) { a = 255; }
+        if (prefix === undefined) { prefix = '#'; }
 
         if (prefix === '#')
         {
@@ -1292,8 +1275,8 @@ Phaser.Color = {
     */
     HSVColorWheel: function (s, v) {
 
-        if (typeof s === 'undefined') { s = 1.0; }
-        if (typeof v === 'undefined') { v = 1.0; }
+        if (s === undefined) { s = 1.0; }
+        if (v === undefined) { v = 1.0; }
 
         var colors = [];
 
@@ -1317,8 +1300,8 @@ Phaser.Color = {
     */
     HSLColorWheel: function (s, l) {
 
-        if (typeof s === 'undefined') { s = 0.5; }
-        if (typeof l === 'undefined') { l = 0.5; }
+        if (s === undefined) { s = 0.5; }
+        if (l === undefined) { l = 0.5; }
 
         var colors = [];
 
@@ -1345,7 +1328,7 @@ Phaser.Color = {
     */
     interpolateColor: function (color1, color2, steps, currentStep, alpha) {
 
-        if (typeof alpha === "undefined") { alpha = 255; }
+        if (alpha === undefined) { alpha = 255; }
 
         var src1 = Phaser.Color.getRGB(color1);
         var src2 = Phaser.Color.getRGB(color2);
@@ -1419,9 +1402,9 @@ Phaser.Color = {
     */
     getRandomColor: function (min, max, alpha) {
 
-        if (typeof min === "undefined") { min = 0; }
-        if (typeof max === "undefined") { max = 255; }
-        if (typeof alpha === "undefined") { alpha = 255; }
+        if (min === undefined) { min = 0; }
+        if (max === undefined) { max = 255; }
+        if (alpha === undefined) { alpha = 255; }
 
         //  Sanity checks
         if (max > 255 || min > max)

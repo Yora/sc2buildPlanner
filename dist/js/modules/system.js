@@ -728,7 +728,7 @@ Phaser.Device._initialize = function () {
         device.getUserMedia = device.getUserMedia && !!navigator.getUserMedia && !!window.URL;
 
         // Older versions of firefox (< 21) apparently claim support but user media does not actually work
-        if (device.firefoxVersion < 21)
+        if (device.firefox && device.firefoxVersion < 21)
         {
             device.getUserMedia = false;
         }
@@ -737,8 +737,7 @@ Phaser.Device._initialize = function () {
 
         // Excludes iOS versions as they generally wrap UIWebView (eg. Safari WebKit) and it
         // is safer to not try and use the fast copy-over method.
-        if (!device.iOS &&
-            (device.ie || device.firefox || device.chrome))
+        if (!device.iOS && (device.ie || device.firefox || device.chrome))
         {
             device.canvasBitBltShift = true;
         }
@@ -923,11 +922,11 @@ Phaser.Device._initialize = function () {
             device.node = true;
         }
         
-        if (device.node && typeof window.process.versions === 'object')
+        if (device.node && typeof process.versions === 'object')
         {
-            device.nodeWebkit = !!window.process.versions['node-webkit'];
+            device.nodeWebkit = !!process.versions['node-webkit'];
             
-            device.electron = !!window.process.versions.electron;
+            device.electron = !!process.versions.electron;
         }
         
         if (navigator['isCocoonJS'])
@@ -1126,12 +1125,12 @@ Phaser.Device._initialize = function () {
     */
     function _checkIsUint8ClampedImageData () {
 
-        if (typeof Uint8ClampedArray === "undefined")
+        if (Uint8ClampedArray === undefined)
         {
             return false;
         }
 
-        var elem = document.createElement('canvas');
+        var elem = PIXI.CanvasPool.create(this, 1, 1);
         var ctx = elem.getContext('2d');
 
         if (!ctx)
@@ -1140,6 +1139,8 @@ Phaser.Device._initialize = function () {
         }
 
         var image = ctx.createImageData(1, 1);
+
+        PIXI.CanvasPool.remove(this);
 
         return image.data instanceof Uint8ClampedArray;
 
@@ -1247,7 +1248,7 @@ Phaser.Device.canPlayVideo = function (type) {
     {
         return true;
     }
-    else if (type === 'ogg' && this.oggVideo)
+    else if ((type === 'ogg' || type === 'ogv') && this.oggVideo)
     {
         return true;
     }
@@ -1376,7 +1377,7 @@ Phaser.DOM = {
     */
     getBounds: function (element, cushion) {
 
-        if (typeof cushion === 'undefined') { cushion = 0; }
+        if (cushion === undefined) { cushion = 0; }
 
         element = element && !element.nodeType ? element[0] : element;
 
@@ -1754,7 +1755,8 @@ Phaser.Device.whenReady(function (device) {
 */
 
 /**
-* The Canvas class handles everything related to creating the `canvas` DOM tag that Phaser will use, including styles, offset and aspect ratio.
+* The Canvas class handles everything related to creating the `canvas` DOM tag that Phaser will use, 
+* including styles, offset and aspect ratio.
 *
 * @class Phaser.Canvas
 * @static
@@ -1765,17 +1767,26 @@ Phaser.Canvas = {
     * Creates a `canvas` DOM element. The element is not automatically added to the document.
     *
     * @method Phaser.Canvas.create
+    * @param {object} parent - The object that will own the canvas that is created.
     * @param {number} [width=256] - The width of the canvas element.
     * @param {number} [height=256] - The height of the canvas element..
     * @param {string} [id=(none)] - If specified, and not the empty string, this will be set as the ID of the canvas element. Otherwise no ID will be set.
+    * @param {boolean} [skipPool=false] - If `true` the canvas will not be placed in the CanvasPool global.
     * @return {HTMLCanvasElement} The newly created canvas element.
     */
-    create: function (width, height, id) {
+    create: function (parent, width, height, id, skipPool) {
 
         width = width || 256;
         height = height || 256;
 
-        var canvas = document.createElement('canvas');
+        if (skipPool === undefined)
+        {
+            var canvas = PIXI.CanvasPool.create(parent, width, height);
+        }
+        else
+        {
+            var canvas = document.createElement('canvas');
+        }
 
         if (typeof id === 'string' && id !== '')
         {
@@ -1784,7 +1795,6 @@ Phaser.Canvas = {
 
         canvas.width = width;
         canvas.height = height;
-
         canvas.style.display = 'block';
 
         return canvas;
@@ -1867,7 +1877,7 @@ Phaser.Canvas = {
 
         var target;
 
-        if (typeof overflowHidden === 'undefined') { overflowHidden = true; }
+        if (overflowHidden === undefined) { overflowHidden = true; }
 
         if (parent)
         {
@@ -2037,7 +2047,7 @@ Phaser.Canvas = {
 */
 Phaser.RequestAnimationFrame = function(game, forceSetTimeOut) {
 
-    if (typeof forceSetTimeOut === 'undefined') { forceSetTimeOut = false; }
+    if (forceSetTimeOut === undefined) { forceSetTimeOut = false; }
 
     /**
     * @property {Phaser.Game} game - The currently running game.

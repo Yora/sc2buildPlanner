@@ -84,18 +84,26 @@ Main.prototype = {
 
     preload: function () {
 
+        this.load.image('minerals', 'assets/minerals.png');
+        
         switch (this.race) {
 
             case 'terran':
             this.game.load.atlas('terran', 'assets/terran.png', 'assets/terran.json');
+            this.load.image('gas', 'assets/terran-gas.png');
+            this.load.image('supply', 'assets/depot-supply.png');
             break;
 
             case 'protoss':
             this.game.load.atlas('protoss', 'assets/protoss.png', 'assets/protoss.json');
+            this.load.image('gas', 'assets/protoss-gas.png');
+            this.load.image('supply', 'assets/pylon-supply.png');
             break;
 
             case 'zerg':
             this.game.load.atlas('zerg', 'assets/zerg.png', 'assets/zerg.json');
+            this.load.image('gas', 'assets/zerg-gas.png');
+            this.load.image('supply', 'assets/overlord-supply.png');
             break;
 
         }
@@ -124,7 +132,7 @@ Main.prototype = {
         this.maxScrollCount = 0;
         this.isScrolling = false;
         this.scrollDifference = 0;
-        this.maxRowsOnScreen = 0;
+        this.maxHeight = 0;
 
         this.bg = this.game.add.sprite(0, 0, 'stars')
         this.bg.alpha = 0.2;
@@ -148,6 +156,7 @@ Main.prototype = {
         this.world.bringToTop(this.selectionUI);
 
         this.timer = _game.time.create(true);
+
     },
 
     update: function() {
@@ -155,6 +164,7 @@ Main.prototype = {
         if (this.isScrolling) {
 
             var scrollValue;
+            var val;
             var _scrollingBar;
             var _game;
             var _unitGroupUI;
@@ -167,6 +177,7 @@ Main.prototype = {
             _structureGroupUI = this.structureGroupUI;
             _upgradeGroupUI = this.upgradeGroupUI;
 
+            // Starting scroll point
             scrollValue = (_game.input.activePointer.y - _scrollingBar.y);
 
             if (scrollValue >= _scrollingBar.height)
@@ -174,7 +185,6 @@ Main.prototype = {
 
             // follow input with scroll bar
             _scrollingBar.y = _game.input.activePointer.y - this.scrollDifference;
-
 
             // scroll bar at top
             if (_scrollingBar.y < 0) 
@@ -184,45 +194,13 @@ Main.prototype = {
             else if (_scrollingBar.y > (_game.height - _scrollingBar.height)) 
                 _scrollingBar.y = (_game.height - _scrollingBar.height);
 
-            //_unitGroupUI.y = -_scrollingBar.y - 5
-            //_structureGroupUI.y = -_scrollingBar.y + _unitGroupUI.getTop().y + 54
-            //_upgradeGroupUI.y = -_scrollingBar.y +  _structureGroupUI.height + _unitGroupUI.height + 12
+            // Get the percentage Y value to adjust the unit group by relevant to scroll bar
+            val = this.heightDifferece * (_scrollingBar.y / this.gameAndScrollHeight)
 
-            //_unitGroupUI.y = -_scrollingBar.y - 5 * ((640 - this.game.height) / 68);
-            //_structureGroupUI.y = -_scrollingBar.y + _unitGroupUI.getTop().y + 54 * ((640 - this.game.height) / 68);
-            //_upgradeGroupUI.y = -_scrollingBar.y +  _structureGroupUI.height + _unitGroupUI.height + 12 * ((640 - this.game.height) / 68);
-
-            //console.log((-((_scrollingBar.y/* - 5*/) * (1 + ((640 - this.game.height) / 640)))));
-
-            //console.log((1 + ((640 - this.game.height - _scrollingBar.height) / 640)));
-
-            var percent = this.game.height - (this.scrollingBar.y + this.scrollingBar.height);
-
-            console.log(percent)
-
-            var totalPercent = (1 + (this.game.height / (this.unitGroupUI.height + this.structureGroupUI.height + this.upgradeGroupUI.height - 20)));
-
-            //_unitGroupUI.y = -((_scrollingBar.y/* - 5*/) * (1 + ((640 - this.game.height) / 640)));// - (((640 - this.game.height) / 100) * _scrollingBar.y);
-            //_unitGroupUI.y = -_scrollingBar.y;
-            //_unitGroupUI.y = -((_scrollingBar.y/* - 5*/) * (1 + ((640 - this.game.height) / (640 - _scrollingBar.height))));// - (((640 - this.game.height) / 100) * _scrollingBar.y);
-            _unitGroupUI.y = -_scrollingBar.y * (totalPercent);
+            _unitGroupUI.y = -val + 10;
             _structureGroupUI.y = _unitGroupUI.y + _unitGroupUI.height + 10;
             _upgradeGroupUI.y = _unitGroupUI.y + _unitGroupUI.height + _structureGroupUI.height + 20;
-
-            //console.log(_unitGroupUI.y);
-
-            //console.log((this.game.height / (_unitGroupUI.height + _structureGroupUI.height + _upgradeGroupUI.height + 20)) - 68);
         }
-    },
-
-    scaleUpdate: function() {
-
-        this.selectionUI.x = this.game.width - this.selectionUI.width - 25;
-        this.scrollBar.x = this.game.width - this.scrollBar.width;
-        this.scrollingBar.x = this.game.width - this.scrollingBar.width;
-        this.unitGroupUI.x = this.selectionUI.x - 5;
-        this.structureGroupUI.x = this.selectionUI.x - 5;
-        this.upgradeGroupUI.x = this.selectionUI.x - 5;
     },
 
     touchInputDown: function() {
@@ -262,46 +240,93 @@ Main.prototype = {
 
     initUI: function() {
 
-        this.selectionUI = this.game.add.sprite(0, 0, 'ui-units');
-        this.selectionUI.width = 290;
-        this.selectionUI.height = this.game.height;
+        var supplyIcon;
+        var gasIcon;
+        var mineralIcon;
+        var time1;
+
+        // Selection UI
+        this.selectionUI = this.game.add.sprite(0, 91, 'ui-units');
+        this.selectionUI.height = this.game.height - 91;
+        this.topRightUI = this.game.add.sprite(this.game.width - 359, -1, 'ui-topRight');
+        this.timerUI = this.game.add.sprite(0, 50, 'ui-timer');
 
         this.scrollingBar = this.game.add.button(0, 0, 'scrolling-bar', this._scrollBar, this);
-        this.scrollingBar.width += 10;
 
         this.scrollBar = this.game.add.button(0, 0, 'scroll-bar', this._scrollBar, this);
         this.scrollBar.height = this.game.height;
         this.scrollBar.onInputDown.add(this._scrollBar, this);
-        this.scrollBar.width += 10;
+        
+        // Resource UI
+        this.resourcesUI = this.game.add.sprite(0, 0, 'ui-resources');
+        this.game.add.sprite(0, 0, 'ui-resources-end');
 
-        this.maxRowsOnScreen = Math.floor(this.game.height / 69);
+        mineralIcon = this.game.add.sprite(10, 6, 'minerals');
+        mineralIcon.width = 42;
+        mineralIcon.height = 42;
 
-        console.log(this.maxRowsOnScreen);
+        this.mineralText = this.game.add.bitmapText(60, 10, 'Agency_35', '0', 35); 
+        this.mineralText.tint = 0x00ff00;
+
+        gasIcon = this.game.add.sprite(200, 6, 'gas');
+        gasIcon.width = 42;
+        gasIcon.height = 42;
+
+        this.gasText = this.game.add.bitmapText(250, 10, 'Agency_35', '0', 35); 
+        this.gasText.tint = 0x00ff00;
+        
+        supplyIcon = this.game.add.sprite(370, 6, 'supply');
+        supplyIcon.width = 42;
+        supplyIcon.height = 42;
+
+        this.supplyText = this.game.add.bitmapText(420, 10, 'Agency_35', '12/15', 35); 
+        this.supplyText.tint = 0x00ff00;
+
+        // Timer UI
+        time1 = this.game.add.sprite(5, 57, 'time1');
+        time2 = this.game.add.sprite(95, 57, 'time2');
+        time3 = this.game.add.sprite(185, 57, 'time3');
+        //this.game.add.bitmapText(100, 53, 'Agency_35', '0:15', 28);
 
         this.scaleUpdate();
     },
 
     startUI: function() {
 
-        this.selectionUI.x = this.game.width - this.selectionUI.width - 25;
+        this.unitGroupUI.x = this.selectionUI.x + 11;
+        this.structureGroupUI.x = this.unitGroupUI.x;
+        this.upgradeGroupUI.x = this.unitGroupUI.x;
+
+        this.unitGroupUI.y = -this.scrollingBar.y + 10;
+        this.structureGroupUI.y = this.unitGroupUI.y + this.unitGroupUI.height + 10;
+        this.upgradeGroupUI.y = this.unitGroupUI.y + this.unitGroupUI.height + this.structureGroupUI.height + 20;
+
+        this.resourcesUI.width = this.game.width - this.selectionUI.width - this.scrollBar.width + 5 - 42;
+        this.timerUI.width = this.resourcesUI.width + 28;
+
+        this.maxHeight = this.unitGroupUI.height + this.structureGroupUI.height + this.upgradeGroupUI.height + 20;
+        this.heightDifferece = (this.maxHeight - this.game.height + 20);
+        this.scrollingBar.height = this.game.height * ((this.maxHeight - this.game.height) / this.maxHeight);
+        this.gameAndScrollHeight = (this.game.height - this.scrollingBar.height);
+    },
+
+    scaleUpdate: function() {
+
+        this.selectionUI.x = this.game.width - this.selectionUI.width - this.scrollBar.width + 3;
+        this.topRightUI.x = this.game.width - 359;
         this.scrollBar.x = this.game.width - this.scrollBar.width;
         this.scrollingBar.x = this.game.width - this.scrollingBar.width;
-        this.unitGroupUI.x = this.selectionUI.x - 5;
-        this.structureGroupUI.x = this.selectionUI.x - 5;
-        this.upgradeGroupUI.x = this.selectionUI.x - 5;
+        this.unitGroupUI.x = this.selectionUI.x + 11;
+        this.structureGroupUI.x = this.unitGroupUI.x;
+        this.upgradeGroupUI.x = this.unitGroupUI.x;
 
-        //this.scrollingBar.height = this.game.height - ((this.maxScrollCount - this.maxRowsOnScreen) * 69) - 20; // 20 = small gaps between types
-        //this.scrollingBar.height = this.game.height * (this.game.height / (this.unitGroupUI.height + this.structureGroupUI.height + this.upgradeGroupUI.height))
-        //this.scrollingBar.height = (this.unitGroupUI.height + this.structureGroupUI.height + this.upgradeGroupUI.height) - this.game.height - (this.maxScrollCount * 2);
+        if (this.game.width > 960)
+            this.bg.width = this.game.width;
+        else
+            this.bg.width = 960;
 
-        //this.scrollingBar.height = this.game.height - (this.game.height / (this.game.height - (this.unitGroupUI.height + this.structureGroupUI.height + this.upgradeGroupUI.height))) 
-
-        this.scrollingBar.height = this.game.height * (1 - (this.game.height / (this.unitGroupUI.height + this.structureGroupUI.height + this.upgradeGroupUI.height - 20))) 
-
-        //console.log(((this.game.height / (this.unitGroupUI.height + this.structureGroupUI.height + this.upgradeGroupUI.height - 20))))
-
-        //console.log(((640 - this.game.height) / 68))
-        //this.scrollingBar.height *= (((640 - this.game.height) / 68));
+        this.resourcesUI.width = this.game.width - this.selectionUI.width - this.scrollBar.width + 5 - 42;
+        this.timerUI.width = this.resourcesUI.width + 28;
     },
 
     _scrollBar: function() {
@@ -349,8 +374,8 @@ Main.prototype = {
                 if (index > this.unitCount)
                     return;
 
-                x = 15 + xx * 62 + (xx * 7);
-                y = 16 + yy * 62 + (yy * 7);
+                x = xx * 62 + (xx * 7);
+                y = yy * 62 + (yy * 7);
 
                 icon = this.game.add.sprite(x - 3, y - 2, 'icon');
                 icon.width = 66;
@@ -397,8 +422,8 @@ Main.prototype = {
                 if (index > this.structureCount)
                     return;
 
-                x = 15 + xx * 62 + (xx * 7);
-                y = 16 + yy * 62 + (yy * 7);
+                x = xx * 62 + (xx * 7);
+                y = yy * 62 + (yy * 7);
 
                 icon = this.game.add.sprite(x - 3, y - 2, 'icon');
                 icon.width = 66;
@@ -444,8 +469,8 @@ Main.prototype = {
                 if (index > this.upgradeCount)
                     return;
 
-                x = 15 + xx * 62 + (xx * 7);
-                y = 16 + yy * 62 + (yy * 7);
+                x = xx * 62 + (xx * 7);
+                y = yy * 62 + (yy * 7);
 
                 icon = this.game.add.sprite(x - 3, y - 2, 'icon');
                 icon.width = 66;
@@ -1276,7 +1301,7 @@ MainMenu.prototype = {
 		this.startButton = this.add.button(this.game.width / 2, 200, 'loaderFull', this.startGame, this, 2, 0, 1);
 		this.startButton.anchor.set(0.5,0);
 
-		this.game.state.start('Main', true, false, 'zerg');
+		this.game.state.start('Main', true, false, 'terran');
 	},
 
 	startGame: function() {
@@ -1296,11 +1321,23 @@ Preloader.prototype = {
 
 		this.game.advancedTiming = true;
 
+		var fileFormat = (this.game.device.cocoonJS) ? '.json' : '.xml';
+
 		this.load.image('icon', 'assets/icon.png');
 		this.load.image('ui-units', 'assets/ui-units.png');
+		this.load.image('ui-topRight', 'assets/ui-topRight.png');
+		this.load.image('ui-timer', 'assets/ui-timer.png');
+		this.load.image('ui-resources', 'assets/ui-resources.png');
+		this.load.image('ui-resources-end', 'assets/ui-resources-end.png');
 		this.load.image('scroll-bar', 'assets/scroll-bar.png');
 		this.load.image('scrolling-bar', 'assets/scrolling-bar.png');
 		this.load.image('stars', 'assets/stars.png');
+		//this.load.bitmapFont('Agency_35', 'assets/fonts/agency_35_0.png', 'assets/fonts/agency_35' + fileFormat);
+		this.load.bitmapFont('Agency_35', 'assets/fonts/agency_35_0.png', 'assets/fonts/agency_35.xml');
+
+		this.load.image('time1', 'assets/time1.png');
+		this.load.image('time2', 'assets/time2.png');
+		this.load.image('time3', 'assets/time3.png');
 
 
 	},

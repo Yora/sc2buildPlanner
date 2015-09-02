@@ -25,6 +25,19 @@ Phaser.TweenManager = function (game) {
     this.game = game;
 
     /**
+    * Are all newly created Tweens frame or time based? A frame based tween will use the physics elapsed timer when updating. This means
+    * it will retain the same consistent frame rate, regardless of the speed of the device. The duration value given should
+    * be given in frames.
+    * 
+    * If the Tween uses a time based update (which is the default) then the duration is given in milliseconds.
+    * In this situation a 2000ms tween will last exactly 2 seconds, regardless of the device and how many visual updates the tween
+    * has actually been through. For very short tweens you may wish to experiment with a frame based update instead.
+    * @property {boolean} frameBased
+    * @default
+    */
+    this.frameBased = false;
+
+    /**
     * @property {array<Phaser.Tween>} _tweens - All of the currently running tweens.
     * @private
     */
@@ -133,7 +146,7 @@ Phaser.TweenManager.prototype = {
     */
     removeFrom: function (obj, children) {
         
-        if (typeof children === 'undefined') { children = true; }
+        if (children === undefined) { children = true; }
 
         var i;
         var len;
@@ -483,6 +496,22 @@ Phaser.Tween = function (target, game, manager) {
     this.isPaused = false;
 
     /**
+    * Is this Tween frame or time based? A frame based tween will use the physics elapsed timer when updating. This means
+    * it will retain the same consistent frame rate, regardless of the speed of the device. The duration value given should
+    * be given in frames.
+    * 
+    * If the Tween uses a time based update (which is the default) then the duration is given in milliseconds.
+    * In this situation a 2000ms tween will last exactly 2 seconds, regardless of the device and how many visual updates the tween
+    * has actually been through. For very short tweens you may wish to experiment with a frame based update instead.
+    *
+    * The default value is whatever you've set in TweenManager.frameBased.
+    * 
+    * @property {boolean} frameBased
+    * @default
+    */
+    this.frameBased = manager.frameBased;
+
+    /**
     * @property {function} _onUpdateCallback - An onUpdate callback.
     * @private
     * @default null
@@ -526,7 +555,7 @@ Phaser.Tween.prototype = {
     *
     * @method Phaser.Tween#to
     * @param {object} properties - An object containing the properties you want to tween, such as `Sprite.x` or `Sound.volume`. Given as a JavaScript object.
-    * @param {number} [duration=1000] - Duration of this tween in ms.
+    * @param {number} [duration=1000] - Duration of this tween in ms. Or if `Tween.frameBased` is true this represents the number of frames that should elapse.
     * @param {function|string} [ease=null] - Easing function. If not set it will default to Phaser.Easing.Default, which is Phaser.Easing.Linear.None by default but can be over-ridden.
     * @param {boolean} [autoStart=false] - Set to `true` to allow this tween to start automatically. Otherwise call Tween.start().
     * @param {number} [delay=0] - Delay before this tween will start in milliseconds. Defaults to 0, no delay.
@@ -536,12 +565,12 @@ Phaser.Tween.prototype = {
     */
     to: function (properties, duration, ease, autoStart, delay, repeat, yoyo) {
 
-        if (typeof duration === 'undefined' || duration <= 0) { duration = 1000; }
-        if (typeof ease === 'undefined' || ease === null) { ease = Phaser.Easing.Default; }
-        if (typeof autoStart === 'undefined') { autoStart = false; }
-        if (typeof delay === 'undefined') { delay = 0; }
-        if (typeof repeat === 'undefined') { repeat = 0; }
-        if (typeof yoyo === 'undefined') { yoyo = false; }
+        if (duration === undefined || duration <= 0) { duration = 1000; }
+        if (ease === undefined || ease === null) { ease = Phaser.Easing.Default; }
+        if (autoStart === undefined) { autoStart = false; }
+        if (delay === undefined) { delay = 0; }
+        if (repeat === undefined) { repeat = 0; }
+        if (yoyo === undefined) { yoyo = false; }
 
         if (typeof ease === 'string' && this.manager.easeMap[ease])
         {
@@ -573,7 +602,7 @@ Phaser.Tween.prototype = {
     *
     * @method Phaser.Tween#from
     * @param {object} properties - An object containing the properties you want to tween., such as `Sprite.x` or `Sound.volume`. Given as a JavaScript object.
-    * @param {number} [duration=1000] - Duration of this tween in ms.
+    * @param {number} [duration=1000] - Duration of this tween in ms. Or if `Tween.frameBased` is true this represents the number of frames that should elapse.
     * @param {function|string} [ease=null] - Easing function. If not set it will default to Phaser.Easing.Default, which is Phaser.Easing.Linear.None by default but can be over-ridden.
     * @param {boolean} [autoStart=false] - Set to `true` to allow this tween to start automatically. Otherwise call Tween.start().
     * @param {number} [delay=0] - Delay before this tween will start in milliseconds. Defaults to 0, no delay.
@@ -583,12 +612,12 @@ Phaser.Tween.prototype = {
     */
     from: function (properties, duration, ease, autoStart, delay, repeat, yoyo) {
 
-        if (typeof duration === 'undefined') { duration = 1000; }
-        if (typeof ease === 'undefined' || ease === null) { ease = Phaser.Easing.Default; }
-        if (typeof autoStart === 'undefined') { autoStart = false; }
-        if (typeof delay === 'undefined') { delay = 0; }
-        if (typeof repeat === 'undefined') { repeat = 0; }
-        if (typeof yoyo === 'undefined') { yoyo = false; }
+        if (duration === undefined) { duration = 1000; }
+        if (ease === undefined || ease === null) { ease = Phaser.Easing.Default; }
+        if (autoStart === undefined) { autoStart = false; }
+        if (delay === undefined) { delay = 0; }
+        if (repeat === undefined) { repeat = 0; }
+        if (yoyo === undefined) { yoyo = false; }
 
         if (typeof ease === 'string' && this.manager.easeMap[ease])
         {
@@ -623,7 +652,7 @@ Phaser.Tween.prototype = {
     */
     start: function (index) {
 
-        if (typeof index === 'undefined') { index = 0; }
+        if (index === undefined) { index = 0; }
 
         if (this.game === null || this.target === null || this.timeline.length === 0 || this.isRunning)
         {
@@ -679,7 +708,7 @@ Phaser.Tween.prototype = {
     */
     stop: function (complete) {
 
-        if (typeof complete === 'undefined') { complete = false; }
+        if (complete === undefined) { complete = false; }
 
         this.isRunning = false;
 
@@ -717,7 +746,7 @@ Phaser.Tween.prototype = {
 
         if (this.timeline.length === 0) { return this; }
 
-        if (typeof index === 'undefined') { index = 0; }
+        if (index === undefined) { index = 0; }
 
         if (index === -1)
         {
@@ -766,7 +795,7 @@ Phaser.Tween.prototype = {
     */
     repeat: function (total, repeatDelay, index) {
 
-        if (typeof repeatDelay === 'undefined') { repeatDelay = 0; }
+        if (repeatDelay === undefined) { repeatDelay = 0; }
 
         this.updateTweenData('repeatCounter', total, index);
 
@@ -806,7 +835,7 @@ Phaser.Tween.prototype = {
     */
     yoyo: function(enable, yoyoDelay, index) {
 
-        if (typeof yoyoDelay === 'undefined') { yoyoDelay = 0; }
+        if (yoyoDelay === undefined) { yoyoDelay = 0; }
 
         this.updateTweenData('yoyo', enable, index);
 
@@ -867,7 +896,7 @@ Phaser.Tween.prototype = {
     */
     interpolation: function (interpolation, context, index) {
 
-        if (typeof context === 'undefined') { context = Phaser.Math; }
+        if (context === undefined) { context = Phaser.Math; }
 
         this.updateTweenData('interpolationFunction', interpolation, index);
 
@@ -886,7 +915,7 @@ Phaser.Tween.prototype = {
     */
     repeatAll: function (total) {
 
-        if (typeof total === 'undefined') { total = 0; }
+        if (total === undefined) { total = 0; }
 
         this.repeatCounter = total;
 
@@ -945,7 +974,7 @@ Phaser.Tween.prototype = {
     */
     loop: function (value) {
 
-        if (typeof value === 'undefined') { value = true; }
+        if (value === undefined) { value = true; }
 
         if (value)
         {
@@ -1183,11 +1212,11 @@ Phaser.Tween.prototype = {
             return null;
         }
 
-        if (typeof frameRate === 'undefined') {
+        if (frameRate === undefined) {
             frameRate = 60;
         }
 
-        if (typeof data === 'undefined') {
+        if (data === undefined) {
             data = [];
         }
 
@@ -1583,13 +1612,14 @@ Phaser.TweenData.prototype = {
     *
     * @protected
     * @method Phaser.TweenData#update
+    * @param {number} time - A timestamp passed in by the Tween parent.
     * @return {number} The current status of this Tween. One of the Phaser.TweenData constants: PENDING, RUNNING, LOOPED or COMPLETE.
     */
-    update: function () {
+    update: function (time) {
 
         if (!this.isRunning)
         {
-            if (this.game.time.time >= this.startTime)
+            if (time >= this.startTime)
             {
                 this.isRunning = true;
             }
@@ -1601,20 +1631,22 @@ Phaser.TweenData.prototype = {
         else
         {
             //  Is Running, but is waiting to repeat
-            if (this.game.time.time < this.startTime)
+            if (time < this.startTime)
             {
                 return Phaser.TweenData.RUNNING;
             }
         }
 
+        var ms = (this.parent.frameBased) ? this.game.time.physicsElapsedMS : this.game.time.elapsedMS;
+
         if (this.parent.reverse)
         {
-            this.dt -= this.game.time.physicsElapsedMS * this.parent.timeScale;
+            this.dt -= ms * this.parent.timeScale;
             this.dt = Math.max(this.dt, 0);
         }
         else
         {
-            this.dt += this.game.time.physicsElapsedMS * this.parent.timeScale;
+            this.dt += ms * this.parent.timeScale;
             this.dt = Math.min(this.dt, this.duration);
         }
 
