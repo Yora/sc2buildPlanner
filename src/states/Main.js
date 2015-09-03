@@ -87,6 +87,10 @@ Main.prototype = {
 
         this.startUI();
 
+        // Next: resource gathering.
+
+        // Next: boxes for constructing, use filled rectangles
+
         this.world.bringToTop(this.selectionUI);
 
         this.timer = _game.time.create(true);
@@ -172,7 +176,7 @@ Main.prototype = {
     },
 
     initUI: function() {
-        
+
         var supplyIcon;
         var gasIcon;
         var mineralIcon;
@@ -220,13 +224,15 @@ Main.prototype = {
     startUI: function() {
 
         var i;
-        var timeCount;
+        var timeIterations;
+        var visibleTimeIterations;
         var timeValue;
         var timeString1;
         var timeString2;
         var timeString;
         var time;
         var line;
+        var line2;
 
         this.unitGroupUI.x = this.selectionUI.x + 11;
         this.structureGroupUI.x = this.unitGroupUI.x;
@@ -248,9 +254,22 @@ Main.prototype = {
         // Timer UI
         this.game.add.bitmapText(5, 58, 'Agency_35', '0:00', 25);
 
-        timeCount = Math.floor(this.timerUI.width / 90) - 1;
+        if (this.game.device.desktop) {
 
-        for (i = 0; i < timeCount; i++) {
+            // Desktop
+            timeIterations = 25;
+            visibleTimeIterations = Math.floor(this.timerUI.width / 90) - 2;
+
+        } else {
+
+            // Mobile
+            timeIterations = Math.floor(this.timerUI.width / 90) - 1;
+
+        }
+
+        for (i = 0; i < timeIterations; i++) {
+
+            //For mobile, maybe make this one big bitmapdata
 
             timeValue = (i + 1) * 30;
 
@@ -263,13 +282,35 @@ Main.prototype = {
             line = this.game.make.graphics(90 + (i * 90), 80);
             line.lineStyle(3, 0x00ff00, 1);
             line.lineTo(0, -8);
+            line2 = this.game.make.graphics(90 + (i * 90), 80);
+            line2.lineStyle(1, 0x00ff00, 0.2);
+            line2.lineTo(0, this.game.height - 50);
             this.lineGroup.add(time);
             this.lineGroup.add(line);
+            this.lineGroup.add(line2);
+
+            if (i > visibleTimeIterations) {
+                
+                time.visible = false;
+                line.visible = false;
+                line2.visible = false;
+
+            }
 
         }
+
+        this.scaleUpdate();
     },
 
     scaleUpdate: function() {
+
+        var i;
+        var _game;
+        var _gameHeight;
+        var val;
+
+        _game = this.game;
+        _gameWidth = this.game.width;
 
         this.selectionUI.x = this.game.width - this.selectionUI.width - this.scrollBar.width + 3;
         this.topRightUI.x = this.game.width - 359;
@@ -286,6 +327,29 @@ Main.prototype = {
 
         this.resourcesUI.width = this.game.width - this.selectionUI.width - this.scrollBar.width + 5 - 42;
         this.timerUI.width = this.resourcesUI.width + 28;
+
+        // Control visibility of time indicators based on width
+        if (this.game.device.desktop) {
+
+            for (i = 0; i < 75; i += 3) {
+
+                val = ((90 + (i / 3 * 90)));
+
+                if ((_gameWidth - 384) >= val) {
+
+                    this.lineGroup.getAt(i).visible = true;
+                    this.lineGroup.getAt((i + 1)).visible = true;
+                    this.lineGroup.getAt((i + 2)).visible = true;
+
+                } else {
+
+                    this.lineGroup.getAt(i).visible = false;
+                    this.lineGroup.getAt((i + 1)).visible = false;
+                    this.lineGroup.getAt((i + 2)).visible = false;
+
+                }
+            }
+        }
     },
 
     _scrollBar: function() {

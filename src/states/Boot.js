@@ -17,6 +17,7 @@ Boot.prototype = {
 		    //this.game.scale.windowConstraints.right = 'visual';
 		    this.game.scale.minWidth = 960;
 		    this.game.scale.minHeight = 640;
+		    this.game.scale.maxWidth = 2220;
 
 
 		    //this.game.scale.onSizeChange.add(function () {this.game.scale.setGameSize(window.innerWidth, window.innerHeight)}, this)
