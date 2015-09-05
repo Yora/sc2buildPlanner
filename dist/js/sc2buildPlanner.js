@@ -76,6 +76,50 @@ function Main() {}
 
 // base allowed buildings off constructed buildings array.  Fade out things that cant be made yet
 
+// x = harvesting seconds
+// y = travel seconds
+// z = waiting seconds (3 SCV saturation)
+
+//Eq.i) Minerals/SCV-second = 5 / (x+y+z)
+//Eq.ii) Gas/SCV-second = 4 / (x+y+z)\
+
+/*
+
+The simulation will always spread your workers for optimal mining depending on how many bases you have. 
+For one base that means a soft cap at 16 workers and a hard cap at 24 workers. As soon as your expansion 
+is finished it will transfer workers but it does not currently take into account the distance between your
+ bases as it is impossible for it to know how many you want to transfer. If you want to simulate a probe 
+ transfer you will need to do this manually by the sending out worker action and returning with them at 
+ a later point.
+
+
+You cannot explicitly swap addons at this time. The simulation does that for you. For now if you want to 
+simulate hovering around with buildings you can do this by adding some pause.
+
+Building in reactories have special actions so that the simulation knows you want to utilize the reactory
+ and not two single baracks for example.
+
+
+ When you are building anything as terran the simulator will temporarily remove one mineral worker.
+  So what you want is already simulated.
+
+I see. In that case you need to adjust it by adding pause.
+
+*/
+
+// AUTOMATIC
+// so, if (workers > 16 && bases > 2) -> caps workers at this base, transfers extra to next base, and so on with more bases
+
+// MANUAL
+// 
+
+
+// scv mining is   timeForTrip * scvs
+
+// MINERALS: 3.8-4.8sec travel time
+// GAS: 3.6-5.0sec travel time
+
+
 Main.prototype = {
 
     init: function(race) {
@@ -141,6 +185,7 @@ Main.prototype = {
         this.unitGroupUI = this.game.add.group();
         this.structureGroupUI = this.game.add.group();
         this.upgradeGroupUI = this.game.add.group();
+        this.lineGroupUI = this.game.add.group();
         this.lineGroup = this.game.add.group();
 
         this.initUI();
@@ -162,6 +207,13 @@ Main.prototype = {
         this.world.bringToTop(this.selectionUI);
 
         this.timer = _game.time.create(true);
+
+        for (var i = 0; i < 24; i++) {
+        
+            //var test = this.game.add.bitmapText(60, 0 + (i * 30), 'Agency_35', '1000', 35); 
+            //test.visible = false;
+            //test.exists = false;
+        }
     },
 
     update: function() {
@@ -248,42 +300,85 @@ Main.prototype = {
         var supplyIcon;
         var gasIcon;
         var mineralIcon;
+        var line;
+        var line2;
+        var _game;
+        var _lineGroupUI;
+        var __gameWidth;
+        var __gameHeight;
+
+
+        _game = this.game;
+        _lineGroupUI = this.lineGroupUI;
+
+        __gameWidth = _game.width;
+        __gameHeight = _game.height;
 
         // Selection UI
-        this.selectionUI = this.game.add.sprite(0, 91, 'ui-units');
-        this.selectionUI.height = this.game.height - 91;
-        this.topRightUI = this.game.add.sprite(this.game.width - 359, -1, 'ui-topRight');
-        this.timerUI = this.game.add.sprite(0, 50, 'ui-timer');
+        this.selectionUI = _game.add.sprite(0, 91, 'ui-units');
+        this.selectionUI.height = _game.height - 91;
+        this.topRightUI = _game.add.sprite(_game.width - 359, -1, 'ui-topRight');
+        this.timerUI = _game.add.sprite(0, 50, 'ui-timer');
 
-        this.scrollingBar = this.game.add.button(0, 0, 'scrolling-bar', this._scrollBar, this);
+        this.timerUI.visible = false;
+        this.topRightUI.visible = false;
+        this.selectionUI.visible = false;
+        //this.selectionUI.x = _game.width - this.selectionUI.width - this.scrollBar.width + 3;
 
-        this.scrollBar = this.game.add.button(0, 0, 'scroll-bar', this._scrollBar, this);
-        this.scrollBar.height = this.game.height;
+
+        line = _game.make.graphics(__gameWidth - 290, 91);
+        line.lineStyle(3, 0x00ff00, 1);
+        line.lineTo(0, _game.height - 91);
+
+        line2 = _game.make.graphics(__gameWidth - 290, __gameHeight - 2);
+        line2.lineStyle(3, 0x00ff00, 1);
+        line2.lineTo(290, 0);
+
+        line3 = _game.make.graphics(__gameWidth - 290, 91);
+        line3.lineStyle(3, 0x00ff00, 1);
+        line3.lineTo(-40, -40);
+
+        line4 = _game.make.graphics(__gameWidth - 330, 51);
+        line4.lineStyle(3, 0x00ff00, 1);
+        line4.lineTo(-__gameWidth + 330, 0);
+
+        _lineGroupUI.add(line);
+        _lineGroupUI.add(line2);
+        _lineGroupUI.add(line3);
+        _lineGroupUI.add(line4);
+
+
+        this.scrollingBar = _game.add.button(0, 0, 'scrolling-bar', this._scrollBar, this);
+
+        this.scrollBar = _game.add.button(0, 0, 'scroll-bar', this._scrollBar, this);
+        this.scrollBar.height = _game.height;
         this.scrollBar.onInputDown.add(this._scrollBar, this);
         
         // Resource UI
-        this.resourcesUI = this.game.add.sprite(0, 0, 'ui-resources');
-        this.game.add.sprite(0, 0, 'ui-resources-end');
+        this.resourcesUI = _game.add.sprite(0, 0, 'ui-resources');
+        _game.add.sprite(0, 0, 'ui-resources-end');
+        this.resourcesUI.visible = false;
 
-        mineralIcon = this.game.add.sprite(10, 6, 'minerals');
+
+        mineralIcon = _game.add.sprite(10, 6, 'minerals');
         mineralIcon.width = 42;
         mineralIcon.height = 42;
 
-        this.mineralText = this.game.add.bitmapText(60, 10, 'Agency_35', '0', 35); 
+        this.mineralText = _game.add.bitmapText(60, 10, 'Agency_35', '0', 35); 
         this.mineralText.tint = 0x00ff00;
 
-        gasIcon = this.game.add.sprite(200, 6, 'gas');
+        gasIcon = _game.add.sprite(200, 6, 'gas');
         gasIcon.width = 42;
         gasIcon.height = 42;
 
-        this.gasText = this.game.add.bitmapText(250, 10, 'Agency_35', '0', 35); 
+        this.gasText = _game.add.bitmapText(250, 10, 'Agency_35', '0', 35); 
         this.gasText.tint = 0x00ff00;
         
-        supplyIcon = this.game.add.sprite(370, 6, 'supply');
+        supplyIcon = _game.add.sprite(370, 6, 'supply');
         supplyIcon.width = 42;
         supplyIcon.height = 42;
 
-        this.supplyText = this.game.add.bitmapText(420, 10, 'Agency_35', '12/15', 35); 
+        this.supplyText = _game.add.bitmapText(420, 10, 'Agency_35', '12/15', 35); 
         this.supplyText.tint = 0x00ff00;
 
         this.scaleUpdate();
@@ -374,27 +469,35 @@ Main.prototype = {
 
         var i;
         var _game;
-        var _gameHeight;
+        var _lineGroupUI;
+        var __gameWidth;
         var val;
 
         _game = this.game;
-        _gameWidth = this.game.width;
+        _lineGroupUI = this.lineGroupUI;
 
-        this.selectionUI.x = this.game.width - this.selectionUI.width - this.scrollBar.width + 3;
-        this.topRightUI.x = this.game.width - 359;
-        this.scrollBar.x = this.game.width - this.scrollBar.width;
-        this.scrollingBar.x = this.game.width - this.scrollingBar.width;
-        this.unitGroupUI.x = this.selectionUI.x + 11;
-        this.structureGroupUI.x = this.unitGroupUI.x;
-        this.upgradeGroupUI.x = this.unitGroupUI.x;
+        __gameWidth = _game.width;
 
-        if (this.game.width > 960)
-            this.bg.width = this.game.width;
+        //this.selectionUI.x = __gameWidth - this.selectionUI.width - this.scrollBar.width + 3;
+        //this.topRightUI.x = __gameWidth - 359;
+        //this.scrollBar.x = __gameWidth - this.scrollBar.width;
+        //this.scrollingBar.x = __gameWidth - this.scrollingBar.width;
+        //this.unitGroupUI.x = this.selectionUI.x + 11;
+        //this.structureGroupUI.x = this.unitGroupUI.x;
+        //this.upgradeGroupUI.x = this.unitGroupUI.x;
+
+        _lineGroupUI.getAt(0).x = __gameWidth - 290;
+        _lineGroupUI.getAt(1).x = __gameWidth - 290;
+        _lineGroupUI.getAt(2).x = __gameWidth - 290;
+        _lineGroupUI.getAt(3).x = __gameWidth - 330;
+
+        if (__gameWidth > 960)
+            this.bg.width = __gameWidth;
         else
             this.bg.width = 960;
 
-        this.resourcesUI.width = this.game.width - this.selectionUI.width - this.scrollBar.width + 5 - 42;
-        this.timerUI.width = this.resourcesUI.width + 28;
+        //this.resourcesUI.width = __gameWidth - this.selectionUI.width - this.scrollBar.width + 5 - 42;
+        //this.timerUI.width = this.resourcesUI.width + 28;
 
         // Control visibility of time indicators based on width
         if (this.game.device.desktop) {
@@ -403,7 +506,7 @@ Main.prototype = {
 
                 val = ((90 + (i / 3 * 90)));
 
-                if ((_gameWidth - 384) >= val) {
+                if ((__gameWidth - 384) >= val) {
 
                     this.lineGroup.getAt(i).visible = true;
                     this.lineGroup.getAt((i + 1)).visible = true;
