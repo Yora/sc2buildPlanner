@@ -59,29 +59,29 @@ Main.prototype = {
         this.race = race;
     },
 
-    preload: function () {
+    preload: function() {
 
         this.load.image('minerals', 'assets/minerals.png');
-        
+
         switch (this.race) {
 
             case 'terran':
-            this.game.load.atlas('terran', 'assets/terran.png', 'assets/terran.json');
-            this.load.image('gas', 'assets/terran-gas.png');
-            this.load.image('supply', 'assets/depot-supply.png');
-            break;
+                this.game.load.atlas('terran', 'assets/terran.png', 'assets/terran.json');
+                this.load.image('gas', 'assets/terran-gas.png');
+                this.load.image('supply', 'assets/depot-supply.png');
+                break;
 
             case 'protoss':
-            this.game.load.atlas('protoss', 'assets/protoss.png', 'assets/protoss.json');
-            this.load.image('gas', 'assets/protoss-gas.png');
-            this.load.image('supply', 'assets/pylon-supply.png');
-            break;
+                this.game.load.atlas('protoss', 'assets/protoss.png', 'assets/protoss.json');
+                this.load.image('gas', 'assets/protoss-gas.png');
+                this.load.image('supply', 'assets/pylon-supply.png');
+                break;
 
             case 'zerg':
-            this.game.load.atlas('zerg', 'assets/zerg.png', 'assets/zerg.json');
-            this.load.image('gas', 'assets/zerg-gas.png');
-            this.load.image('supply', 'assets/overlord-supply.png');
-            break;
+                this.game.load.atlas('zerg', 'assets/zerg.png', 'assets/zerg.json');
+                this.load.image('gas', 'assets/zerg-gas.png');
+                this.load.image('supply', 'assets/overlord-supply.png');
+                break;
 
         }
     },
@@ -111,7 +111,7 @@ Main.prototype = {
         this.scrollDifference = 0;
         this.maxHeight = 0;
 
-        this.bg = this.game.add.sprite(0, 0, 'stars')
+        this.bg = this.game.add.image(0, 0, 'stars')
         this.bg.alpha = 0.2;
 
         this.unitGroupUI = this.game.add.group();
@@ -123,7 +123,7 @@ Main.prototype = {
         this.initUI();
 
         this.initRace();
- 
+
         this.createUnits();
 
         this.createStructures();
@@ -136,12 +136,10 @@ Main.prototype = {
 
         // Next: boxes for constructing, use filled rectangles
 
-        this.world.bringToTop(this.selectionUI);
-
         this.timer = _game.time.create(true);
 
         for (var i = 0; i < 24; i++) {
-        
+
             //var test = this.game.add.bitmapText(60, 0 + (i * 30), 'Agency_35', '1000', 35); 
             //test.visible = false;
             //test.exists = false;
@@ -154,6 +152,9 @@ Main.prototype = {
 
             var scrollValue;
             var val;
+            var scrollVal;
+            var _upgradeY;
+            var structureY;
             var _scrollingBar;
             var _game;
             var _unitGroupUI;
@@ -173,30 +174,33 @@ Main.prototype = {
                 scrollValue = _scrollingBar.height;
 
             // follow input with scroll bar
-            _scrollingBar.y = _game.input.activePointer.y - this.scrollDifference;
+            scrollVal = _game.input.activePointer.y - this.scrollDifference;
+            _scrollingBar.y = scrollVal;
 
             // scroll bar at top
-            if (_scrollingBar.y < 0) 
+            if (_scrollingBar.y < 0)
                 _scrollingBar.y = 0;
 
             // scroll bar at bottom
-            else if (_scrollingBar.y > (_game.height - _scrollingBar.height)) 
+            else if (_scrollingBar.y > (_game.height - _scrollingBar.height))
                 _scrollingBar.y = (_game.height - _scrollingBar.height);
 
             // Get the percentage Y value to adjust the unit group by relevant to scroll bar
-            val = this.heightDifferece * (_scrollingBar.y / this.gameAndScrollHeight)
+            val = this.heightDifferece * (_scrollingBar.y / this.gameAndScrollHeight) - 10;
+            
+            _unitGroupUI.y = -val;
 
-            _unitGroupUI.y = -val + 10;
-            _structureGroupUI.y = _unitGroupUI.y + _unitGroupUI.height + 10;
-            _upgradeGroupUI.y = _unitGroupUI.y + _unitGroupUI.height + _structureGroupUI.height + 20;
+            structureY = _unitGroupUI.y + _unitGroupUI.height + 10;
+            upgradeY = _unitGroupUI.y + _unitGroupUI.height + this.structureGroupUI.height + 20;
+
+            _structureGroupUI.y = structureY;
+            _upgradeGroupUI.y = upgradeY;
         }
     },
 
-    touchInputDown: function() {
-    },
+    touchInputDown: function() {},
 
-    touchInputUp: function() {
-    },
+    touchInputUp: function() {},
 
     initRace: function() {
 
@@ -207,22 +211,22 @@ Main.prototype = {
         switch (race) {
 
             case 'terran':
-            this.unitCount = 15;
-            this.structureCount = 17;
-            this.upgradeCount = 25;
-            break;
+                this.unitCount = 15;
+                this.structureCount = 17;
+                this.upgradeCount = 25;
+                break;
 
             case 'protoss':
-            this.unitCount = 20;
-            this.structureCount = 14;
-            this.upgradeCount = 24;
-            break;
+                this.unitCount = 20;
+                this.structureCount = 14;
+                this.upgradeCount = 24;
+                break;
 
             case 'zerg':
-            this.unitCount = 18;
-            this.structureCount = 18;
-            this.upgradeCount = 28;
-            break;
+                this.unitCount = 18;
+                this.structureCount = 18;
+                this.upgradeCount = 28;
+                break;
 
         }
     },
@@ -234,11 +238,12 @@ Main.prototype = {
         var mineralIcon;
         var line;
         var line2;
+        var line3;
+        var line4;
         var _game;
         var _lineGroupUI;
         var __gameWidth;
         var __gameHeight;
-
 
         _game = this.game;
         _lineGroupUI = this.lineGroupUI;
@@ -246,73 +251,72 @@ Main.prototype = {
         __gameWidth = _game.width;
         __gameHeight = _game.height;
 
+        // Scroll bar
+        this.scrollingBar = _game.add.sprite(0, 0, 'scrolling-bar');
+
+        this.scrollBar = _game.add.button(__gameWidth - 42, 0, '', this._scrollBar, this);
+        this.scrollBar.width = 42;
+        this.scrollBar.height = __gameHeight;
+        this.scrollBar.onInputDown.add(this._scrollBar, this);
+
         // Selection UI
-        this.selectionUI = _game.add.sprite(0, 91, 'ui-units');
-        this.selectionUI.height = _game.height - 91;
-        this.topRightUI = _game.add.sprite(_game.width - 359, -1, 'ui-topRight');
-        this.timerUI = _game.add.sprite(0, 50, 'ui-timer');
-
-        this.timerUI.visible = false;
-        this.topRightUI.visible = false;
-        this.selectionUI.visible = false;
-        //this.selectionUI.x = _game.width - this.selectionUI.width - this.scrollBar.width + 3;
-
-
-        line = _game.make.graphics(__gameWidth - 290, 91);
+        line = _game.make.graphics(__gameWidth - 360, 51);
         line.lineStyle(3, 0x00ff00, 1);
-        line.lineTo(0, _game.height - 91);
+        line.lineTo(40, 40);
+        line.lineTo(40, __gameHeight - 53);
+        line.lineTo(358, __gameHeight - 53);
+        line.lineTo(358, -90);
+        line.lineTo(326, -90);
+        line.lineTo(326, __gameHeight);
 
-        line2 = _game.make.graphics(__gameWidth - 290, __gameHeight - 2);
+        // 2nd down from top
+        line2 = _game.make.graphics(__gameWidth - 359, 51);
         line2.lineStyle(3, 0x00ff00, 1);
-        line2.lineTo(290, 0);
+        line2.lineTo(-1000, 0);
 
-        line3 = _game.make.graphics(__gameWidth - 290, 91);
+        // top of screen
+        line3 = _game.make.graphics(0, 1);
         line3.lineStyle(3, 0x00ff00, 1);
-        line3.lineTo(-40, -40);
+        line3.lineTo(__gameWidth, 0);
 
-        line4 = _game.make.graphics(__gameWidth - 330, 51);
+        // small left end of screen
+        line4 = _game.make.graphics(1, 1);
         line4.lineStyle(3, 0x00ff00, 1);
-        line4.lineTo(-__gameWidth + 330, 0);
+        line4.lineTo(0, 51);
+
+        line5 = _game.make.graphics(0, 81);
+        line5.lineStyle(3, 0x00ff00, 1);
+        line5.lineTo(__gameWidth - 323, 0);
 
         _lineGroupUI.add(line);
         _lineGroupUI.add(line2);
         _lineGroupUI.add(line3);
         _lineGroupUI.add(line4);
+        _lineGroupUI.add(line5);
 
-
-        this.scrollingBar = _game.add.button(0, 0, 'scrolling-bar', this._scrollBar, this);
-
-        this.scrollBar = _game.add.button(0, 0, 'scroll-bar', this._scrollBar, this);
-        this.scrollBar.height = _game.height;
-        this.scrollBar.onInputDown.add(this._scrollBar, this);
-        
-        // Resource UI
-        this.resourcesUI = _game.add.sprite(0, 0, 'ui-resources');
-        _game.add.sprite(0, 0, 'ui-resources-end');
-        this.resourcesUI.visible = false;
-
-
+        // Mineral / gas / supply icons
         mineralIcon = _game.add.sprite(10, 6, 'minerals');
         mineralIcon.width = 42;
         mineralIcon.height = 42;
 
-        this.mineralText = _game.add.bitmapText(60, 10, 'Agency_35', '0', 35); 
+        this.mineralText = _game.add.bitmapText(60, 10, 'Agency_35', '0', 35);
         this.mineralText.tint = 0x00ff00;
 
         gasIcon = _game.add.sprite(200, 6, 'gas');
         gasIcon.width = 42;
         gasIcon.height = 42;
 
-        this.gasText = _game.add.bitmapText(250, 10, 'Agency_35', '0', 35); 
+        this.gasText = _game.add.bitmapText(250, 10, 'Agency_35', '0', 35);
         this.gasText.tint = 0x00ff00;
-        
+
         supplyIcon = _game.add.sprite(370, 6, 'supply');
         supplyIcon.width = 42;
         supplyIcon.height = 42;
 
-        this.supplyText = _game.add.bitmapText(420, 10, 'Agency_35', '12/15', 35); 
+        this.supplyText = _game.add.bitmapText(420, 10, 'Agency_35', '12/15', 35);
         this.supplyText.tint = 0x00ff00;
 
+        // Do a scale update
         this.scaleUpdate();
     },
 
@@ -328,23 +332,37 @@ Main.prototype = {
         var time;
         var line;
         var line2;
+        var maxHeightVar;
+        var heightDiffereceVar;
+        var scrollingBarHeightVar;
+        var gameAndScrollHeightVar;
+        var structureY;
+        var upgradeY;
+        var _game;
+        var _lineGroup;
+        var _unitGroupUI;
+        var __gameHeight;
+        var __gameWidth;
 
-        this.unitGroupUI.x = this.selectionUI.x + 11;
-        this.structureGroupUI.x = this.unitGroupUI.x;
-        this.upgradeGroupUI.x = this.unitGroupUI.x;
+        _game = this.game;
+        _lineGroup = this.lineGroup;
+        _unitGroupUI = this.unitGroupUI;
+        __gameHeight = _game.height;
+        __gameWidth = _game.width;
 
-        this.unitGroupUI.y = -this.scrollingBar.y + 10;
-        this.structureGroupUI.y = this.unitGroupUI.y + this.unitGroupUI.height + 10;
-        this.upgradeGroupUI.y = this.unitGroupUI.y + this.unitGroupUI.height + this.structureGroupUI.height + 20;
 
-        this.resourcesUI.width = this.game.width - this.selectionUI.width - this.scrollBar.width + 5 - 42;
-        this.timerUI.width = this.resourcesUI.width + 28;
+        // Set state-wide size variables
+        maxHeightVar = this.unitGroupUI.height + this.structureGroupUI.height + this.upgradeGroupUI.height + 20;
+        this.maxHeight = maxHeightVar;
 
-        this.maxHeight = this.unitGroupUI.height + this.structureGroupUI.height + this.upgradeGroupUI.height + 20;
-        this.heightDifferece = (this.maxHeight - this.game.height + 20);
-        this.scrollingBar.height = this.game.height * ((this.maxHeight - this.game.height) / this.maxHeight);
-        this.gameAndScrollHeight = (this.game.height - this.scrollingBar.height);
-    
+        heightDiffereceVar = (this.maxHeight - __gameHeight + 20);
+        this.heightDifferece = heightDiffereceVar;
+
+        scrollingBarHeightVar = __gameHeight * ((this.maxHeight - __gameHeight) / this.maxHeight);
+        this.scrollingBar.height = scrollingBarHeightVar;
+
+        gameAndScrollHeightVar = (__gameHeight - this.scrollingBar.height);
+        this.gameAndScrollHeight = gameAndScrollHeightVar;
 
         // Timer UI
         this.game.add.bitmapText(5, 58, 'Agency_35', '0:00', 25);
@@ -353,12 +371,12 @@ Main.prototype = {
 
             // Desktop
             timeIterations = 25;
-            visibleTimeIterations = Math.floor(this.timerUI.width / 90) - 2;
+            visibleTimeIterations = Math.floor((__gameWidth - 360) / 90) - 2; // here
 
         } else {
 
             // Mobile
-            timeIterations = Math.floor(this.timerUI.width / 90) - 1;
+            timeIterations = Math.floor((__gameWidth - 360) / 90) - 1;
 
         }
 
@@ -369,23 +387,24 @@ Main.prototype = {
             timeValue = (i + 1) * 30;
 
             timeString1 = Math.floor(timeValue / 60).toString();
-            timeString2 = this.pad((timeValue % 60), 2)
+            timeString2 = this.pad((timeValue % 60), 2);
 
             timeString = (timeString1 + ":" + timeString2);
 
-            time = this.game.add.bitmapText(95 + (i * 90), 58, 'Agency_35', timeString, 25);
-            line = this.game.make.graphics(90 + (i * 90), 80);
+            time = _game.add.bitmapText(95 + (i * 90), 58, 'Agency_35', timeString, 25);
+            line = _game.make.graphics(90 + (i * 90), 80);
             line.lineStyle(3, 0x00ff00, 1);
             line.lineTo(0, -8);
-            line2 = this.game.make.graphics(90 + (i * 90), 80);
+
+            line2 = _game.make.graphics(90 + (i * 90), 80);
             line2.lineStyle(1, 0x00ff00, 0.2);
             line2.lineTo(0, this.game.height - 50);
-            this.lineGroup.add(time);
-            this.lineGroup.add(line);
-            this.lineGroup.add(line2);
+            _lineGroup.add(time);
+            _lineGroup.add(line);
+            _lineGroup.add(line2);
 
             if (i > visibleTimeIterations) {
-                
+
                 time.visible = false;
                 line.visible = false;
                 line2.visible = false;
@@ -394,45 +413,53 @@ Main.prototype = {
 
         }
 
+        _game.world.sendToBack(this.scrollingBar);
+
         this.scaleUpdate();
     },
 
     scaleUpdate: function() {
 
         var i;
+        var uiPos;
         var _game;
+        var _lineGroup;
         var _lineGroupUI;
         var __gameWidth;
         var val;
 
         _game = this.game;
+        _lineGroup = this.lineGroup;
         _lineGroupUI = this.lineGroupUI;
 
         __gameWidth = _game.width;
 
-        //this.selectionUI.x = __gameWidth - this.selectionUI.width - this.scrollBar.width + 3;
-        //this.topRightUI.x = __gameWidth - 359;
-        //this.scrollBar.x = __gameWidth - this.scrollBar.width;
-        //this.scrollingBar.x = __gameWidth - this.scrollingBar.width;
-        //this.unitGroupUI.x = this.selectionUI.x + 11;
-        //this.structureGroupUI.x = this.unitGroupUI.x;
-        //this.upgradeGroupUI.x = this.unitGroupUI.x;
+        uiPos = __gameWidth - 310;
 
-        _lineGroupUI.getAt(0).x = __gameWidth - 290;
-        _lineGroupUI.getAt(1).x = __gameWidth - 290;
-        _lineGroupUI.getAt(2).x = __gameWidth - 290;
-        _lineGroupUI.getAt(3).x = __gameWidth - 330;
+        this.unitGroupUI.x = uiPos;
+        this.structureGroupUI.x = uiPos;
+        this.upgradeGroupUI.x = uiPos;
 
+        this.scrollBar.x = __gameWidth - 32;
+        this.scrollingBar.x = __gameWidth - 32;
+
+        _lineGroupUI.getAt(0).x = __gameWidth - 360;
+        _lineGroupUI.getAt(1).x = __gameWidth - 359;
+        _lineGroupUI.getAt(1).width = __gameWidth - 320;
+        _lineGroupUI.getAt(2).width = __gameWidth + 10;
+        _lineGroupUI.getAt(4).moveTo(0, 0);
+        _lineGroupUI.getAt(4).lineTo(__gameWidth - 323, 0);
+        _lineGroupUI.getAt(4).width = __gameWidth - 323;
+
+
+        // Strech background to fit the screen
         if (__gameWidth > 960)
             this.bg.width = __gameWidth;
         else
             this.bg.width = 960;
 
-        //this.resourcesUI.width = __gameWidth - this.selectionUI.width - this.scrollBar.width + 5 - 42;
-        //this.timerUI.width = this.resourcesUI.width + 28;
-
         // Control visibility of time indicators based on width
-        if (this.game.device.desktop) {
+        if (_game.device.desktop) {
 
             for (i = 0; i < 75; i += 3) {
 
@@ -440,15 +467,15 @@ Main.prototype = {
 
                 if ((__gameWidth - 384) >= val) {
 
-                    this.lineGroup.getAt(i).visible = true;
-                    this.lineGroup.getAt((i + 1)).visible = true;
-                    this.lineGroup.getAt((i + 2)).visible = true;
+                    _lineGroup.getAt(i).visible = true;
+                    _lineGroup.getAt((i + 1)).visible = true;
+                    _lineGroup.getAt((i + 2)).visible = true;
 
                 } else {
 
-                    this.lineGroup.getAt(i).visible = false;
-                    this.lineGroup.getAt((i + 1)).visible = false;
-                    this.lineGroup.getAt((i + 2)).visible = false;
+                    _lineGroup.getAt(i).visible = false;
+                    _lineGroup.getAt((i + 1)).visible = false;
+                    _lineGroup.getAt((i + 2)).visible = false;
 
                 }
             }
@@ -467,7 +494,7 @@ Main.prototype = {
             return;
         }
 
-        scrollValue =  (this.game.input.activePointer.y - this.scrollingBar.y);
+        scrollValue = (this.game.input.activePointer.y - this.scrollingBar.y);
 
         this.scrollDifference = scrollValue;
     },
@@ -481,10 +508,17 @@ Main.prototype = {
         var index;
         var texture;
         var icon;
+        var _game;
+        var __gameWidth;
+
+        _game = this.game;
+
+        __gameWidth = this.game.width;
 
         index = 0;
 
-        this.unitGroupUI.x = this.selectionUI.x;
+        this.unitGroupUI.x = __gameWidth - 310;
+        this.unitGroupUI.y = 10;
 
         for (yy = 0; yy <= 7; yy++) {
 
@@ -503,12 +537,12 @@ Main.prototype = {
                 x = xx * 62 + (xx * 7);
                 y = yy * 62 + (yy * 7);
 
-                icon = this.game.add.sprite(x - 3, y - 2, 'icon');
-                icon.width = 66;
-                icon.height = 66;
+                //icon = this.game.add.sprite(x - 3, y - 2, 'icon');
+                //icon.width = 66;
+                //icon.height = 66;
                 //icon.tint = 0xff0000;
 
-                this.unitGroupUI.add(icon);
+                //this.unitGroupUI.add(icon);
 
                 texture = this._getUnitTexture(index);
 
@@ -530,7 +564,6 @@ Main.prototype = {
 
         index = 0;
 
-        //this.structureGroupUI.y = this.unitGroupUI.getTop().y + 54;
         this.structureGroupUI.y = this.unitGroupUI.y + this.unitGroupUI.height + 10;
 
 
@@ -551,12 +584,12 @@ Main.prototype = {
                 x = xx * 62 + (xx * 7);
                 y = yy * 62 + (yy * 7);
 
-                icon = this.game.add.sprite(x - 3, y - 2, 'icon');
-                icon.width = 66;
-                icon.height = 66;
+                //icon = this.game.add.sprite(x - 3, y - 2, 'icon');
+                //icon.width = 66;
+                //icon.height = 66;
                 //icon.tint = 0xff0000;
 
-                this.structureGroupUI.add(icon);
+                //this.structureGroupUI.add(icon);
 
                 texture = this._getStructureTexture(index);
 
@@ -578,7 +611,6 @@ Main.prototype = {
 
         index = 0;
 
-        //this.upgradeGroupUI.y = this.structureGroupUI.y + this.structureGroupUI.getTop().y + 54;
         this.upgradeGroupUI.y = this.unitGroupUI.y + this.unitGroupUI.height + this.structureGroupUI.height + 20;
 
         for (yy = 0; yy <= 7; yy++) {
@@ -598,11 +630,11 @@ Main.prototype = {
                 x = xx * 62 + (xx * 7);
                 y = yy * 62 + (yy * 7);
 
-                icon = this.game.add.sprite(x - 3, y - 2, 'icon');
-                icon.width = 66;
-                icon.height = 66;
+                //icon = this.game.add.sprite(x - 3, y - 2, 'icon');
+                //icon.width = 66;
+                //icon.height = 66;
 
-                this.upgradeGroupUI.add(icon);
+                //this.upgradeGroupUI.add(icon);
 
                 texture = this._getUpgradeTexture(index);
 
@@ -611,7 +643,7 @@ Main.prototype = {
             }
         }
     },
-    
+
     _createEntity: function(x, y, texture, group) {
 
         var sprite;
@@ -635,224 +667,220 @@ Main.prototype = {
             switch (index) {
 
                 case 1:
-                texture = 'scv';
-                break;
+                    texture = 'scv';
+                    break;
 
                 case 2:
-                texture = 'reaper';
-                break;
+                    texture = 'reaper';
+                    break;
 
                 case 3:
-                texture = 'marauder';
-                break;
+                    texture = 'marauder';
+                    break;
 
                 case 4:
-                texture = 'ghost';
-                break;
+                    texture = 'ghost';
+                    break;
 
                 case 5:
-                texture = 'hellion';
-                break;
+                    texture = 'hellion';
+                    break;
 
                 case 6:
-                texture = 'widow-mine';
-                break;
+                    texture = 'widow-mine';
+                    break;
 
                 case 7:
-                texture = 'siege-tank';
-                break;
+                    texture = 'siege-tank';
+                    break;
 
                 case 8:
-                texture = 'cyclone';
-                break;
+                    texture = 'cyclone';
+                    break;
 
                 case 9:
-                texture = 'thor';
-                break;
+                    texture = 'thor';
+                    break;
 
                 case 10:
-                texture = 'viking';
-                break;
+                    texture = 'viking';
+                    break;
 
                 case 11:
-                texture = 'medivac';
-                break;
+                    texture = 'medivac';
+                    break;
 
                 case 12:
-                texture = 'liberator';
-                break;
+                    texture = 'liberator';
+                    break;
 
                 case 13:
-                texture = 'raven';
-                break;
+                    texture = 'raven';
+                    break;
 
                 case 14:
-                texture = 'banshee';
-                break;
+                    texture = 'banshee';
+                    break;
 
                 case 15:
-                texture = 'battlecruiser';
-                break;
-            }
-
-        else if (this.race === 'protoss')
+                    texture = 'battlecruiser';
+                    break;
+            } else if (this.race === 'protoss')
             switch (index) {
 
                 case 1:
-                texture = 'probe';
-                break;
+                    texture = 'probe';
+                    break;
 
                 case 2:
-                texture = 'zealot';
-                break;
+                    texture = 'zealot';
+                    break;
 
                 case 3:
-                texture = 'adept';
-                break;
+                    texture = 'adept';
+                    break;
 
                 case 4:
-                texture = 'sentry';
-                break;
+                    texture = 'sentry';
+                    break;
 
                 case 5:
-                texture = 'stalker';
-                break;
+                    texture = 'stalker';
+                    break;
 
                 case 6:
-                texture = 'dark-templar';
-                break;
+                    texture = 'dark-templar';
+                    break;
 
                 case 7:
-                texture = 'high-templar';
-                break;
+                    texture = 'high-templar';
+                    break;
 
                 case 8:
-                texture = 'archon';
-                break;
+                    texture = 'archon';
+                    break;
 
                 case 9:
-                texture = 'observer';
-                break;
+                    texture = 'observer';
+                    break;
 
                 case 10:
-                texture = 'void-prism';
-                break;
+                    texture = 'void-prism';
+                    break;
 
                 case 11:
-                texture = 'immortal';
-                break;
+                    texture = 'immortal';
+                    break;
 
                 case 12:
-                texture = 'collosus';
-                break;
+                    texture = 'collosus';
+                    break;
 
                 case 13:
-                texture = 'disruptor';
-                break;
+                    texture = 'disruptor';
+                    break;
 
                 case 14:
-                texture = 'phoenix';
-                break;
+                    texture = 'phoenix';
+                    break;
 
                 case 15:
-                texture = 'void-ray';
-                break;
+                    texture = 'void-ray';
+                    break;
 
                 case 16:
-                texture = 'oracle';
-                break;
+                    texture = 'oracle';
+                    break;
 
                 case 17:
-                texture = 'tempest';
-                break;
+                    texture = 'tempest';
+                    break;
 
                 case 18:
-                texture = 'carrier';
-                break;
+                    texture = 'carrier';
+                    break;
 
                 case 19:
-                texture = 'mothership-core';
-                break;
+                    texture = 'mothership-core';
+                    break;
 
                 case 20:
-                texture = 'mothership';
-                break;
-            }
-
-        else if (this.race === 'zerg')
+                    texture = 'mothership';
+                    break;
+            } else if (this.race === 'zerg')
             switch (index) {
 
                 case 1:
-                texture = 'larva';
-                break;
+                    texture = 'larva';
+                    break;
 
                 case 2:
-                texture = 'drone';
-                break;
+                    texture = 'drone';
+                    break;
 
                 case 3:
-                texture = 'zergling';
-                break;
+                    texture = 'zergling';
+                    break;
 
                 case 4:
-                texture = 'baneling';
-                break;
+                    texture = 'baneling';
+                    break;
 
                 case 5:
-                texture = 'roach';
-                break;
+                    texture = 'roach';
+                    break;
 
                 case 6:
-                texture = 'ravager';
-                break;
+                    texture = 'ravager';
+                    break;
 
                 case 7:
-                texture = 'hydralisk';
-                break;
+                    texture = 'hydralisk';
+                    break;
 
                 case 8:
-                texture = 'lurker';
-                break;
+                    texture = 'lurker';
+                    break;
 
                 case 9:
-                texture = 'viper';
-                break;
+                    texture = 'viper';
+                    break;
 
                 case 10:
-                texture = 'mutalisk';
-                break;
+                    texture = 'mutalisk';
+                    break;
 
                 case 11:
-                texture = 'corruptor';
-                break;
+                    texture = 'corruptor';
+                    break;
 
                 case 12:
-                texture = 'swarm-host';
-                break;
+                    texture = 'swarm-host';
+                    break;
 
                 case 13:
-                texture = 'infestor';
-                break;
+                    texture = 'infestor';
+                    break;
 
                 case 14:
-                texture = 'ultralisk';
-                break;
+                    texture = 'ultralisk';
+                    break;
 
                 case 15:
-                texture = 'broodlord';
-                break;
+                    texture = 'broodlord';
+                    break;
 
                 case 16:
-                texture = 'overlord';
-                break;
+                    texture = 'overlord';
+                    break;
 
                 case 17:
-                texture = 'overseer';
-                break;
+                    texture = 'overseer';
+                    break;
 
                 case 18:
-                texture = 'queen';
-                break;
+                    texture = 'queen';
+                    break;
             }
 
         return texture;
@@ -866,205 +894,201 @@ Main.prototype = {
             switch (index) {
 
                 case 1:
-                texture = 'command-center';
-                break;
+                    texture = 'command-center';
+                    break;
 
                 case 2:
-                texture = 'orbital';
-                break;
+                    texture = 'orbital';
+                    break;
 
                 case 3:
-                texture = 'planetary-fortress';
-                break;
+                    texture = 'planetary-fortress';
+                    break;
 
                 case 4:
-                texture = 'refinery';
-                break;
+                    texture = 'refinery';
+                    break;
 
                 case 5:
-                texture = 'supply-depot';
-                break;
+                    texture = 'supply-depot';
+                    break;
 
                 case 6:
-                texture = 'barracks';
-                break;
+                    texture = 'barracks';
+                    break;
 
                 case 7:
-                texture = 'engineering-bay';
-                break;
+                    texture = 'engineering-bay';
+                    break;
 
                 case 8:
-                texture = 'bunker';
-                break;
+                    texture = 'bunker';
+                    break;
 
                 case 9:
-                texture = 'turret';
-                break;
+                    texture = 'turret';
+                    break;
 
                 case 10:
-                texture = 'sensor-tower';
-                break;
+                    texture = 'sensor-tower';
+                    break;
 
                 case 11:
-                texture = 'ghost-academy';
-                break;
+                    texture = 'ghost-academy';
+                    break;
 
                 case 12:
-                texture = 'factory';
-                break;
+                    texture = 'factory';
+                    break;
 
                 case 13:
-                texture = 'armory';
-                break;
+                    texture = 'armory';
+                    break;
 
                 case 14:
-                texture = 'starport';
-                break;
+                    texture = 'starport';
+                    break;
 
                 case 15:
-                texture = 'fusion-core';
-                break;
+                    texture = 'fusion-core';
+                    break;
 
                 case 16:
-                texture = 'tech-lab';
-                break;
+                    texture = 'tech-lab';
+                    break;
 
                 case 17:
-                texture = 'reactor';
-                break;
+                    texture = 'reactor';
+                    break;
 
-            }
-
-        else if (this.race === 'protoss')
+            } else if (this.race === 'protoss')
             switch (index) {
 
                 case 1:
-                texture = 'nexus';
-                break;
+                    texture = 'nexus';
+                    break;
 
                 case 2:
-                texture = 'assimilator';
-                break;
+                    texture = 'assimilator';
+                    break;
 
                 case 3:
-                texture = 'pylon';
-                break;
+                    texture = 'pylon';
+                    break;
 
                 case 4:
-                texture = 'gateway';
-                break;
+                    texture = 'gateway';
+                    break;
 
                 case 5:
-                texture = 'forge';
-                break;
+                    texture = 'forge';
+                    break;
 
                 case 6:
-                texture = 'cybernetics-core';
-                break;
+                    texture = 'cybernetics-core';
+                    break;
 
                 case 7:
-                texture = 'cannon';
-                break;
+                    texture = 'cannon';
+                    break;
 
                 case 8:
-                texture = 'twilight-council';
-                break;
+                    texture = 'twilight-council';
+                    break;
 
                 case 9:
-                texture = 'stargate';
-                break;
+                    texture = 'stargate';
+                    break;
 
                 case 10:
-                texture = 'robotics-facility';
-                break;
+                    texture = 'robotics-facility';
+                    break;
 
                 case 11:
-                texture = 'templar-archives';
-                break;
+                    texture = 'templar-archives';
+                    break;
 
                 case 12:
-                texture = 'fleet-beacon';
-                break;
+                    texture = 'fleet-beacon';
+                    break;
 
                 case 13:
-                texture = 'robotics-bay';
-                break;
+                    texture = 'robotics-bay';
+                    break;
 
                 case 14:
-                texture = 'dark-shrine';
-                break;
-            }
-
-        else if (this.race === 'zerg')
+                    texture = 'dark-shrine';
+                    break;
+            } else if (this.race === 'zerg')
             switch (index) {
 
                 case 1:
-                texture = 'hatchery';
-                break;
+                    texture = 'hatchery';
+                    break;
 
                 case 2:
-                texture = 'lair';
-                break;
+                    texture = 'lair';
+                    break;
 
                 case 3:
-                texture = 'hive';
-                break;
+                    texture = 'hive';
+                    break;
 
                 case 4:
-                texture = 'extractor';
-                break;
+                    texture = 'extractor';
+                    break;
 
                 case 5:
-                texture = 'spawning-pool';
-                break;
+                    texture = 'spawning-pool';
+                    break;
 
                 case 6:
-                texture = 'evolution-chamber';
-                break;
+                    texture = 'evolution-chamber';
+                    break;
 
                 case 7:
-                texture = 'roach-warren';
-                break;
+                    texture = 'roach-warren';
+                    break;
 
                 case 8:
-                texture = 'baneling-nest';
-                break;
+                    texture = 'baneling-nest';
+                    break;
 
                 case 9:
-                texture = 'spine-crawler';
-                break;
+                    texture = 'spine-crawler';
+                    break;
 
                 case 10:
-                texture = 'spore-crawler';
-                break;
+                    texture = 'spore-crawler';
+                    break;
 
                 case 11:
-                texture = 'hydralisk-den';
-                break;
+                    texture = 'hydralisk-den';
+                    break;
 
                 case 12:
-                texture = 'lurker-den';
-                break;
+                    texture = 'lurker-den';
+                    break;
 
                 case 13:
-                texture = 'infestation-pit';
-                break;
+                    texture = 'infestation-pit';
+                    break;
 
                 case 14:
-                texture = 'spire';
-                break;
+                    texture = 'spire';
+                    break;
 
                 case 15:
-                texture = 'greater-spire';
-                break;
+                    texture = 'greater-spire';
+                    break;
 
                 case 16:
-                texture = 'nydus-network';
-                break;
+                    texture = 'nydus-network';
+                    break;
 
                 case 17:
-                texture = 'ultralisk-cavern';
-                break;
+                    texture = 'ultralisk-cavern';
+                    break;
             }
 
         return texture;
@@ -1078,320 +1102,316 @@ Main.prototype = {
             switch (index) {
 
                 case 1:
-                texture = 'infantry-weapons-1';
-                break;
+                    texture = 'infantry-weapons-1';
+                    break;
 
                 case 2:
-                texture = 'infantry-weapons-2';
-                break;
+                    texture = 'infantry-weapons-2';
+                    break;
 
                 case 3:
-                texture = 'infantry-weapons-3';
-                break;
+                    texture = 'infantry-weapons-3';
+                    break;
 
                 case 4:
-                texture = 'vehicle-weapons-1';
-                break;
+                    texture = 'vehicle-weapons-1';
+                    break;
 
                 case 5:
-                texture = 'vehicle-weapons-2';
-                break;
+                    texture = 'vehicle-weapons-2';
+                    break;
 
                 case 6:
-                texture = 'vehicle-weapons-3';
-                break;
+                    texture = 'vehicle-weapons-3';
+                    break;
 
                 case 7:
-                texture = 'infantry-armor-1';
-                break;
+                    texture = 'infantry-armor-1';
+                    break;
 
                 case 8:
-                texture = 'infantry-armor-2';
-                break;
+                    texture = 'infantry-armor-2';
+                    break;
 
                 case 9:
-                texture = 'infantry-armor-3';
-                break;
+                    texture = 'infantry-armor-3';
+                    break;
 
                 case 10:
-                texture = 'vehicle-plating-1';
-                break;
+                    texture = 'vehicle-plating-1';
+                    break;
 
                 case 11:
-                texture = 'vehicle-plating-2';
-                break;
+                    texture = 'vehicle-plating-2';
+                    break;
 
                 case 12:
-                texture = 'vehicle-plating-3';
-                break;
+                    texture = 'vehicle-plating-3';
+                    break;
 
                 case 13:
-                texture = 'hisec-auto-tracking';
-                break;
+                    texture = 'hisec-auto-tracking';
+                    break;
 
                 case 14:
-                texture = 'cloaking-field';
-                break;
+                    texture = 'cloaking-field';
+                    break;
 
                 case 15:
-                texture = 'stimpack';
-                break;
+                    texture = 'stimpack';
+                    break;
 
                 case 16:
-                texture = 'yamato-cannon';
-                break;
+                    texture = 'yamato-cannon';
+                    break;
 
                 case 17:
-                texture = 'behemoth-reactor';
-                break;
+                    texture = 'behemoth-reactor';
+                    break;
 
                 case 18:
-                texture = 'corvid-reactor';
-                break;
+                    texture = 'corvid-reactor';
+                    break;
 
                 case 19:
-                texture = 'moebius-reactor';
-                break;
+                    texture = 'moebius-reactor';
+                    break;
 
                 case 20:
-                texture = 'drilling-claws';
-                break;
+                    texture = 'drilling-claws';
+                    break;
 
                 case 21:
-                texture = 'building-armor';
-                break;
+                    texture = 'building-armor';
+                    break;
 
                 case 22:
-                texture = 'combat-shield';
-                break;
+                    texture = 'combat-shield';
+                    break;
 
                 case 23:
-                texture = 'durable-materials';
-                break;
+                    texture = 'durable-materials';
+                    break;
 
                 case 24:
-                texture = 'infernal-preigniter';
-                break;
+                    texture = 'infernal-preigniter';
+                    break;
 
                 case 25:
-                texture = 'neosteel-frames';
-                break;
-            }
-
-        else if (this.race === 'protoss')
+                    texture = 'neosteel-frames';
+                    break;
+            } else if (this.race === 'protoss')
             switch (index) {
 
                 case 1:
-                texture = 'ground-weapons-1';
-                break;
+                    texture = 'ground-weapons-1';
+                    break;
 
                 case 2:
-                texture = 'ground-weapons-2';
-                break;
+                    texture = 'ground-weapons-2';
+                    break;
 
                 case 3:
-                texture = 'ground-weapons-3';
-                break;
+                    texture = 'ground-weapons-3';
+                    break;
 
                 case 4:
-                texture = 'air-weapons-1';
-                break;
+                    texture = 'air-weapons-1';
+                    break;
 
                 case 5:
-                texture = 'air-weapons-2';
-                break;
+                    texture = 'air-weapons-2';
+                    break;
 
                 case 6:
-                texture = 'air-weapons-3';
-                break;
+                    texture = 'air-weapons-3';
+                    break;
 
                 case 7:
-                texture = 'ground-armor-1';
-                break;
+                    texture = 'ground-armor-1';
+                    break;
 
                 case 8:
-                texture = 'ground-armor-2';
-                break;
+                    texture = 'ground-armor-2';
+                    break;
 
                 case 9:
-                texture = 'ground-armor-3';
-                break;
+                    texture = 'ground-armor-3';
+                    break;
 
                 case 10:
-                texture = 'air-armor-1';
-                break;
+                    texture = 'air-armor-1';
+                    break;
 
                 case 11:
-                texture = 'air-armor-2';
-                break;
+                    texture = 'air-armor-2';
+                    break;
 
                 case 12:
-                texture = 'air-armor-3';
-                break;
+                    texture = 'air-armor-3';
+                    break;
 
                 case 13:
-                texture = 'shields-1';
-                break;
+                    texture = 'shields-1';
+                    break;
 
                 case 14:
-                texture = 'shields-2';
-                break;
+                    texture = 'shields-2';
+                    break;
 
                 case 15:
-                texture = 'shields-3';
-                break;
+                    texture = 'shields-3';
+                    break;
 
                 case 16:
-                texture = 'charge';
-                break;
+                    texture = 'charge';
+                    break;
 
                 case 17:
-                texture = 'gravitic-booster';
-                break;
+                    texture = 'gravitic-booster';
+                    break;
 
                 case 18:
-                texture = 'gravitic-drive';
-                break;
+                    texture = 'gravitic-drive';
+                    break;
 
                 case 19:
-                texture = 'anion-pulse-crystals';
-                break;
+                    texture = 'anion-pulse-crystals';
+                    break;
 
                 case 20:
-                texture = 'extended-thermal-lances';
-                break;
+                    texture = 'extended-thermal-lances';
+                    break;
 
                 case 21:
-                texture = 'psionic-storm';
-                break;
+                    texture = 'psionic-storm';
+                    break;
 
                 case 22:
-                texture = 'blink';
-                break;
+                    texture = 'blink';
+                    break;
 
                 case 23:
-                texture = 'hallucination';
-                break;
+                    texture = 'hallucination';
+                    break;
 
                 case 24:
-                texture = 'graviton-catapult';
-                break;
-            }
-
-        else if (this.race === 'zerg')
+                    texture = 'graviton-catapult';
+                    break;
+            } else if (this.race === 'zerg')
             switch (index) {
 
                 case 1:
-                texture = 'melee-attacks-1';
-                break;
+                    texture = 'melee-attacks-1';
+                    break;
 
                 case 2:
-                texture = 'melee-attacks-2';
-                break;
+                    texture = 'melee-attacks-2';
+                    break;
 
                 case 3:
-                texture = 'melee-attacks-3';
-                break;
+                    texture = 'melee-attacks-3';
+                    break;
 
                 case 4:
-                texture = 'missile-attacks-1';
-                break;
+                    texture = 'missile-attacks-1';
+                    break;
 
                 case 5:
-                texture = 'missile-attacks-2';
-                break;
+                    texture = 'missile-attacks-2';
+                    break;
 
                 case 6:
-                texture = 'missile-attacks-3';
-                break;
+                    texture = 'missile-attacks-3';
+                    break;
 
                 case 7:
-                texture = 'flyer-attacks-1';
-                break;
+                    texture = 'flyer-attacks-1';
+                    break;
 
                 case 8:
-                texture = 'flyer-attacks-2';
-                break;
+                    texture = 'flyer-attacks-2';
+                    break;
 
                 case 9:
-                texture = 'flyer-attacks-3';
-                break;
+                    texture = 'flyer-attacks-3';
+                    break;
 
                 case 10:
-                texture = 'ground-carapace-1';
-                break;
+                    texture = 'ground-carapace-1';
+                    break;
 
                 case 11:
-                texture = 'ground-carapace-2';
-                break;
+                    texture = 'ground-carapace-2';
+                    break;
 
                 case 12:
-                texture = 'ground-carapace-3';
-                break;
+                    texture = 'ground-carapace-3';
+                    break;
 
                 case 13:
-                texture = 'flyer-carapace-1';
-                break;
+                    texture = 'flyer-carapace-1';
+                    break;
 
                 case 14:
-                texture = 'flyer-carapace-2';
-                break;
+                    texture = 'flyer-carapace-2';
+                    break;
 
                 case 15:
-                texture = 'flyer-carapace-3';
-                break;
+                    texture = 'flyer-carapace-3';
+                    break;
 
                 case 16:
-                texture = 'chitinous-plating';
-                break;
+                    texture = 'chitinous-plating';
+                    break;
 
                 case 17:
-                texture = 'centrifugal-hooks';
-                break;
+                    texture = 'centrifugal-hooks';
+                    break;
 
                 case 18:
-                texture = 'glial-reconstitution';
-                break;
+                    texture = 'glial-reconstitution';
+                    break;
 
                 case 19:
-                texture = 'metabolic-boost';
-                break;
+                    texture = 'metabolic-boost';
+                    break;
 
                 case 20:
-                texture = 'pneumatized-carapace';
-                break;
+                    texture = 'pneumatized-carapace';
+                    break;
 
                 case 21:
-                texture = 'muscular-augments';
-                break;
+                    texture = 'muscular-augments';
+                    break;
 
                 case 22:
-                texture = 'grooved-spines';
-                break;
+                    texture = 'grooved-spines';
+                    break;
 
                 case 23:
-                texture = 'burrow';
-                break;
+                    texture = 'burrow';
+                    break;
 
                 case 24:
-                texture = 'neural-parasite';
-                break;
+                    texture = 'neural-parasite';
+                    break;
 
                 case 25:
-                texture = 'pathogen-glands';
-                break;
+                    texture = 'pathogen-glands';
+                    break;
 
                 case 26:
-                texture = 'adrenal-glands';
-                break;
+                    texture = 'adrenal-glands';
+                    break;
 
                 case 27:
-                texture = 'tunneling-claws';
-                break;
+                    texture = 'tunneling-claws';
+                    break;
 
                 case 28:
-                texture = 'flying-locust';
-                break;
+                    texture = 'flying-locust';
+                    break;
             }
 
         return texture;
@@ -1415,8 +1435,8 @@ Main.prototype = {
 
     pad: function(str, max) {
 
-      str = str.toString();
-      return str.length < max ? this.pad("0" + str, max) : str;
+        str = str.toString();
+        return str.length < max ? this.pad("0" + str, max) : str;
     }
 };
 
