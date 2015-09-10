@@ -183,6 +183,12 @@ Main.prototype = {
         this.isScrolling = false;
         this.scrollDifference = 0;
         this.maxHeight = 0;
+        this.timeIterations = 0;
+        this.visibleTimeIterations = 0;
+        this.timeLandmarks = 0;
+        this.slowdownDrag = 0;
+
+        this.bg = null;
 
         this.bg = this.game.add.image(0, 0, 'stars')
         this.bg.alpha = 0.2;
@@ -209,7 +215,6 @@ Main.prototype = {
 
         this.initTimeline();
 
-        // Next: resource gathering.
         this.initBases();
 
         this.initWorkers();
@@ -248,10 +253,10 @@ Main.prototype = {
             _upgradeGroupUI = this.upgradeGroupUI;
 
             // Starting scroll point
-            scrollValue = (_game.input.activePointer.y - _scrollingBar.y);
-
             if (scrollValue >= _scrollingBar.height)
                 scrollValue = _scrollingBar.height;
+            else
+                scrollValue = (_game.input.activePointer.y - _scrollingBar.y);
 
             // follow input with scroll bar
             scrollVal = _game.input.activePointer.y - this.scrollDifference;
@@ -277,14 +282,16 @@ Main.prototype = {
             _upgradeGroupUI.y = upgradeY;
 
             // Cropping icons
-            this.structureGroupUI.forEach(this._crop, this);
-            this.upgradeGroupUI.forEach(this._crop, this);
+            _structureGroupUI.forEach(this._crop, this);
+            _upgradeGroupUI.forEach(this._crop, this);
         }
     },
 
-    touchInputDown: function() {},
+    touchInputDown: function() {
+    },
 
-    touchInputUp: function() {},
+    touchInputUp: function() {
+    },
 
     initRace: function() {
 
@@ -318,8 +325,6 @@ Main.prototype = {
     initUI: function() {
 
         var i;
-        var timeIterations;
-        var visibleTimeIterations;
         var timeValue;
         var timeString1;
         var timeString2;
@@ -358,18 +363,18 @@ Main.prototype = {
 
 
         // Selection UI
-        line = _game.make.graphics(__gameWidth - 360, 51);
+        line = _game.make.graphics(__gameWidth - 330, 51);
         line.lineStyle(3, 0x00ff00, 1);
-        line.lineTo(40, 40);
-        line.lineTo(40, __gameHeight - 53);
-        line.lineTo(358, __gameHeight - 53);
-        line.lineTo(358, -90);
-        line.lineTo(326, -90);
-        line.lineTo(326, __gameHeight);
+        line.lineTo(10, 10);
+        line.lineTo(10, __gameHeight - 53);
+        line.lineTo(328, __gameHeight - 53);
+        line.lineTo(328, -90);
+        line.lineTo(296, -90);
+        line.lineTo(296, __gameHeight);
 
 
         // 2nd down from top
-        line2 = _game.make.graphics(__gameWidth - 359, 51);
+        line2 = _game.make.graphics(__gameWidth - 330, 51);
         line2.lineStyle(3, 0x00ff00, 1);
         line2.lineTo(-1000, 0);
 
@@ -423,31 +428,20 @@ Main.prototype = {
         this.supplyText.tint = 0x00ff00;
 
 
-        // Timer starting text 0:00
-        //var startingTime = _game.add.bitmapText(5, 58, 'Agency_35', '0:00', 25);
-        //line.lineStyle(3, 0x00ff00, 1);
-        //line.lineTo(0, -8);
-        //line2 = _game.make.graphics(0, 80);
-        //line2.lineStyle(1, 0x00ff00, 0.2);
-        //line2.lineTo(0, this.game.height - 50);
-        //_lineGroup.add(startingTime);
-        //_lineGroup.add(line);
-        //_lineGroup.add(line2);
-
         if (_game.device.desktop) {
 
             // Desktop
-            timeIterations = 25;
-            visibleTimeIterations = Math.floor((__gameWidth - 360) / 90) - 2;
+            this.timeIterations = 25;
+            this.visibleTimeIterations = Math.floor((__gameWidth - 232) / 90) - 2;
         } else {
 
             // Mobile
-            timeIterations = Math.floor((__gameWidth - 360) / 90) - 1;
+            this.timeIterations = Math.floor((__gameWidth - 232) / 90) - 1;
         }
 
 
         // Time texts
-        for (i = 0; i < timeIterations; i++) {
+        for (i = 0; i < this.timeIterations; i++) {
 
             //For mobile, maybe make this one big bitmapdata
 
@@ -458,19 +452,21 @@ Main.prototype = {
 
             timeString = (timeString1 + ":" + timeString2);
 
-            time = _game.add.bitmapText(95 + (i * 90), 58, 'Agency_35', timeString, 25);
-            line = _game.make.graphics(90 + (i * 90), 80);
+            time = _game.make.bitmapText(5 + (i * 90), 58, 'Agency_35', timeString, 25);
+            time.index = i;
+            time.seconds = timeValue;
+            line = _game.make.graphics((i * 90), 80);
             line.lineStyle(3, 0x00ff00, 1);
             line.lineTo(0, -8);
 
-            line2 = _game.make.graphics(90 + (i * 90), 80);
+            line2 = _game.make.graphics((i * 90), 80);
             line2.lineStyle(1, 0x00ff00, 0.2);
             line2.lineTo(0, this.game.height - 50);
             _lineGroup.add(time);
             _lineGroup.add(line);
             _lineGroup.add(line2);
 
-            if (i > visibleTimeIterations) {
+            if (i > this.visibleTimeIterations) {
 
                 time.visible = false;
                 line.visible = false;
@@ -558,42 +554,125 @@ Main.prototype = {
 
     updateTimeline: function(line) {
 
+        var i;
         var x;
         var seconds;
         var minutes;
         var realTime;
+        var _game;
+        var _lineGroup;
+        var __gameWidth;
+
+        _game = this.game;
+        _lineGroup = this.lineGroup;
+        __gameWidth = _game.width;
 
         // X value of the line sprite dragged by mouse
         x = Math.floor(line.x + (line.width / 2) - 0.5);
 
-        seconds = Math.floor((1 - ((90 - x) / 90)) * 30);
+        timeValue = (-(_lineGroup.x / 3) + (this.timeLandmarks * 30)) + (this.timeline.x / 3);
+        minutes = Math.floor(timeValue / 60).toString();
+        seconds = this.pad((timeValue % 60), 2);
+        realTime = (minutes + ":" + seconds);
 
-        // Only move the timeline bar per second
-        if (this.prevTime != seconds) {
+        // If timeline is moved within movable area
+        if (this.timelineDrag.x < __gameWidth - 349) {
 
-            this.timeline.x = seconds * 3;
-        }
-
-
-        if (this.timeline.x < 540) {
-
+            // Get time string
+            
+            /*
+            seconds = Math.floor((1 - ((90 - x) / 90)) * 30);
             minutes = Math.floor(seconds / 60);
-
             realTime = (minutes + ":" + this.pad(seconds % 60, 2));
-
             realTime.toString();
+            */
+            
+            
+            
+    
+            console.log(realTime);
+
+            // Only move the timeline bar per second
+            //if (this.prevTime != seconds) 
+                this.timeline.x = Math.floor((1 - ((90 - x) / 90)) * 30) * 3; //seconds * 3; //(timeline.x % / 3)
 
             this.currentTimeText.setText(realTime);
 
+
+        // If timeline is dragged to maximum right, start scrolling
         } else {
 
-            this.timeline.x = 540;
+            // Wait for 3 updates (matching a second) before sliding the time/line group over
+            if (this.slowdownDrag < 3) {
 
-            this.lineGroup.forEach(function (sprite) {sprite.tint = 0x00ffff;}, this);
+                this.slowdownDrag++;
+                return;
+            }
+
+            // Reset slow drag count
+            this.slowdownDrag = 0;
+
+            // Set gray timeline bar position
+            this.timelineDrag.x = __gameWidth - 350;
+
+            // Move time/line group
+            _lineGroup.x -= 3;
+
+
+            this.currentTimeText.setText(realTime);
+
+
+            // If scrolled past the width of a 30 second time block, reset lineGroup position and change times to align
+            if (_lineGroup.x <= -90) {
+
+                _lineGroup.x = 0;
+             
+                this.timeLandmarks++;
+
+               // Time texts
+               for (i = 0; i < this.timeIterations; i++) {
+
+                   //For mobile, maybe make this one big bitmapdata
+
+                   timeValue = (i + this.timeLandmarks) * 30;
+                   minutes = Math.floor(timeValue / 60).toString();
+                   seconds = this.pad((timeValue % 60), 2);
+                   realTime = (minutes + ":" + seconds);
+
+
+                   time = _lineGroup.getAt((i * 3));
+
+                   time.text = realTime;
+
+                   /*
+                   if ((i / 3) > this.visibleTimeIterations) {
+
+                       time.visible = false;
+                       line.visible = false;
+                       line2.visible = false;
+
+                   }
+                   */
+               }
+
+            }
         }
 
         this.prevTime = seconds;
     },
+
+    _changeTime: function(sprite) {
+
+        var val;
+
+        if (sprite.type === 6) {
+
+            val = sprite.seconds;
+
+        }
+
+    },
+
 
     initBases: function() {
 
@@ -641,22 +720,19 @@ Main.prototype = {
         this.scrollBar.x = __gameWidth - 32;
         this.scrollingBar.x = __gameWidth - 32;
 
-        _lineGroupUI.getAt(0).tint = 0xff0000;
-        console.log(_lineGroupUI.getAt(4));
-
-        _lineGroupUI.getAt(0).x = __gameWidth - 360;
-        _lineGroupUI.getAt(1).x = __gameWidth - 359;
+        _lineGroupUI.getAt(0).x = __gameWidth - 330;
+        _lineGroupUI.getAt(1).x = __gameWidth - 329;
         _lineGroupUI.getAt(1).width = __gameWidth - 320;
         _lineGroupUI.getAt(2).width = __gameWidth + 10;
         _lineGroupUI.getAt(4).moveTo(0, 0);
         _lineGroupUI.getAt(4).lineTo(__gameWidth - 323, 0);
-        _lineGroupUI.getAt(4).width = __gameWidth - 323;
+        _lineGroupUI.getAt(4).width = __gameWidth - 315;
 
 
         // Strech background to fit the screen
-        if (__gameWidth > 960)
+        if (_game.device.desktop && this.bg !== null && __gameWidth > 960)
             this.bg.width = __gameWidth;
-        else
+        else if (this.bg !== null)
             this.bg.width = 960;
 
         // Control visibility of time indicators based on width
@@ -666,15 +742,21 @@ Main.prototype = {
 
                 val = ((90 + (i / 3 * 90)));
 
-                if ((__gameWidth - 384) >= val) {
-
+                // Time incrament visibility
+                if ((__gameWidth - 270) >= val) 
                     _lineGroup.getAt(i).visible = true;
+                 else 
+                    _lineGroup.getAt(i).visible = false;
+
+
+                // Time line visibility (lasts longer than time incrament)
+                if ((__gameWidth - 232) >= val) {
+
                     _lineGroup.getAt((i + 1)).visible = true;
                     _lineGroup.getAt((i + 2)).visible = true;
 
                 } else {
 
-                    _lineGroup.getAt(i).visible = false;
                     _lineGroup.getAt((i + 1)).visible = false;
                     _lineGroup.getAt((i + 2)).visible = false;
 
