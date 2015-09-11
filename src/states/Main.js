@@ -133,6 +133,8 @@ Main.prototype = {
         this.workerGroup = this.game.add.group();
         this.baseGroup = this.game.add.group();
 
+        this.initTimeline();
+
         this.initUI();
 
         this.initRace();
@@ -144,8 +146,6 @@ Main.prototype = {
         this.createUpgrades();
 
         this.startUI();
-
-        this.initTimeline();
 
         this.initBases();
 
@@ -479,6 +479,7 @@ Main.prototype = {
         // Timeline events
         this.timelineDrag.events.onDragStart.add(this.moveTimeline, this);
         this.timelineDrag.events.onDragUpdate.add(this.updateTimeline, this);
+        this.timelineDrag.events.onDragStop.add(this.stopTimeline, this);
     },
 
     moveTimeline: function(line) {
@@ -491,6 +492,7 @@ Main.prototype = {
         var seconds;
         var minutes;
         var realTime;
+        var timeValue;
         var _game;
         var _lineGroup;
         var __gameWidth;
@@ -502,32 +504,20 @@ Main.prototype = {
         // X value of the line sprite dragged by mouse
         x = Math.floor(line.x + (line.width / 2) - 0.5);
 
+        // Get time string
         timeValue = (-(_lineGroup.x / 3) + (this.timeLandmarks * 30)) + (this.timeline.x / 3);
         minutes = Math.floor(timeValue / 60).toString();
         seconds = this.pad((timeValue % 60), 2);
         realTime = (minutes + ":" + seconds);
 
         // If timeline is moved within movable area
-        if (this.timelineDrag.x < __gameWidth - 349) {
+        if (this.timelineDrag.x < __gameWidth - 349) {   // LEFT OFF ~ desktop adjusting width doesnt compensate for timeline position. backwards scrolling.
 
-            // Get time string
-            
-            /*
-            seconds = Math.floor((1 - ((90 - x) / 90)) * 30);
-            minutes = Math.floor(seconds / 60);
-            realTime = (minutes + ":" + this.pad(seconds % 60, 2));
-            realTime.toString();
-            */
-            
-            
-            
     
-            console.log(realTime);
-
             // Only move the timeline bar per second
-            //if (this.prevTime != seconds) 
-                this.timeline.x = Math.floor((1 - ((90 - x) / 90)) * 30) * 3; //seconds * 3; //(timeline.x % / 3)
+            this.timeline.x = Math.floor((1 - ((90 - x) / 90)) * 30) * 3; 
 
+            // Set the current time
             this.currentTimeText.setText(realTime);
 
 
@@ -551,6 +541,7 @@ Main.prototype = {
             _lineGroup.x -= 3;
 
 
+            // Set the current time
             this.currentTimeText.setText(realTime);
 
 
@@ -570,7 +561,6 @@ Main.prototype = {
                    minutes = Math.floor(timeValue / 60).toString();
                    seconds = this.pad((timeValue % 60), 2);
                    realTime = (minutes + ":" + seconds);
-
 
                    time = _lineGroup.getAt((i * 3));
 
@@ -593,18 +583,11 @@ Main.prototype = {
         this.prevTime = seconds;
     },
 
-    _changeTime: function(sprite) {
+    stopTimeline: function(line) {
 
-        var val;
-
-        if (sprite.type === 6) {
-
-            val = sprite.seconds;
-
-        }
-
+        if (line.x >= this.game.width - 349)
+            line.x = this.game.width - 350;
     },
-
 
     initBases: function() {
 
@@ -631,6 +614,11 @@ Main.prototype = {
 
         var i;
         var uiPos;
+        var x;
+        var seconds;
+        var minutes;
+        var realTime;
+        var timeValue;
         var _game;
         var _lineGroup;
         var _lineGroupUI;
@@ -651,6 +639,23 @@ Main.prototype = {
 
         this.scrollBar.x = __gameWidth - 32;
         this.scrollingBar.x = __gameWidth - 32;
+
+        // Adjust gray timeline bar to scroll time backwards if desktop re-scaling maxes out the time distance (hits UI)
+        if (this.timeline.x > __gameWidth - 334) {   
+
+            this.timelineDrag.x = __gameWidth - 350;
+            this.timeline.x = __gameWidth - 334;
+
+            // X value of the line sprite dragged by mouse
+            x = Math.floor(this.timeline.x + (this.timeline.width / 2) - 0.5);
+
+            // Get time string
+            timeValue = Math.floor((-(_lineGroup.x / 3) + (this.timeLandmarks * 30)) + (this.timeline.x / 3));
+            minutes = Math.floor(timeValue / 60).toString();
+            seconds = this.pad((timeValue % 60), 2);
+            realTime = (minutes + ":" + seconds);
+            this.currentTimeText.setText(realTime);
+        }
 
         _lineGroupUI.getAt(0).x = __gameWidth - 330;
         _lineGroupUI.getAt(1).x = __gameWidth - 329;
