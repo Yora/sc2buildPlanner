@@ -354,7 +354,8 @@ Main.prototype = {
 
 
         // Scroll bar
-        this.scrollingBar = _game.add.sprite(0, 0, 'scrolling-bar');
+        //this.scrollingBar = _game.add.sprite(0, 0, 'scrolling-bar');
+
 
         this.scrollBar = _game.add.button(__gameWidth - 42, 0, '', this._scrollBar, this);
         this.scrollBar.width = 42;
@@ -466,7 +467,7 @@ Main.prototype = {
             _lineGroup.add(line);
             _lineGroup.add(line2);
 
-            if (i > this.visibleTimeIterations) {
+            if (this.game.device.desktop && i > this.visibleTimeIterations) {
 
                 time.visible = false;
                 line.visible = false;
@@ -480,7 +481,7 @@ Main.prototype = {
 
 
         // Do a scale update
-        this.scaleUpdate();
+        //this.scaleUpdate();
     },
 
     startUI: function() {
@@ -510,8 +511,16 @@ Main.prototype = {
         this.heightDifferece = heightDiffereceVar;
 
         scrollingBarHeightVar = __gameHeight * ((this.maxHeight - __gameHeight) / this.maxHeight);
-        this.scrollingBar.height = scrollingBarHeightVar;
 
+
+        // Create scrolling bar.  Needed to be created here.
+        this.scrollingBar = _game.add.graphics(0, 0);
+        this.scrollingBar.lineStyle(1, 0x00ff00, 1);
+        this.scrollingBar.beginFill(0x00ff00, 0.3);
+        this.scrollingBar.drawRect(0, 0, 32, scrollingBarHeightVar);
+
+
+        // Used in update to properly adjust unit groups based on game height
         gameAndScrollHeightVar = (__gameHeight - this.scrollingBar.height);
         this.gameAndScrollHeight = gameAndScrollHeightVar;
 
@@ -520,8 +529,6 @@ Main.prototype = {
         this.structureGroupUI.forEach(this._crop, this);
         this.upgradeGroupUI.forEach(this._crop, this);
 
-
-        _game.world.sendToBack(this.scrollingBar);
 
         this.scaleUpdate();
     },
@@ -579,7 +586,7 @@ Main.prototype = {
         realTime = (minutes + ":" + seconds);
 
         // If timeline is moved within movable area
-        if (this.timelineDrag.x < __gameWidth - 349) {   // LEFT OFF ~ desktop adjusting width doesnt compensate for timeline position. backwards scrolling.
+        if (this.timelineDrag.x < __gameWidth - 349) {  
 
     
             // Only move the timeline bar per second
@@ -590,7 +597,7 @@ Main.prototype = {
 
 
         // If timeline is dragged to maximum right, start scrolling
-        } else {
+        } else if (this.timelineDrag.x >= __gameWidth - 349) {
 
             // Wait for 3 updates (matching a second) before sliding the time/line group over
             if (this.slowdownDrag < 3) {
@@ -633,19 +640,14 @@ Main.prototype = {
                    time = _lineGroup.getAt((i * 3));
 
                    time.text = realTime;
-
-                   /*
-                   if ((i / 3) > this.visibleTimeIterations) {
-
-                       time.visible = false;
-                       line.visible = false;
-                       line2.visible = false;
-
-                   }
-                   */
-               }
-
+                }
             }
+
+        // If timeline is dragged to maximum left, start scrolling backwards
+        } else {
+
+
+
         }
 
         this.prevTime = seconds;
