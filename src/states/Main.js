@@ -109,8 +109,6 @@ Main.prototype = {
         this.workerCount = 12;
 
         this.timeline = null;
-        this.prevTime = 0;
-
         this.maxScrollCount = 0;
         this.isScrolling = false;
         this.scrollDifference = 0;
@@ -119,6 +117,13 @@ Main.prototype = {
         this.visibleTimeIterations = 0;
         this.timeLandmarks = 0;
         this.slowdownDrag = 0;
+
+        this.mineralIcon = null;
+        this.mineralText = null;
+        this.gasIcon = null;
+        this.gasText = null;
+        this.supplyIcon = null;
+        this.supplyText = null;
 
         this.bg = null;
 
@@ -264,11 +269,6 @@ Main.prototype = {
         var time;
         var line;
         var line2;
-        var supplyIcon;
-        var gasIcon;
-        var mineralIcon;
-        var line;
-        var line2;
         var line3;
         var line4;
         var _game;
@@ -285,10 +285,7 @@ Main.prototype = {
         __gameHeight = _game.height;
 
 
-        // Scroll bar
-        //this.scrollingBar = _game.add.sprite(0, 0, 'scrolling-bar');
-
-
+        // Static scroll bar button
         this.scrollBar = _game.add.button(__gameWidth - 42, 0, '', this._scrollBar, this);
         this.scrollBar.width = 42;
         this.scrollBar.height = __gameHeight;
@@ -339,42 +336,43 @@ Main.prototype = {
 
 
         // Mineral / gas / supply icons
-        mineralIcon = _game.add.sprite(85, 6, 'minerals');
-        mineralIcon.width = 42;
-        mineralIcon.height = 42;
+        this.mineralIcon = _game.add.sprite(__gameWidth - 800, 7, 'minerals');
+        this.mineralIcon.width = 40;
+        this.mineralIcon.height = 40;
 
-        this.mineralText = _game.add.bitmapText(135, 10, 'Agency_35', '0', 35);
+        this.mineralText = _game.add.bitmapText(__gameWidth - 750, 10, 'Agency_35', '0', 35);
         this.mineralText.tint = 0x00ff00;
 
-        gasIcon = _game.add.sprite(240, 6, 'gas');
-        gasIcon.width = 42;
-        gasIcon.height = 42;
+        this.gasIcon = _game.add.sprite(__gameWidth - 650, 7, 'gas');
+        this.gasIcon.width = 40;
+        this.gasIcon.height = 40;
 
-        this.gasText = _game.add.bitmapText(290, 10, 'Agency_35', '0', 35);
+        this.gasText = _game.add.bitmapText(__gameWidth - 600, 10, 'Agency_35', '0', 35);
         this.gasText.tint = 0x00ff00;
 
-        supplyIcon = _game.add.sprite(370, 6, 'supply');
-        supplyIcon.width = 42;
-        supplyIcon.height = 42;
+        this.supplyIcon = _game.add.sprite(__gameWidth - 500, 6, 'supply');
+        this.supplyIcon.width = 42;
+        this.supplyIcon.height = 42;
 
-        this.supplyText = _game.add.bitmapText(420, 10, 'Agency_35', '12/15', 35);
-        this.supplyText.tint = 0x00ff00;
+        this.supplyText = _game.add.bitmapText(__gameWidth - 450, 10, 'Agency_35', '12/15', 35);
+        //this.supplyText.tint = 0x00ff00;
 
 
         if (_game.device.desktop) {
 
             // Desktop
-            this.timeIterations = 25;
-            this.visibleTimeIterations = Math.floor((__gameWidth - 232) / 90) - 2;
+            this.timeIterations = 25;//Math.floor((__gameWidth - 232) / 90) - 1;//25;
+            this.visibleTimeIterations = Math.floor((__gameWidth - 232) / 90) - 1;
         } else {
 
             // Mobile
             this.timeIterations = Math.floor((__gameWidth - 232) / 90) - 1;
+            this.visibleTimeIterations = Math.floor((__gameWidth - 232) / 90) - 1;
         }
 
 
         // Time texts
-        for (i = 0; i < this.timeIterations; i++) {
+        for (i = 0; i < this.timeIterations + 1; i++) {
 
             //For mobile, maybe make this one big bitmapdata
 
@@ -399,11 +397,15 @@ Main.prototype = {
             _lineGroup.add(line);
             _lineGroup.add(line2);
 
-            if (this.game.device.desktop && i > this.visibleTimeIterations) {
-
+            if (i === this.timeIterations) {
                 time.visible = false;
-                line.visible = false;
-                line2.visible = false;
+            }
+
+            if (this.game.device.desktop && i > this.visibleTimeIterations + 1) {
+
+                //time.visible = false;
+                //line.visible = false;
+                //line2.visible = false;
 
             }
         }
@@ -484,12 +486,8 @@ Main.prototype = {
         this.timeline.lineTo(0, (this.game.height - 83))
 
         // Timeline events
-        this.timelineDrag.events.onDragStart.add(this.moveTimeline, this);
         this.timelineDrag.events.onDragUpdate.add(this.updateTimeline, this);
         this.timelineDrag.events.onDragStop.add(this.stopTimeline, this);
-    },
-
-    moveTimeline: function(line) {
     },
 
     updateTimeline: function(line) {
@@ -551,18 +549,69 @@ Main.prototype = {
             // Set the current time
             this.currentTimeText.setText(realTime);
 
+            //console.log((__gameWidth - 340) + " " + ((__gameWidth - 340) % 90))
+
+
+
+            for (i = 0; i < 75; i += 3) {
+
+                val = 90 + (i / 3 * 90);
+
+                //console.log(val)
+
+                // Time incrament visibility
+                //if ((__gameWidth - 270) >= val) 
+                //    _lineGroup.getAt(i).tint = 0xff0000;//.visible = true;
+                //else  
+                //    _lineGroup.getAt(i).tint = 0x0000ff//.visible = false;
+
+
+                // Time line visibility (lasts longer than time incrament)
+                if ((__gameWidth - 232) >= val) {
+
+                    //_lineGroup.getAt((i + 1)).visible = true;
+                    //_lineGroup.getAt((i + 2)).visible = true;
+
+                } else {
+
+                    //_lineGroup.getAt((i + 1)).visible = false;
+                    //_lineGroup.getAt((i + 2)).visible = false;
+
+                }
+            }
+
+
+
+            if ((_lineGroup.getAt(((this.visibleTimeIterations) * 3 + 2)).x + _lineGroup.x) < (__gameWidth - 323)) {
+                console.log(  (_lineGroup.getAt(((this.visibleTimeIterations) * 3 + 5)).x + _lineGroup.x) + " < " + (__gameWidth - 323) + " " + ((_lineGroup.getAt(((this.visibleTimeIterations) * 3 + 5)).x + _lineGroup.x) < (__gameWidth - 323))    )
+
+                _lineGroup.getAt(((this.visibleTimeIterations) * 3 + 2)).visible = true;
+                //_lineGroup.getAt(((this.visibleTimeIterations) * 3 + 2)).tint = 0xff0000;
+            }
+
+            if (_lineGroup.x === -45) {
+
+                //console.log(_lineGroup.getAt((this.visibleTimeIterations * 3)).text);
+                //console.log(_lineGroup.getAt((this.visibleTimeIterations * 3 - 1)));
+                //console.log(_lineGroup.getAt((this.visibleTimeIterations * 3 - 2)));
+
+                //_lineGroup.getAt(((this.visibleTimeIterations) * 3)).visible = true;
+                //_lineGroup.getAt(((this.visibleTimeIterations) * 3)).tint = 0xff0000;
+                //console.log((_lineGroup.getAt(((this.visibleTimeIterations) * 3 + 5)).x + _lineGroup.x))
+
 
             // If scrolled past the width of a 30 second time block, reset lineGroup position and change times to align
-            if (_lineGroup.x <= -90) {
+            } else if (_lineGroup.x <= -90) {
+
+                _lineGroup.getAt(((this.visibleTimeIterations + 2) * 3)).visible = false;
+                _lineGroup.getAt(((this.visibleTimeIterations) * 3 + 5)).visible = false;
 
                 _lineGroup.x = 0;
              
                 this.timeLandmarks++;
 
-               // Time texts
+               // Update time texts
                for (i = 0; i < this.timeIterations; i++) {
-
-                   //For mobile, maybe make this one big bitmapdata
 
                    timeValue = (i + this.timeLandmarks) * 30;
                    minutes = Math.floor(timeValue / 60).toString();
@@ -581,8 +630,6 @@ Main.prototype = {
 
 
         }
-
-        this.prevTime = seconds;
     },
 
     stopTimeline: function(line) {
@@ -640,7 +687,20 @@ Main.prototype = {
         this.upgradeGroupUI.x = uiPos;
 
         this.scrollBar.x = __gameWidth - 32;
-        this.scrollingBar.x = __gameWidth - 32;
+        this.scrollingBar.x = __gameWidth - 33;
+
+        this.mineralIcon.x = __gameWidth - 800;
+        this.mineralText.x = __gameWidth - 750;
+        this.gasIcon.x = __gameWidth - 650;
+        this.gasText.x = __gameWidth - 600;
+        this.supplyIcon.x = __gameWidth - 500;
+        this.supplyText.x = __gameWidth - 450;
+
+
+        if (_game.device.desktop) {
+            
+            this.visibleTimeIterations = Math.floor((__gameWidth - 232) / 90) - 1;
+        } 
 
         // Adjust gray timeline bar to scroll time backwards if desktop re-scaling maxes out the time distance (hits UI)
         if (this.timeline.x > __gameWidth - 334) {   
@@ -679,17 +739,17 @@ Main.prototype = {
 
             for (i = 0; i < 75; i += 3) {
 
-                val = ((90 + (i / 3 * 90)));
+                val = 90 + (i / 3 * 90);
 
                 // Time incrament visibility
                 if ((__gameWidth - 270) >= val) 
                     _lineGroup.getAt(i).visible = true;
-                 else 
+                else  
                     _lineGroup.getAt(i).visible = false;
 
 
                 // Time line visibility (lasts longer than time incrament)
-                if ((__gameWidth - 232) >= val) {
+                if ((__gameWidth - 323) >= val) {
 
                     _lineGroup.getAt((i + 1)).visible = true;
                     _lineGroup.getAt((i + 2)).visible = true;
@@ -710,12 +770,9 @@ Main.prototype = {
 
         this.isScrolling = !(this.isScrolling);
 
-        if (!this.isScrolling) {
-
-            this.scrollingBar.anchor.setTo(0, 0);
+        if (!this.isScrolling) 
             return;
-        }
-
+        
         scrollValue = (this.game.input.activePointer.y - this.scrollingBar.y);
 
         this.scrollDifference = scrollValue;
