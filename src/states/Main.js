@@ -101,6 +101,7 @@ Main.prototype = {
         _game.input.onUp.add(this.touchInputUp, this);
         _game.input.onDown.add(this.touchInputDown, this);
 
+        this.funCount = 0;
 
         // Assign state variables
         this.buildHash = window.location.hash;
@@ -284,6 +285,7 @@ Main.prototype = {
         __gameWidth = _game.width;
         __gameHeight = _game.height;
 
+        this.testSprite = this.game.add.sprite(__gameWidth - 360, 0, 'icon');
 
         // Static scroll bar button
         this.scrollBar = _game.add.button(__gameWidth - 42, 0, '', this._scrollBar, this);
@@ -549,62 +551,32 @@ Main.prototype = {
             // Set the current time
             this.currentTimeText.setText(realTime);
 
-            //console.log((__gameWidth - 340) + " " + ((__gameWidth - 340) % 90))
+             
 
-
-
-            for (i = 0; i < 75; i += 3) {
-
-                val = 90 + (i / 3 * 90);
-
-                //console.log(val)
-
-                // Time incrament visibility
-                //if ((__gameWidth - 270) >= val) 
-                //    _lineGroup.getAt(i).tint = 0xff0000;//.visible = true;
-                //else  
-                //    _lineGroup.getAt(i).tint = 0x0000ff//.visible = false;
-
-
-                // Time line visibility (lasts longer than time incrament)
-                if ((__gameWidth - 232) >= val) {
-
-                    //_lineGroup.getAt((i + 1)).visible = true;
-                    //_lineGroup.getAt((i + 2)).visible = true;
-
-                } else {
-
-                    //_lineGroup.getAt((i + 1)).visible = false;
-                    //_lineGroup.getAt((i + 2)).visible = false;
-
-                }
-            }
-
-
-
-            if ((_lineGroup.getAt(((this.visibleTimeIterations) * 3 + 2)).x + _lineGroup.x) < (__gameWidth - 323)) {
-                console.log(  (_lineGroup.getAt(((this.visibleTimeIterations) * 3 + 5)).x + _lineGroup.x) + " < " + (__gameWidth - 323) + " " + ((_lineGroup.getAt(((this.visibleTimeIterations) * 3 + 5)).x + _lineGroup.x) < (__gameWidth - 323))    )
-
-                _lineGroup.getAt(((this.visibleTimeIterations) * 3 + 2)).visible = true;
-                //_lineGroup.getAt(((this.visibleTimeIterations) * 3 + 2)).tint = 0xff0000;
-            }
-
-            if (_lineGroup.x === -45) {
-
-                //console.log(_lineGroup.getAt((this.visibleTimeIterations * 3)).text);
-                //console.log(_lineGroup.getAt((this.visibleTimeIterations * 3 - 1)));
-                //console.log(_lineGroup.getAt((this.visibleTimeIterations * 3 - 2)));
-
-                //_lineGroup.getAt(((this.visibleTimeIterations) * 3)).visible = true;
-                //_lineGroup.getAt(((this.visibleTimeIterations) * 3)).tint = 0xff0000;
-                //console.log((_lineGroup.getAt(((this.visibleTimeIterations) * 3 + 5)).x + _lineGroup.x))
-
+            //console.log((_lineGroup.getAt(((this.visibleTimeIterations) * 3)).x - _lineGroup.x) + " " + this.testSprite.x 
+            //    + " " + _lineGroup.x + " " + _lineGroup.getAt(((this.visibleTimeIterations) * 3)).alpha);
 
             // If scrolled past the width of a 30 second time block, reset lineGroup position and change times to align
-            } else if (_lineGroup.x <= -90) {
+            if (_lineGroup.x <= -90) {
+
+                this.funCount++;
+                this.mineralText.text = this.funCount.toString();
+
+                /*
+                if (_lineGroup.getAt(((this.visibleTimeIterations) * 3)).x + _lineGroup.x < this.testSprite.x)
+                    _lineGroup.getAt(((this.visibleTimeIterations) * 3)).alpha = 0.5;//visible = false;
+
+                if (_lineGroup.getAt(((this.visibleTimeIterations) * 3 + 6)).x <= this.testSprite.x) {
+                    _lineGroup.getAt(((this.visibleTimeIterations) * 3 + 6)).visible = false;
+                }
 
                 _lineGroup.getAt(((this.visibleTimeIterations + 2) * 3)).visible = false;
+                _lineGroup.getAt(((this.visibleTimeIterations) * 3 + 4)).visible = false;
                 _lineGroup.getAt(((this.visibleTimeIterations) * 3 + 5)).visible = false;
+
+                // Furthest out time
+                _lineGroup.getAt(((this.visibleTimeIterations) * 3 + 3)).visible = false;
+                */
 
                 _lineGroup.x = 0;
              
@@ -623,6 +595,36 @@ Main.prototype = {
                    time.text = realTime;
                 }
             }
+
+
+            // Make time during the scroll visible
+            for (i = 0; i < 75; i += 3) {
+
+                //_lineGroup.getAt(i).tint = 0xffff00;
+
+                if (_lineGroup.getAt(i).x + _lineGroup.x > this.testSprite.x)
+                    _lineGroup.getAt(i).visible = false; //.tint = 0xff00ff;
+                else
+                    _lineGroup.getAt(i).visible = true;
+
+            }
+
+            /*
+            // Set time and line UIs to visible if they're within UI
+            if ((_lineGroup.getAt(((this.visibleTimeIterations) * 3)).x + _lineGroup.x) <= this.testSprite.x) 
+                _lineGroup.getAt(((this.visibleTimeIterations) * 3)).alpha = 1;//visible = true;
+
+            if ((_lineGroup.getAt(((this.visibleTimeIterations) * 3 + 3)).x + _lineGroup.x) <= this.testSprite.x) 
+                _lineGroup.getAt(((this.visibleTimeIterations) * 3 + 3)).visible = true;
+
+            // Make green line during the scroll visible
+            if ((_lineGroup.getAt(((this.visibleTimeIterations) * 3 + 5)).x + _lineGroup.x) <= (__gameWidth - 323)) {
+
+                // Tiny green line, long green line
+                _lineGroup.getAt(((this.visibleTimeIterations) * 3 + 4)).visible = true;
+                _lineGroup.getAt(((this.visibleTimeIterations) * 3 + 5)).visible = true;
+            }
+            */
 
         // If timeline is dragged to maximum left, start scrolling backwards
         } else {
@@ -696,10 +698,14 @@ Main.prototype = {
         this.supplyIcon.x = __gameWidth - 500;
         this.supplyText.x = __gameWidth - 450;
 
+        this.testSprite.x = __gameWidth - 360;
 
+        this.lineGroup.forEach(function(s){s.tint = 0x00ff00}, this);
         if (_game.device.desktop) {
             
-            this.visibleTimeIterations = Math.floor((__gameWidth - 232) / 90) - 1;
+            this.visibleTimeIterations = Math.floor((__gameWidth - 360) / 90) - 1;
+            console.log(this.visibleTimeIterations);
+            this.lineGroup.getAt(((this.visibleTimeIterations) * 3 + 3)).tint = 0xff0000;
         } 
 
         // Adjust gray timeline bar to scroll time backwards if desktop re-scaling maxes out the time distance (hits UI)
@@ -737,19 +743,37 @@ Main.prototype = {
         // Control visibility of time indicators based on width
         if (_game.device.desktop) {
 
+            // Make time during the scroll visible
             for (i = 0; i < 75; i += 3) {
 
+                //_lineGroup.getAt(i).tint = 0xffff00;
+
+                if (_lineGroup.getAt(i).x + _lineGroup.x > this.testSprite.x)
+                    _lineGroup.getAt(i).visible = false; //.tint = 0xff00ff;
+                else
+                    _lineGroup.getAt(i).visible = true;
+
+            }
+
+            // **** MAYBE TRY GETBETWEEN
+            for (i = 0; i < 75; i += 3) {
+
+                //_lineGroup.getAt(i).tint = 0xffff00;
+                //if (_lineGroup.getAt(i).x < this.testSprite.x)
+                //    _lineGroup.getAt(i).tint = 0xff00ff;
+
+                /*
                 val = 90 + (i / 3 * 90);
 
                 // Time incrament visibility
-                if ((__gameWidth - 270) >= val) 
+                if ((__gameWidth - 265) >= val + _lineGroup.x) 
                     _lineGroup.getAt(i).visible = true;
                 else  
                     _lineGroup.getAt(i).visible = false;
 
 
                 // Time line visibility (lasts longer than time incrament)
-                if ((__gameWidth - 323) >= val) {
+                if ((__gameWidth - 230) >= val + _lineGroup.x) {
 
                     _lineGroup.getAt((i + 1)).visible = true;
                     _lineGroup.getAt((i + 2)).visible = true;
@@ -760,6 +784,7 @@ Main.prototype = {
                     _lineGroup.getAt((i + 2)).visible = false;
 
                 }
+                */
             }
         }
     },
