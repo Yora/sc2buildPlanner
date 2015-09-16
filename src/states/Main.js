@@ -453,18 +453,21 @@ Main.prototype = {
         var line;
         var line2;
 
+        //this.game.world.setBounds(0, 0, 100, 640); // ** Maybe adjust this for camera zooming
+
         // Gray timeline line bar container
-        this.timelineDrag = this.game.add.sprite(1, 83, '');
-        this.timelineDrag.width = 35;
+        this.timelineDrag = this.game.add.sprite(0, 83, '');
+        this.timelineDrag.width = 36;
         this.timelineDrag.height = this.game.height - 83;
         this.timelineDrag.inputEnabled = true;
         this.timelineDrag.input.enableDrag();
+        this.timelineDrag.input.enableSnap(3, 0, true, true);
         this.timelineDrag.input.allowVerticalDrag = false;
 
         // Gray line
-        this.timeline = this.game.add.graphics(1, 83);
+        this.timeline = this.game.add.graphics(0, 83);
         this.timeline.lineStyle(2, 0x666666, 1);
-        this.timeline.lineTo(0, (this.game.height - 83))
+        this.timeline.lineTo(0, (this.game.height - 83)) // figure out the timeline jump
 
         // Timeline events
         this.timelineDrag.events.onDragUpdate.add(this.updateTimeline, this);
@@ -585,6 +588,7 @@ Main.prototype = {
         var _greenLineIndex;
         var __gameWidth;
 
+        console.log(line.x);
 
         _game = this.game;
         _timeIterations = this.timeIterations;
@@ -608,8 +612,9 @@ Main.prototype = {
         // If timeline is moved within movable area
         if (this.timelineDrag.x < __gameWidth - 349) {
 
+
             // Only move the timeline bar per second
-            this.timeline.x = Math.floor((1 - ((90 - x) / 90)) * 30) * 3;
+            this.timeline.x = this.timelineDrag.x//Math.floor((1 - ((90 - x) / 90)) * 30) * 3;
 
             // Set the current time
             this.currentTimeText.setText(realTime);
@@ -619,11 +624,10 @@ Main.prototype = {
         } else if (this.timelineDrag.x >= __gameWidth - 349) {
 
             // Wait for 3 updates (matching a second) before sliding the time/line group over
-            if (this.slowdownDrag < 3) {
-
-                this.slowdownDrag++;
-                return;
-            }
+            //if (this.slowdownDrag < 3) {
+            //    this.slowdownDrag++;
+            //    return;
+            //}
 
 
             // Reset slow drag count
@@ -631,7 +635,7 @@ Main.prototype = {
 
 
             // Set gray timeline bar position
-            this.timelineDrag.x = __gameWidth - 350;
+            //this.timelineDrag.x = __gameWidth - 350;
 
 
             // Move time/line group
