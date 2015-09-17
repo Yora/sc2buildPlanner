@@ -133,12 +133,12 @@ Main.prototype = {
         this.bg = this.game.add.image(0, 0, 'stars')
         this.bg.alpha = 0.2;
 
-        this.lineGroupUI = this.game.add.group();
-        this.lineGroup = this.game.add.group();
+        this.timelineGroup = this.game.add.group();
         this.starsCover = this.game.add.image(this.game.width - 334, 50, 'stars-cover');
         this.unitGroupUI = this.game.add.group();
         this.structureGroupUI = this.game.add.group();
         this.upgradeGroupUI = this.game.add.group();
+        this.lineGroupUI = this.game.add.group();
         this.workerGroup = this.game.add.group();
         this.baseGroup = this.game.add.group();
 
@@ -267,13 +267,13 @@ Main.prototype = {
         var line3;
         var line4;
         var _game;
-        var _lineGroup;
+        var _timelineGroup;
         var _lineGroupUI;
         var __gameWidth;
         var __gameHeight;
 
         _game = this.game;
-        _lineGroup = this.lineGroup;
+        _timelineGroup = this.timelineGroup;
         _lineGroupUI = this.lineGroupUI;
 
         __gameWidth = _game.width;
@@ -385,9 +385,9 @@ Main.prototype = {
             line2 = _game.make.graphics((i * 90), 80);
             line2.lineStyle(1, 0x00ff00, 0.2);
             line2.lineTo(0, this.game.height - 50);
-            _lineGroup.add(time);
-            _lineGroup.add(line);
-            _lineGroup.add(line2);
+            _timelineGroup.add(time);
+            _timelineGroup.add(line);
+            _timelineGroup.add(line2);
 
             if (i >= (Math.floor((__gameWidth - 232) / 90))) {
                 time.visible = false;
@@ -434,7 +434,7 @@ Main.prototype = {
         this.scrollingBar = _game.add.graphics(0, 0);
         this.scrollingBar.lineStyle(1, 0x00ff00, 1);
         this.scrollingBar.beginFill(0x00ff00, 0.3);
-        this.scrollingBar.drawRect(0, 0, 32, scrollingBarHeightVar);
+        this.scrollingBar.drawRect(0, 0, 28, scrollingBarHeightVar);
 
 
         // Used in update to properly adjust unit groups based on game height
@@ -486,7 +486,7 @@ Main.prototype = {
         var realTime;
         var timeValue;
         var _game;
-        var _lineGroup;
+        var _timelineGroup;
         var _lineGroupUI;
         var _endOfTimeline;
         var _timeIterations;
@@ -495,7 +495,7 @@ Main.prototype = {
         var val;
 
         _game = this.game;
-        _lineGroup = this.lineGroup;
+        _timelineGroup = this.timelineGroup;
         _lineGroupUI = this.lineGroupUI;
 
         __gameWidth = _game.width;
@@ -507,8 +507,8 @@ Main.prototype = {
         this.upgradeGroupUI.x = uiPos;
 
         this.starsCover.x = __gameWidth - 318;
-        this.scrollBar.x = __gameWidth - 32;
-        this.scrollingBar.x = __gameWidth - 33;
+        this.scrollBar.x = __gameWidth - 33;
+        this.scrollingBar.x = __gameWidth - 32;
 
         this.mineralIcon.x = __gameWidth - 800;
         this.mineralText.x = __gameWidth - 750;
@@ -540,7 +540,7 @@ Main.prototype = {
             x = Math.floor(this.timeline.x + (this.timeline.width / 2) - 0.5);
 
             // Get time string
-            timeValue = Math.floor((-(_lineGroup.x / 3) + (this.timeLandmarks * 30)) + (this.timeline.x / 3));
+            timeValue = Math.floor((-(_timelineGroup.x / 3) + (this.timeLandmarks * 30)) + (this.timeline.x / 3));
             minutes = Math.floor(timeValue / 60).toString();
             seconds = this.pad((timeValue % 60), 2);
             realTime = (minutes + ":" + seconds);
@@ -563,12 +563,12 @@ Main.prototype = {
             this.bg.width = 960;
 
         // Control visibility of time indicators based on width
-        _lineGroup.forEach(this._scaleUpdateVisibility, this, false, _lineGroup, _endOfTimeline);
+        _timelineGroup.forEach(this._scaleUpdateVisibility, this, false, _timelineGroup, _endOfTimeline);
     },
 
-    _scaleUpdateVisibility: function(sprite, _lineGroup, _endOfTimeline) {
+    _scaleUpdateVisibility: function(sprite, _timelineGroup, _endOfTimeline) {
 
-        if (sprite.x + _lineGroup.x > _endOfTimeline) {
+        if (sprite.x + _timelineGroup.x > _endOfTimeline) {
             sprite.visible = false;
         } else {
             sprite.visible = true;
@@ -585,43 +585,37 @@ Main.prototype = {
         var timeValue;
         var _game;
         var _timeIterations;
-        var _lineGroup;
+        var _timelineGroup;
         var _endOfTimeline;
         var _greenLineIndex;
+        var _timeline;
+        var _timelineDrag;
+        var _timeLandmarks;
         var __gameWidth;
 
         _game = this.game;
         _timeIterations = this.timeIterations;
-        _lineGroup = this.lineGroup;
+        _timelineGroup = this.timelineGroup;
         _endOfTimeline = this.endOfTimeline;
         _greenLineIndex = this.greenLineIndex;
+        _timeline = this.timeline;
+        _timelineDrag = this.timelineDrag;
+        _timeLandmarks = this.timeLandmarks;
         __gameWidth = _game.width;
 
 
         // Get time string
-        timeValue = (-(_lineGroup.x / 3) + (this.timeLandmarks * 30)) + (this.timelineDrag.x / 3);
+        timeValue = (-(_timelineGroup.x / 3) + (_timeLandmarks * 30)) + (_timelineDrag.x / 3);
         minutes = Math.floor(timeValue / 60).toString();
         seconds = this.pad((timeValue % 60), 2);
         realTime = (minutes + ":" + seconds);
 
+        // If timeline is dragged to maximum left, start scrolling backwards
+        if (_timelineDrag.x <= 40 && this.timeLandmarks != 0) {
 
-        // If timeline is moved within movable area
-        if (this.timelineDrag.x < __gameWidth - 349) {
-
-
-            // Only move the timeline bar per second
-            this.timeline.x = this.timelineDrag.x;
-
-            // Set the current time
-            this.currentTimeText.setText(realTime);
-
-
-            // If timeline is dragged to maximum right, start scrolling
-        } else if (this.timelineDrag.x >= __gameWidth - 349) {
-
-
+            
             // Move time/line group
-            _lineGroup.x -= 3;
+            _timelineGroup.x += 3;
 
 
             // Set the current time
@@ -629,63 +623,127 @@ Main.prototype = {
 
 
             // If scrolled past the width of a 30 second time block, reset lineGroup position and change times to align
-            if (_lineGroup.x <= -90) {
+            if (_timelineGroup.x >= 90) {
 
                 this.funCount++;
                 this.mineralText.text = this.funCount.toString();
 
-                _lineGroup.x = 0;
+                _timelineGroup.x = 0;
 
-                this.timeLandmarks++;
+                this.timeLandmarks--;
+
+                _timeLandmarks = this.timeLandmarks;
 
                 // Update time texts
                 for (i = 0; i < _timeIterations * 3; i++) {
 
-                    timeValue = (i + this.timeLandmarks) * 30;
+                    timeValue = (i + _timeLandmarks) * 30;
                     minutes = Math.floor(timeValue / 60).toString();
                     seconds = this.pad((timeValue % 60), 2);
                     realTime = (minutes + ":" + seconds);
 
-                    time = _lineGroup.getAt((i * 3));
+                    time = _timelineGroup.getAt((i * 3));
 
                     time.text = realTime;
                 }
             }
 
-            if (_lineGroup.getAt(((_timeIterations) * 3) - 3).x + _lineGroup.x > _endOfTimeline)
-                _lineGroup.getAt(((_timeIterations) * 3) - 3).visible = false;
-            else if (!_lineGroup.getAt(((_timeIterations) * 3) - 3).visible)
-                _lineGroup.getAt(((_timeIterations) * 3) - 3).visible = true;
+            // Control visibility of passing timeline indicators
+            if (_timelineGroup.getAt(((_timeIterations) * 3) - 3).x + _timelineGroup.x > _endOfTimeline)
+                _timelineGroup.getAt(((_timeIterations) * 3) - 3).visible = false;
+            else if (!_timelineGroup.getAt(((_timeIterations) * 3) - 3).visible)
+                _timelineGroup.getAt(((_timeIterations) * 3) - 3).visible = true;
 
-            if (_lineGroup.getAt(((_timeIterations) * 3) - 2).x + _lineGroup.x > _endOfTimeline)
-                _lineGroup.getAt(((_timeIterations) * 3) - 2).visible = false;
-            else if (!_lineGroup.getAt(((_timeIterations) * 3) - 2).visible)
-                _lineGroup.getAt(((_timeIterations) * 3) - 2).visible = true;
+            if (_timelineGroup.getAt(((_timeIterations) * 3) - 2).x + _timelineGroup.x > _endOfTimeline)
+                _timelineGroup.getAt(((_timeIterations) * 3) - 2).visible = false;
+            else if (!_timelineGroup.getAt(((_timeIterations) * 3) - 2).visible)
+                _timelineGroup.getAt(((_timeIterations) * 3) - 2).visible = true;
 
-            if (_lineGroup.getAt(((_timeIterations) * 3) - 1).x + _lineGroup.x > _endOfTimeline)
-                _lineGroup.getAt(((_timeIterations) * 3) - 1).visible = false;
-            else if (!_lineGroup.getAt(((_timeIterations) * 3) - 1).visible)
-                _lineGroup.getAt(((_timeIterations) * 3) - 1).visible = true;
+            if (_timelineGroup.getAt(((_timeIterations) * 3) - 1).x + _timelineGroup.x > _endOfTimeline)
+                _timelineGroup.getAt(((_timeIterations) * 3) - 1).visible = false;
+            else if (!_timelineGroup.getAt(((_timeIterations) * 3) - 1).visible)
+                _timelineGroup.getAt(((_timeIterations) * 3) - 1).visible = true;
 
 
-            // Make time during the scroll visible
-            for (i = 0; i < _timeIterations - 1; i++) {
 
-                //_lineGroup.getAt(i).tint = 0xffff00;
 
-                //if (_lineGroup.getAt(i).x + _lineGroup.getAt(i).width + _lineGroup.x > _endOfTimeline)
-                //    _lineGroup.getAt(i).visible = false;
-                //else
-                //    _lineGroup.getAt(i).visible = true;
 
+
+
+
+
+        // If timeline moved within movable area
+        } else if (_timelineDrag.x < __gameWidth - 349) {
+
+
+            // Update gray timeline bar location
+            _timeline.x = _timelineDrag.x;
+
+
+            // Set current time
+            this.currentTimeText.setText(realTime);
+
+
+
+
+
+
+
+
+
+        // If timeline dragged maximum right, start scrolling
+        } else if (_timelineDrag.x >= __gameWidth - 349) {
+
+
+            // Move time/line group
+            _timelineGroup.x -= 3;
+
+
+            // Set the current time
+            this.currentTimeText.setText(realTime);
+
+
+            // If scrolled past the width of a 30 second time block, reset lineGroup position and change times to align
+            if (_timelineGroup.x <= -90) {
+
+                this.funCount++;
+                this.mineralText.text = this.funCount.toString();
+
+                _timelineGroup.x = 0;
+
+                this.timeLandmarks++;
+
+                _timeLandmarks = this.timeLandmarks;
+
+                // Update time texts
+                for (i = 0; i < _timeIterations * 3; i++) {
+
+                    timeValue = (i + _timeLandmarks) * 30;
+                    minutes = Math.floor(timeValue / 60).toString();
+                    seconds = this.pad((timeValue % 60), 2);
+                    realTime = (minutes + ":" + seconds);
+
+                    time = _timelineGroup.getAt((i * 3));
+
+                    time.text = realTime;
+                }
             }
 
+            // Control visibility of passing timeline indicators
+            if (_timelineGroup.getAt(((_timeIterations) * 3) - 3).x + _timelineGroup.x > _endOfTimeline)
+                _timelineGroup.getAt(((_timeIterations) * 3) - 3).visible = false;
+            else if (!_timelineGroup.getAt(((_timeIterations) * 3) - 3).visible)
+                _timelineGroup.getAt(((_timeIterations) * 3) - 3).visible = true;
 
-            // If timeline is dragged to maximum left, start scrolling backwards
-        } else {
+            if (_timelineGroup.getAt(((_timeIterations) * 3) - 2).x + _timelineGroup.x > _endOfTimeline)
+                _timelineGroup.getAt(((_timeIterations) * 3) - 2).visible = false;
+            else if (!_timelineGroup.getAt(((_timeIterations) * 3) - 2).visible)
+                _timelineGroup.getAt(((_timeIterations) * 3) - 2).visible = true;
 
-
-
+            if (_timelineGroup.getAt(((_timeIterations) * 3) - 1).x + _timelineGroup.x > _endOfTimeline)
+                _timelineGroup.getAt(((_timeIterations) * 3) - 1).visible = false;
+            else if (!_timelineGroup.getAt(((_timeIterations) * 3) - 1).visible)
+                _timelineGroup.getAt(((_timeIterations) * 3) - 1).visible = true;
         }
     },
 
