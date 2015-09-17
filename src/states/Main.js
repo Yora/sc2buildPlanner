@@ -367,29 +367,29 @@ Main.prototype = {
 
             //For mobile, maybe make this one big bitmapdata
 
-            timeValue = (i) * 30;
+            timeValue = (i - 1) * 30;
 
             timeString1 = Math.floor(timeValue / 60).toString();
             timeString2 = this.pad((timeValue % 60), 2);
 
             timeString = (timeString1 + ":" + timeString2);
 
-            time = _game.make.bitmapText(5 + (i * 90), 58, 'Agency_35', timeString, 25);
+            time = _game.make.bitmapText(-85 + (i * 90), 58, 'Agency_35', timeString, 25);
             time.tint = 0x00ff00;
             time.index = i;
             time.seconds = timeValue;
-            line = _game.make.graphics((i * 90), 80);
+            line = _game.make.graphics(-90 + (i * 90), 80);
             line.lineStyle(3, 0x00ff00, 1);
             line.lineTo(0, -8);
 
-            line2 = _game.make.graphics((i * 90), 80);
+            line2 = _game.make.graphics(-90 + (i * 90), 80);
             line2.lineStyle(1, 0x00ff00, 0.2);
             line2.lineTo(0, this.game.height - 50);
             _timelineGroup.add(time);
             _timelineGroup.add(line);
             _timelineGroup.add(line2);
 
-            if (i >= (Math.floor((__gameWidth - 232) / 90))) {
+            if (i - 1 >= (Math.floor((__gameWidth - 232) / 90))) {
                 time.visible = false;
                 line.visible = false;
                 line2.visible = false;
@@ -490,7 +490,6 @@ Main.prototype = {
         var _lineGroupUI;
         var _endOfTimeline;
         var _timeIterations;
-        var __timeIterationsMod;
         var __gameWidth;
         var val;
 
@@ -523,11 +522,10 @@ Main.prototype = {
         if (_game.device.desktop)
             this.timeIterations = Math.floor((__gameWidth - 232) / 90) + 1;
         _timeIterations = this.timeIterations;
-        __timeIterationsMod = _timeIterations * 3;
 
 
         // 'dynamic' green line, this index used to crop it off the side of the UI
-        this.greenLineIndex = ((_timeIterations) * 3) - 1;
+        this.greenLineIndex = 1 + ((_timeIterations) * 3) - 1;
 
 
         // Adjust gray timeline bar to scroll time backwards if desktop re-scaling maxes out the time distance (hits UI)
@@ -623,12 +621,14 @@ Main.prototype = {
 
 
             // If scrolled past the width of a 30 second time block, reset lineGroup position and change times to align
-            if (_timelineGroup.x >= 90) {
+            if (_timelineGroup.x >= 0) {
 
                 this.funCount++;
                 this.mineralText.text = this.funCount.toString();
 
-                _timelineGroup.x = 0;
+                console.log(_timelineGroup.x);
+
+                _timelineGroup.x = -90;
 
                 this.timeLandmarks--;
 
@@ -637,7 +637,7 @@ Main.prototype = {
                 // Update time texts
                 for (i = 0; i < _timeIterations * 3; i++) {
 
-                    timeValue = (i + _timeLandmarks) * 30;
+                    timeValue = (i + _timeLandmarks - 1) * 30;
                     minutes = Math.floor(timeValue / 60).toString();
                     seconds = this.pad((timeValue % 60), 2);
                     realTime = (minutes + ":" + seconds);
@@ -648,21 +648,23 @@ Main.prototype = {
                 }
             }
 
+            console.log((_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).x + _timelineGroup.x) + " > " + _endOfTimeline)
+
             // Control visibility of passing timeline indicators
-            if (_timelineGroup.getAt(((_timeIterations) * 3) - 3).x + _timelineGroup.x > _endOfTimeline)
-                _timelineGroup.getAt(((_timeIterations) * 3) - 3).visible = false;
-            else if (!_timelineGroup.getAt(((_timeIterations) * 3) - 3).visible)
-                _timelineGroup.getAt(((_timeIterations) * 3) - 3).visible = true;
+            if (_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).x + _timelineGroup.x > _endOfTimeline)
+                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).visible = false;
+            else if (!_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).visible)
+                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).visible = true;
 
-            if (_timelineGroup.getAt(((_timeIterations) * 3) - 2).x + _timelineGroup.x > _endOfTimeline)
-                _timelineGroup.getAt(((_timeIterations) * 3) - 2).visible = false;
-            else if (!_timelineGroup.getAt(((_timeIterations) * 3) - 2).visible)
-                _timelineGroup.getAt(((_timeIterations) * 3) - 2).visible = true;
+            if (_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 2).x + _timelineGroup.x > _endOfTimeline)
+                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 2).visible = false;
+            else if (!_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 2).visible)
+                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 2).visible = true;
 
-            if (_timelineGroup.getAt(((_timeIterations) * 3) - 1).x + _timelineGroup.x > _endOfTimeline)
-                _timelineGroup.getAt(((_timeIterations) * 3) - 1).visible = false;
-            else if (!_timelineGroup.getAt(((_timeIterations) * 3) - 1).visible)
-                _timelineGroup.getAt(((_timeIterations) * 3) - 1).visible = true;
+            if (_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).x + _timelineGroup.x > _endOfTimeline)
+                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).visible = false;
+            else if (!_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).visible)
+                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).visible = true;
 
 
 
@@ -718,7 +720,7 @@ Main.prototype = {
                 // Update time texts
                 for (i = 0; i < _timeIterations * 3; i++) {
 
-                    timeValue = (i + _timeLandmarks) * 30;
+                    timeValue = (i + _timeLandmarks - 1) * 30;
                     minutes = Math.floor(timeValue / 60).toString();
                     seconds = this.pad((timeValue % 60), 2);
                     realTime = (minutes + ":" + seconds);
@@ -730,20 +732,20 @@ Main.prototype = {
             }
 
             // Control visibility of passing timeline indicators
-            if (_timelineGroup.getAt(((_timeIterations) * 3) - 3).x + _timelineGroup.x > _endOfTimeline)
-                _timelineGroup.getAt(((_timeIterations) * 3) - 3).visible = false;
-            else if (!_timelineGroup.getAt(((_timeIterations) * 3) - 3).visible)
-                _timelineGroup.getAt(((_timeIterations) * 3) - 3).visible = true;
+            if (_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).x + _timelineGroup.x >= _endOfTimeline)
+                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).visible = false;
+            else if (!_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).visible)
+                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).visible = true;
 
-            if (_timelineGroup.getAt(((_timeIterations) * 3) - 2).x + _timelineGroup.x > _endOfTimeline)
-                _timelineGroup.getAt(((_timeIterations) * 3) - 2).visible = false;
-            else if (!_timelineGroup.getAt(((_timeIterations) * 3) - 2).visible)
-                _timelineGroup.getAt(((_timeIterations) * 3) - 2).visible = true;
+            if (_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 2).x + _timelineGroup.x >= _endOfTimeline)
+                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 2).visible = false;
+            else if (!_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 2).visible)
+                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 2).visible = true;
 
-            if (_timelineGroup.getAt(((_timeIterations) * 3) - 1).x + _timelineGroup.x > _endOfTimeline)
-                _timelineGroup.getAt(((_timeIterations) * 3) - 1).visible = false;
-            else if (!_timelineGroup.getAt(((_timeIterations) * 3) - 1).visible)
-                _timelineGroup.getAt(((_timeIterations) * 3) - 1).visible = true;
+            if (_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).x + _timelineGroup.x >= _endOfTimeline)
+                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).visible = false;
+            else if (!_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).visible)
+                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).visible = true;
         }
     },
 
