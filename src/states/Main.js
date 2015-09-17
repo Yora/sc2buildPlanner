@@ -1,5 +1,7 @@
 function Main() {}
 
+////Math.floor((1 - ((90 - x) / 90)) * 30) * 3;
+
 // resizing - if width is too small, start to move the building UI off the side and make more room for timeline
 
 // next setup all upgrades, as well as minerals, gas, supply, energy, larva, etc
@@ -588,8 +590,6 @@ Main.prototype = {
         var _greenLineIndex;
         var __gameWidth;
 
-        console.log(line.x);
-
         _game = this.game;
         _timeIterations = this.timeIterations;
         _lineGroup = this.lineGroup;
@@ -598,12 +598,8 @@ Main.prototype = {
         __gameWidth = _game.width;
 
 
-        // X value of the line sprite dragged by mouse
-        x = Math.floor(line.x + (line.width / 2) - 0.5);
-
-
         // Get time string
-        timeValue = (-(_lineGroup.x / 3) + (this.timeLandmarks * 30)) + (this.timeline.x / 3);
+        timeValue = (-(_lineGroup.x / 3) + (this.timeLandmarks * 30)) + (this.timelineDrag.x / 3);
         minutes = Math.floor(timeValue / 60).toString();
         seconds = this.pad((timeValue % 60), 2);
         realTime = (minutes + ":" + seconds);
@@ -614,7 +610,7 @@ Main.prototype = {
 
 
             // Only move the timeline bar per second
-            this.timeline.x = this.timelineDrag.x//Math.floor((1 - ((90 - x) / 90)) * 30) * 3;
+            this.timeline.x = this.timelineDrag.x;
 
             // Set the current time
             this.currentTimeText.setText(realTime);
@@ -622,20 +618,6 @@ Main.prototype = {
 
             // If timeline is dragged to maximum right, start scrolling
         } else if (this.timelineDrag.x >= __gameWidth - 349) {
-
-            // Wait for 3 updates (matching a second) before sliding the time/line group over
-            //if (this.slowdownDrag < 3) {
-            //    this.slowdownDrag++;
-            //    return;
-            //}
-
-
-            // Reset slow drag count
-            this.slowdownDrag = 0;
-
-
-            // Set gray timeline bar position
-            //this.timelineDrag.x = __gameWidth - 350;
 
 
             // Move time/line group
