@@ -166,11 +166,6 @@ Main.prototype = {
         _game.scale.onSizeChange.add(this.scaleUpdate, this);
         _game.input.justReleasedRate = 10;
 
-
-        // Create mouse events
-        _game.input.onUp.add(this.touchInputUp, this);
-        _game.input.onDown.add(this.touchInputDown, this);
-
         this.funCount = 0;
 
         // Assign state variables
@@ -288,11 +283,7 @@ Main.prototype = {
             _upgradeGroupUI.forEach(this._crop, this);
         }
     },
-
-    touchInputDown: function() {},
-
-    touchInputUp: function() {},
-
+    
     initRace: function() {
 
         var race;
