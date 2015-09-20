@@ -166,11 +166,6 @@ Main.prototype = {
         _game.scale.onSizeChange.add(this.scaleUpdate, this);
         _game.input.justReleasedRate = 10;
 
-
-        // Create mouse events
-        _game.input.onUp.add(this.touchInputUp, this);
-        _game.input.onDown.add(this.touchInputDown, this);
-
         this.funCount = 0;
 
         // Assign state variables
@@ -288,10 +283,6 @@ Main.prototype = {
             _upgradeGroupUI.forEach(this._crop, this);
         }
     },
-
-    touchInputDown: function() {},
-
-    touchInputUp: function() {},
 
     initRace: function() {
 
@@ -526,12 +517,12 @@ Main.prototype = {
         //this.game.world.setBounds(0, 0, 100, 640); // ** Maybe adjust this for camera zooming
 
         // Gray timeline line bar container
-        this.timelineDrag = this.game.add.sprite(0, 83, '');
+        this.timelineDrag = this.game.add.sprite(-18, 83, '');
         this.timelineDrag.width = 36;
         this.timelineDrag.height = this.game.height - 83;
         this.timelineDrag.inputEnabled = true;
         this.timelineDrag.input.enableDrag();
-        this.timelineDrag.input.enableSnap(3, 0, true, true);
+        //this.timelineDrag.input.enableSnap(3, 0, false, false);
         this.timelineDrag.input.allowVerticalDrag = false;
 
         // Gray line
@@ -659,6 +650,12 @@ Main.prototype = {
         var _timeLandmarks;
         var __gameWidth;
 
+
+        // Only update every 3 pixels (1 second)
+        if (this.timelineDrag.x % 3 != 0)
+            return;
+
+
         _game = this.game;
         _timeIterations = this.timeIterations;
         _timelineGroup = this.timelineGroup;
@@ -671,13 +668,14 @@ Main.prototype = {
 
 
         // Get time string
-        timeValue = (-(_timelineGroup.x / 3) + (_timeLandmarks * 30)) + (_timelineDrag.x / 3);
+        timeValue = (-(_timelineGroup.x / 3) + (_timeLandmarks * 30)) + ((_timelineDrag.x + 18) / 3);
         minutes = Math.floor(timeValue / 60).toString();
         seconds = this.pad((timeValue % 60), 2);
         realTime = (minutes + ":" + seconds);
 
-        // If timeline is dragged to maximum left, start scrolling backwards
-        if (_timelineDrag.x <= 40 && this.timeLandmarks != 0) {
+
+        // -----If timeline is dragged to maximum left, start scrolling backwards
+        if (_timelineDrag.x <= 40 && this.timeLandmarks != -1) {
 
             
             // Move time/line group
@@ -689,12 +687,10 @@ Main.prototype = {
 
 
             // If scrolled past the width of a 30 second time block, reset lineGroup position and change times to align
-            if (_timelineGroup.x >= 0) {
+            if (_timelineGroup.x > -21) {
 
                 this.funCount++;
                 this.mineralText.text = this.funCount.toString();
-
-                console.log(_timelineGroup.x);
 
                 _timelineGroup.x = -90;
 
@@ -716,7 +712,6 @@ Main.prototype = {
                 }
             }
 
-            console.log((_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).x + _timelineGroup.x) + " > " + _endOfTimeline)
 
             // Control visibility of passing timeline indicators
             if (_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).x + _timelineGroup.x > _endOfTimeline)
@@ -736,18 +731,12 @@ Main.prototype = {
 
 
 
-
-
-
-
-
-
-        // If timeline moved within movable area
-        } else if (_timelineDrag.x < __gameWidth - 349) {
+        // -----If timeline moved within movable area
+        } else if (_timelineDrag.x < __gameWidth - 349 && _timelineDrag.x > -21) {
 
 
             // Update gray timeline bar location
-            _timeline.x = _timelineDrag.x;
+            _timeline.x = _timelineDrag.x + 18;
 
 
             // Set current time
@@ -755,13 +744,7 @@ Main.prototype = {
 
 
 
-
-
-
-
-
-
-        // If timeline dragged maximum right, start scrolling
+        // -----If timeline dragged maximum right, start scrolling
         } else if (_timelineDrag.x >= __gameWidth - 349) {
 
 
