@@ -247,6 +247,8 @@ Main.prototype = {
 
     initUI: function() {
 
+        
+
         var i;
         var timeValue;
         var timeString1;
@@ -600,7 +602,7 @@ Main.prototype = {
         realTime = (minutes + ":" + seconds);
 
         // If timeline is dragged to maximum left, start scrolling backwards
-        if (_timelineDrag.x <= 40 && this.timeLandmarks != 0) {
+        if (_timelineDrag.x <= 20 && this.timeLandmarks != -1) {
 
             
             // Move time/line group
