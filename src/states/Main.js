@@ -17,7 +17,20 @@ function Main() {}
 //Eq.i) Minerals/SCV-second = 5 / (x+y+z)
 //Eq.ii) Gas/SCV-second = 4 / (x+y+z)\
 
+
+
 /*
+
+4a) Closest mineral patch, SCVs vs income
+- 1 SCV: Measured 45min/minute (predicted 45min/m)
+- 2 SCVs: Measured 90min/minute (predicted 90min/m)
+- 3 SCVs: Measured 100-105min/minute (predicted 102min/m)
+
+4b) Furthest mineral patch, SCVs vs income
+- 1 SCV: Measured 35-40 min/minute (predicted 39min/m)
+- 2 SCVs: Measured 75-80min/minute (predicted 78min/m)
+- 3 SCVs: Measured 100-105min/minute (predicted 102min/m)
+
 
 The simulation will always spread your workers for optimal mining depending on how many bases you have. 
 For one base that means a soft cap at 16 workers and a hard cap at 24 workers. As soon as your expansion 
@@ -64,6 +77,7 @@ Main.prototype = {
     preload: function() {
 
         this.load.image('minerals', 'assets/minerals.png');
+        this.load.image('energy', 'assets/energy.png');
 
         switch (this.race) {
 
@@ -83,6 +97,7 @@ Main.prototype = {
                 this.game.load.atlas('zerg', 'assets/zerg.png', 'assets/zerg.json');
                 this.load.image('gas', 'assets/zerg-gas.png');
                 this.load.image('supply', 'assets/overlord-supply.png');
+                this.load.image('larva', 'assets/larva.png');
                 break;
 
         }
@@ -98,7 +113,6 @@ Main.prototype = {
         _game.scale.onSizeChange.add(this.scaleUpdate, this);
         _game.input.justReleasedRate = 10;
 
-        this.funCount = 0;
 
         // Assign state variables
         this.buildHash = window.location.hash;
@@ -122,6 +136,11 @@ Main.prototype = {
         this.gasText = null;
         this.supplyIcon = null;
         this.supplyText = null;
+
+        if (this.race === 'zerg') {
+            this.larvaIcon = null;
+            this.larvaText = null;
+        }
 
         this.bg = null;
 
@@ -248,7 +267,6 @@ Main.prototype = {
     initUI: function() {
 
         var i;
-        var timeValue;
         var timeString1;
         var timeString2;
         var timeString;
@@ -342,6 +360,21 @@ Main.prototype = {
         this.supplyText = _game.add.bitmapText(__gameWidth - 450, 10, 'Agency_35', '12/15', 35);
         //this.supplyText.tint = 0x00ff00;
 
+        this.energyIcon = _game.add.sprite(__gameWidth - 375, 6, 'energy');
+        this.energyIcon.width = 42;
+        this.energyIcon.height = 42;
+
+        this.energyText = _game.add.bitmapText(__gameWidth - 325, 10, 'Agency_35', '0', 35);
+
+        if (this.race === 'zerg') {
+
+            this.larvaIcon = _game.add.sprite(__gameWidth - 375, 6, 'larva');
+            this.larvaIcon.width = 42;
+            this.larvaIcon.height = 42;
+
+            this.larvaText = _game.add.bitmapText(__gameWidth - 325, 10, 'Agency_35', '0', 35);
+        }
+
 
         if (_game.device.desktop) {
 
@@ -358,17 +391,17 @@ Main.prototype = {
 
             //For mobile, maybe make this one big bitmapdata
 
-            timeValue = (i - 1) * 30;
+            this.timeValue = (i - 1) * 30;
 
-            timeString1 = Math.floor(timeValue / 60).toString();
-            timeString2 = this.pad((timeValue % 60), 2);
+            timeString1 = Math.floor(this.timeValue / 60).toString();
+            timeString2 = this.pad((this.timeValue % 60), 2);
 
             timeString = (timeString1 + ":" + timeString2);
 
             time = _game.make.bitmapText(-85 + (i * 90), 58, 'Agency_35', timeString, 25);
             time.tint = 0x00ff00;
             time.index = i;
-            time.seconds = timeValue;
+            time.seconds = this.timeValue;
             line = _game.make.graphics(-90 + (i * 90), 80);
             line.lineStyle(3, 0x00ff00, 1);
             line.lineTo(0, -8);
@@ -475,7 +508,6 @@ Main.prototype = {
         var seconds;
         var minutes;
         var realTime;
-        var timeValue;
         var _game;
         var _timelineGroup;
         var _lineGroupUI;
@@ -500,12 +532,31 @@ Main.prototype = {
         this.scrollBar.x = __gameWidth - 33;
         this.scrollingBar.x = __gameWidth - 32;
 
-        this.mineralIcon.x = __gameWidth - 800;
-        this.mineralText.x = __gameWidth - 750;
-        this.gasIcon.x = __gameWidth - 650;
-        this.gasText.x = __gameWidth - 600;
-        this.supplyIcon.x = __gameWidth - 500;
-        this.supplyText.x = __gameWidth - 450;
+        if (this.race !== 'zerg') {
+
+            this.mineralIcon.x = __gameWidth - 800;
+            this.mineralText.x = __gameWidth - 750;
+            this.gasIcon.x = __gameWidth - 675;
+            this.gasText.x = __gameWidth - 625;
+            this.supplyIcon.x = __gameWidth - 550;
+            this.supplyText.x = __gameWidth - 500;
+            this.energyIcon.x = __gameWidth - 395;
+            this.energyText.x = __gameWidth - 345;
+
+        // Zerg includes larva
+        } else {
+
+            this.mineralIcon.x = __gameWidth - 800 - 100;
+            this.mineralText.x = __gameWidth - 750 - 100;
+            this.gasIcon.x = __gameWidth - 675 - 100;
+            this.gasText.x = __gameWidth - 625 - 100;
+            this.supplyIcon.x = __gameWidth - 550 - 100;
+            this.supplyText.x = __gameWidth - 500 - 100;
+            this.energyIcon.x = __gameWidth - 395 - 100;
+            this.energyText.x = __gameWidth - 345 - 100;
+            this.larvaIcon.x = __gameWidth - 300 - 100;
+            this.larvaText.x = __gameWidth - 250 - 100;
+        }
 
         this.endOfTimeline = __gameWidth - 319;
         _endOfTimeline = this.endOfTimeline;
@@ -520,18 +571,18 @@ Main.prototype = {
 
 
         // Adjust gray timeline bar to scroll time backwards if desktop re-scaling maxes out the time distance (hits UI)
-        if (this.timeline.x > __gameWidth - 334) {
+        if (this.timeline.x > __gameWidth - 332) {
 
             this.timelineDrag.x = __gameWidth - 350;
-            this.timeline.x = __gameWidth - 334;
+            this.timeline.x = __gameWidth - 332;
 
             // X value of the line sprite dragged by mouse
-            x = Math.floor(this.timeline.x + (this.timeline.width / 2) - 0.5);
+            //x = Math.floor(this.timeline.x + (this.timeline.width / 2) - 0.5);
 
             // Get time string
-            timeValue = Math.floor((-(_timelineGroup.x / 3) + (this.timeLandmarks * 30)) + (this.timeline.x / 3));
-            minutes = Math.floor(timeValue / 60).toString();
-            seconds = this.pad((timeValue % 60), 2);
+            this.timeValue = Math.floor((-(_timelineGroup.x / 3) + (this.timeLandmarks * 30)) + (this.timeline.x / 3));
+            minutes = Math.floor(this.timeValue / 60).toString();
+            seconds = this.pad((this.timeValue % 60), 2);
             realTime = (minutes + ":" + seconds);
             this.currentTimeText.setText(realTime);
         }
@@ -571,7 +622,6 @@ Main.prototype = {
         var seconds;
         var minutes;
         var realTime;
-        var timeValue;
         var _game;
         var _timeIterations;
         var _timelineGroup;
@@ -600,14 +650,14 @@ Main.prototype = {
 
 
         // Get time string
-        timeValue = (-(_timelineGroup.x / 3) + (_timeLandmarks * 30)) + ((_timelineDrag.x + 18) / 3);
-        minutes = Math.floor(timeValue / 60).toString();
-        seconds = this.pad((timeValue % 60), 2);
+        this.timeValue = (-(_timelineGroup.x / 3) + (_timeLandmarks * 30)) + ((_timelineDrag.x + 18) / 3);
+        minutes = Math.floor(this.timeValue / 60).toString();
+        seconds = this.pad((this.timeValue % 60), 2);
         realTime = (minutes + ":" + seconds);
 
 
         // -----If timeline is dragged to maximum left, start scrolling backwards
-        if (_timelineDrag.x <= 40 && this.timeLandmarks != -1) {
+        if (_timelineDrag.x <= 10 && this.timeLandmarks != -1) {
 
             
             // Move time/line group
@@ -621,9 +671,6 @@ Main.prototype = {
             // If scrolled past the width of a 30 second time block, reset lineGroup position and change times to align
             if (_timelineGroup.x > -21) {
 
-                this.funCount++;
-                this.mineralText.text = this.funCount.toString();
-
                 _timelineGroup.x = -90;
 
                 this.timeLandmarks--;
@@ -633,9 +680,9 @@ Main.prototype = {
                 // Update time texts
                 for (i = 0; i < _timeIterations * 3; i++) {
 
-                    timeValue = (i + _timeLandmarks - 1) * 30;
-                    minutes = Math.floor(timeValue / 60).toString();
-                    seconds = this.pad((timeValue % 60), 2);
+                    this.timeValue = (i + _timeLandmarks - 1) * 30;
+                    minutes = Math.floor(this.timeValue / 60).toString();
+                    seconds = this.pad((this.timeValue % 60), 2);
                     realTime = (minutes + ":" + seconds);
 
                     time = _timelineGroup.getAt((i * 3));
@@ -691,9 +738,6 @@ Main.prototype = {
             // If scrolled past the width of a 30 second time block, reset lineGroup position and change times to align
             if (_timelineGroup.x <= -90) {
 
-                this.funCount++;
-                this.mineralText.text = this.funCount.toString();
-
                 _timelineGroup.x = 0;
 
                 this.timeLandmarks++;
@@ -703,9 +747,9 @@ Main.prototype = {
                 // Update time texts
                 for (i = 0; i < _timeIterations * 3; i++) {
 
-                    timeValue = (i + _timeLandmarks - 1) * 30;
-                    minutes = Math.floor(timeValue / 60).toString();
-                    seconds = this.pad((timeValue % 60), 2);
+                    this.timeValue = (i + _timeLandmarks - 1) * 30;
+                    minutes = Math.floor(this.timeValue / 60).toString();
+                    seconds = this.pad((this.timeValue % 60), 2);
                     realTime = (minutes + ":" + seconds);
 
                     time = _timelineGroup.getAt((i * 3));
@@ -730,12 +774,19 @@ Main.prototype = {
             else if (!_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).visible)
                 _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).visible = true;
         }
+
+        this.updateResources();
     },
 
     stopTimeline: function(line) {
 
         if (line.x >= this.game.width - 349)
             line.x = this.game.width - 350;
+
+        if (line.x < 10 && this.timeLandmarks != -1)
+            line.x = 10;
+        else if (line.x < -18)
+            line.x = -18;
     },
 
     initBases: function() {
@@ -746,6 +797,11 @@ Main.prototype = {
     initWorkers: function() {
 
         // Per base.  
+    },
+
+    updateResources: function() {
+
+        console.log(this.timeValue);
     },
 
     _crop: function(sprite) {
@@ -811,11 +867,10 @@ Main.prototype = {
                 x = xx * 62 + (xx * 7);
                 y = yy * 62 + (yy * 7);
 
-                //icon = this.game.add.sprite(x - 3, y - 2, 'icon');
+                //icon = this.game.add.sprite(x - 3, y - 3, 'icon');
                 //icon.width = 66;
                 //icon.height = 66;
-                //icon.tint = 0xff0000;
-
+                //icon.tint = 0x00ff00;
                 //this.unitGroupUI.add(icon);
 
                 texture = this._getUnitTexture(index);
