@@ -183,11 +183,9 @@ Main.prototype = {
 
         if (this.isScrolling) {
 
-            var scrollValue;
             var val;
             var scrollVal;
             var _upgradeY;
-            var structureY;
             var _scrollingBar;
             var _game;
             var _unitGroupUI;
@@ -200,28 +198,22 @@ Main.prototype = {
             _structureGroupUI = this.structureGroupUI;
             _upgradeGroupUI = this.upgradeGroupUI;
 
-            // Starting scroll point
-            if (scrollValue >= _scrollingBar.height)
-                scrollValue = _scrollingBar.height;
-            else
-                scrollValue = (_game.input.activePointer.y - _scrollingBar.y);
-
             // follow input with scroll bar
             scrollVal = _game.input.activePointer.y - this.scrollDifference;
             _scrollingBar.y = scrollVal;
 
             // scroll bar at top
-            if (_scrollingBar.y < 0)
-                _scrollingBar.y = 0;
+            if (_scrollingBar.y < 64)
+                _scrollingBar.y = 64;
 
             // scroll bar at bottom
             else if (_scrollingBar.y > (_game.height - _scrollingBar.height))
                 _scrollingBar.y = (_game.height - _scrollingBar.height);
 
             // Get the percentage Y value to adjust the unit group by relevant to scroll bar
-            val = this.heightDifferece * (_scrollingBar.y / this.gameAndScrollHeight) - 10;
-
-            _unitGroupUI.y = -val;
+            val = this.heightDifferece * ((_scrollingBar.y - 64) / this.gameAndScrollHeight) - 10;
+            
+            _unitGroupUI.y = -val + 64;
 
             structureY = _unitGroupUI.y + _unitGroupUI.height + 10;
             upgradeY = _unitGroupUI.y + _unitGroupUI.height + this.structureGroupUI.height + 20;
@@ -289,43 +281,43 @@ Main.prototype = {
         __gameHeight = _game.height;
 
         // Static scroll bar button
-        this.scrollBar = _game.add.button(__gameWidth - 42, 0, '', this._scrollBar, this);
+        this.scrollBar = _game.add.button(__gameWidth - 42, 64, '', this._scrollBar, this);
         this.scrollBar.width = 42;
-        this.scrollBar.height = __gameHeight;
+        this.scrollBar.height = __gameHeight - 64;
         this.scrollBar.onInputDown.add(this._scrollBar, this);
 
 
         // Selection UI
-        line = _game.make.graphics(__gameWidth - 330, 51);
+        line = _game.make.graphics(__gameWidth - 330, 115);
         line.lineStyle(3, 0x00ff00, 1);
         line.lineTo(10, 10);
-        line.lineTo(10, __gameHeight - 53);
-        line.lineTo(328, __gameHeight - 53);
-        line.lineTo(328, -90);
-        line.lineTo(296, -90);
-        line.lineTo(296, __gameHeight);
+        line.lineTo(10, __gameHeight - 118);
+        line.lineTo(328, __gameHeight - 118);
+        line.lineTo(328, -50);
+        line.lineTo(296, -50);
+        line.lineTo(296, __gameHeight - 64);
 
 
         // 2nd down from top
-        line2 = _game.make.graphics(__gameWidth - 330, 51);
+        line2 = _game.make.graphics(__gameWidth - 330, 115);
         line2.lineStyle(3, 0x00ff00, 1);
         line2.lineTo(-1000, 0);
 
 
         // top of screen
-        line3 = _game.make.graphics(0, 1);
+        line3 = _game.make.graphics(0, 65);
         line3.lineStyle(3, 0x00ff00, 1);
         line3.lineTo(__gameWidth, 0);
 
 
         // small left end of screen
-        line4 = _game.make.graphics(1, 1);
+        line4 = _game.make.graphics(1, 65);
         line4.lineStyle(3, 0x00ff00, 1);
         line4.lineTo(0, 51);
 
 
         // Line under times
-        line5 = _game.make.graphics(0, 81);
+        line5 = _game.make.graphics(0, 145);
         line5.lineStyle(3, 0x00ff00, 1);
         line5.lineTo(__gameWidth - 323, 0);
 
@@ -339,40 +331,40 @@ Main.prototype = {
 
 
         // Mineral / gas / supply icons
-        this.mineralIcon = _game.add.sprite(__gameWidth - 800, 7, 'minerals');
+        this.mineralIcon = _game.add.sprite(__gameWidth - 800, 71, 'minerals');
         this.mineralIcon.width = 40;
         this.mineralIcon.height = 40;
 
-        this.mineralText = _game.add.bitmapText(__gameWidth - 750, 10, 'Agency_35', '0', 35);
+        this.mineralText = _game.add.bitmapText(__gameWidth - 750, 74, 'Agency_35', '0', 35);
         this.mineralText.tint = 0x00ff00;
 
-        this.gasIcon = _game.add.sprite(__gameWidth - 650, 7, 'gas');
+        this.gasIcon = _game.add.sprite(__gameWidth - 650, 71, 'gas');
         this.gasIcon.width = 40;
         this.gasIcon.height = 40;
 
-        this.gasText = _game.add.bitmapText(__gameWidth - 600, 10, 'Agency_35', '0', 35);
+        this.gasText = _game.add.bitmapText(__gameWidth - 600, 74, 'Agency_35', '0', 35);
         this.gasText.tint = 0x00ff00;
 
-        this.supplyIcon = _game.add.sprite(__gameWidth - 500, 6, 'supply');
+        this.supplyIcon = _game.add.sprite(__gameWidth - 500, 70, 'supply');
         this.supplyIcon.width = 42;
         this.supplyIcon.height = 42;
 
-        this.supplyText = _game.add.bitmapText(__gameWidth - 450, 10, 'Agency_35', '12/15', 35);
+        this.supplyText = _game.add.bitmapText(__gameWidth - 450, 74, 'Agency_35', '12/15', 35);
         //this.supplyText.tint = 0x00ff00;
 
-        this.energyIcon = _game.add.sprite(__gameWidth - 375, 6, 'energy');
+        this.energyIcon = _game.add.sprite(__gameWidth - 375, 70, 'energy');
         this.energyIcon.width = 42;
         this.energyIcon.height = 42;
 
-        this.energyText = _game.add.bitmapText(__gameWidth - 325, 10, 'Agency_35', '0', 35);
+        this.energyText = _game.add.bitmapText(__gameWidth - 325, 74, 'Agency_35', '0', 35);
 
         if (this.race === 'zerg') {
 
-            this.larvaIcon = _game.add.sprite(__gameWidth - 375, 6, 'larva');
+            this.larvaIcon = _game.add.sprite(__gameWidth - 375, 70, 'larva');
             this.larvaIcon.width = 42;
             this.larvaIcon.height = 42;
 
-            this.larvaText = _game.add.bitmapText(__gameWidth - 325, 10, 'Agency_35', '0', 35);
+            this.larvaText = _game.add.bitmapText(__gameWidth - 325, 74, 'Agency_35', '0', 35);
         }
 
 
@@ -398,15 +390,15 @@ Main.prototype = {
 
             timeString = (timeString1 + ":" + timeString2);
 
-            time = _game.make.bitmapText(-85 + (i * 90), 58, 'Agency_35', timeString, 25);
+            time = _game.make.bitmapText(-85 + (i * 90), 122, 'Agency_35', timeString, 25);
             time.tint = 0x00ff00;
             time.index = i;
             time.seconds = this.timeValue;
-            line = _game.make.graphics(-90 + (i * 90), 80);
+            line = _game.make.graphics(-90 + (i * 90), 144);
             line.lineStyle(3, 0x00ff00, 1);
             line.lineTo(0, -8);
 
-            line2 = _game.make.graphics(-90 + (i * 90), 80);
+            line2 = _game.make.graphics(-90 + (i * 90), 144);
             line2.lineStyle(1, 0x00ff00, 0.2);
             line2.lineTo(0, this.game.height - 50);
             _timelineGroup.add(time);
@@ -422,7 +414,7 @@ Main.prototype = {
 
 
         // Current time
-        this.currentTimeText = _game.add.bitmapText(10, 10, 'Agency_35', '0:00', 35);
+        this.currentTimeText = _game.add.bitmapText(10, 74, 'Agency_35', '0:00', 35);
     },
 
     startUI: function() {
@@ -440,7 +432,7 @@ Main.prototype = {
 
         _game = this.game;
         _unitGroupUI = this.unitGroupUI;
-        __gameHeight = _game.height;
+        __gameHeight = _game.height - 64;
         __gameWidth = _game.width;
 
 
@@ -455,7 +447,7 @@ Main.prototype = {
 
 
         // Create scrolling bar.  Needed to be created here.
-        this.scrollingBar = _game.add.graphics(0, 0);
+        this.scrollingBar = _game.add.graphics(0, 64);
         this.scrollingBar.lineStyle(1, 0x00ff00, 1);
         this.scrollingBar.beginFill(0x00ff00, 0.3);
         this.scrollingBar.drawRect(0, 0, 28, scrollingBarHeightVar);
@@ -848,7 +840,7 @@ Main.prototype = {
         index = 0;
 
         this.unitGroupUI.x = __gameWidth - 310;
-        this.unitGroupUI.y = 10;
+        this.unitGroupUI.y = 74;
 
         for (yy = 0; yy <= 7; yy++) {
 
