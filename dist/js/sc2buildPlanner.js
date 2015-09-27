@@ -216,10 +216,13 @@ Main.prototype = {
         this.bg.alpha = 0.2;
 
         this.timelineGroup = this.game.add.group();
-        this.starsCover = this.game.add.image(this.game.width - 334, 50, 'stars-cover');
+        this.starsCover = this.game.add.image(this.game.width - 334, 114, 'stars-cover');
         this.unitGroupUI = this.game.add.group();
         this.structureGroupUI = this.game.add.group();
         this.upgradeGroupUI = this.game.add.group();
+        this.starsCoverTop = this.game.add.image(this.game.width - 354, 0, 'stars-cover');
+        this.starsCoverTop.width = 354;
+        this.starsCoverTop.height = 68;
         this.lineGroupUI = this.game.add.group();
         this.workerGroup = this.game.add.group();
         this.baseGroup = this.game.add.group();
@@ -251,11 +254,9 @@ Main.prototype = {
 
         if (this.isScrolling) {
 
-            var scrollValue;
             var val;
             var scrollVal;
             var _upgradeY;
-            var structureY;
             var _scrollingBar;
             var _game;
             var _unitGroupUI;
@@ -268,28 +269,22 @@ Main.prototype = {
             _structureGroupUI = this.structureGroupUI;
             _upgradeGroupUI = this.upgradeGroupUI;
 
-            // Starting scroll point
-            if (scrollValue >= _scrollingBar.height)
-                scrollValue = _scrollingBar.height;
-            else
-                scrollValue = (_game.input.activePointer.y - _scrollingBar.y);
-
             // follow input with scroll bar
             scrollVal = _game.input.activePointer.y - this.scrollDifference;
             _scrollingBar.y = scrollVal;
 
             // scroll bar at top
-            if (_scrollingBar.y < 0)
-                _scrollingBar.y = 0;
+            if (_scrollingBar.y < 64)
+                _scrollingBar.y = 64;
 
             // scroll bar at bottom
             else if (_scrollingBar.y > (_game.height - _scrollingBar.height))
                 _scrollingBar.y = (_game.height - _scrollingBar.height);
 
             // Get the percentage Y value to adjust the unit group by relevant to scroll bar
-            val = this.heightDifferece * (_scrollingBar.y / this.gameAndScrollHeight) - 10;
-
-            _unitGroupUI.y = -val;
+            val = this.heightDifferece * ((_scrollingBar.y - 64) / this.gameAndScrollHeight) - 10;
+            
+            _unitGroupUI.y = -val + 64;
 
             structureY = _unitGroupUI.y + _unitGroupUI.height + 10;
             upgradeY = _unitGroupUI.y + _unitGroupUI.height + this.structureGroupUI.height + 20;
@@ -357,43 +352,43 @@ Main.prototype = {
         __gameHeight = _game.height;
 
         // Static scroll bar button
-        this.scrollBar = _game.add.button(__gameWidth - 42, 0, '', this._scrollBar, this);
+        this.scrollBar = _game.add.button(__gameWidth - 42, 64, '', this._scrollBar, this);
         this.scrollBar.width = 42;
-        this.scrollBar.height = __gameHeight;
+        this.scrollBar.height = __gameHeight - 64;
         this.scrollBar.onInputDown.add(this._scrollBar, this);
 
 
         // Selection UI
-        line = _game.make.graphics(__gameWidth - 330, 51);
+        line = _game.make.graphics(__gameWidth - 330, 115);
         line.lineStyle(3, 0x00ff00, 1);
         line.lineTo(10, 10);
-        line.lineTo(10, __gameHeight - 53);
-        line.lineTo(328, __gameHeight - 53);
-        line.lineTo(328, -90);
-        line.lineTo(296, -90);
-        line.lineTo(296, __gameHeight);
+        line.lineTo(10, __gameHeight - 118);
+        line.lineTo(328, __gameHeight - 118);
+        line.lineTo(328, -50);
+        line.lineTo(296, -50);
+        line.lineTo(296, __gameHeight - 64);
 
 
         // 2nd down from top
-        line2 = _game.make.graphics(__gameWidth - 330, 51);
+        line2 = _game.make.graphics(__gameWidth - 330, 115);
         line2.lineStyle(3, 0x00ff00, 1);
         line2.lineTo(-1000, 0);
 
 
         // top of screen
-        line3 = _game.make.graphics(0, 1);
+        line3 = _game.make.graphics(0, 65);
         line3.lineStyle(3, 0x00ff00, 1);
         line3.lineTo(__gameWidth, 0);
 
 
         // small left end of screen
-        line4 = _game.make.graphics(1, 1);
+        line4 = _game.make.graphics(1, 65);
         line4.lineStyle(3, 0x00ff00, 1);
         line4.lineTo(0, 51);
 
 
         // Line under times
-        line5 = _game.make.graphics(0, 81);
+        line5 = _game.make.graphics(0, 145);
         line5.lineStyle(3, 0x00ff00, 1);
         line5.lineTo(__gameWidth - 323, 0);
 
@@ -407,40 +402,40 @@ Main.prototype = {
 
 
         // Mineral / gas / supply icons
-        this.mineralIcon = _game.add.sprite(__gameWidth - 800, 7, 'minerals');
+        this.mineralIcon = _game.add.sprite(__gameWidth - 800, 71, 'minerals');
         this.mineralIcon.width = 40;
         this.mineralIcon.height = 40;
 
-        this.mineralText = _game.add.bitmapText(__gameWidth - 750, 10, 'Agency_35', '0', 35);
+        this.mineralText = _game.add.bitmapText(__gameWidth - 750, 74, 'Agency_35', '0', 35);
         this.mineralText.tint = 0x00ff00;
 
-        this.gasIcon = _game.add.sprite(__gameWidth - 650, 7, 'gas');
+        this.gasIcon = _game.add.sprite(__gameWidth - 650, 71, 'gas');
         this.gasIcon.width = 40;
         this.gasIcon.height = 40;
 
-        this.gasText = _game.add.bitmapText(__gameWidth - 600, 10, 'Agency_35', '0', 35);
+        this.gasText = _game.add.bitmapText(__gameWidth - 600, 74, 'Agency_35', '0', 35);
         this.gasText.tint = 0x00ff00;
 
-        this.supplyIcon = _game.add.sprite(__gameWidth - 500, 6, 'supply');
+        this.supplyIcon = _game.add.sprite(__gameWidth - 500, 70, 'supply');
         this.supplyIcon.width = 42;
         this.supplyIcon.height = 42;
 
-        this.supplyText = _game.add.bitmapText(__gameWidth - 450, 10, 'Agency_35', '12/15', 35);
+        this.supplyText = _game.add.bitmapText(__gameWidth - 450, 74, 'Agency_35', '12/15', 35);
         //this.supplyText.tint = 0x00ff00;
 
-        this.energyIcon = _game.add.sprite(__gameWidth - 375, 6, 'energy');
+        this.energyIcon = _game.add.sprite(__gameWidth - 375, 70, 'energy');
         this.energyIcon.width = 42;
         this.energyIcon.height = 42;
 
-        this.energyText = _game.add.bitmapText(__gameWidth - 325, 10, 'Agency_35', '0', 35);
+        this.energyText = _game.add.bitmapText(__gameWidth - 325, 74, 'Agency_35', '0', 35);
 
         if (this.race === 'zerg') {
 
-            this.larvaIcon = _game.add.sprite(__gameWidth - 375, 6, 'larva');
+            this.larvaIcon = _game.add.sprite(__gameWidth - 375, 70, 'larva');
             this.larvaIcon.width = 42;
             this.larvaIcon.height = 42;
 
-            this.larvaText = _game.add.bitmapText(__gameWidth - 325, 10, 'Agency_35', '0', 35);
+            this.larvaText = _game.add.bitmapText(__gameWidth - 325, 74, 'Agency_35', '0', 35);
         }
 
 
@@ -466,15 +461,15 @@ Main.prototype = {
 
             timeString = (timeString1 + ":" + timeString2);
 
-            time = _game.make.bitmapText(-85 + (i * 90), 58, 'Agency_35', timeString, 25);
+            time = _game.make.bitmapText(-85 + (i * 90), 122, 'Agency_35', timeString, 25);
             time.tint = 0x00ff00;
             time.index = i;
             time.seconds = this.timeValue;
-            line = _game.make.graphics(-90 + (i * 90), 80);
+            line = _game.make.graphics(-90 + (i * 90), 144);
             line.lineStyle(3, 0x00ff00, 1);
             line.lineTo(0, -8);
 
-            line2 = _game.make.graphics(-90 + (i * 90), 80);
+            line2 = _game.make.graphics(-90 + (i * 90), 144);
             line2.lineStyle(1, 0x00ff00, 0.2);
             line2.lineTo(0, this.game.height - 50);
             _timelineGroup.add(time);
@@ -490,7 +485,7 @@ Main.prototype = {
 
 
         // Current time
-        this.currentTimeText = _game.add.bitmapText(10, 10, 'Agency_35', '0:00', 35);
+        this.currentTimeText = _game.add.bitmapText(10, 74, 'Agency_35', '0:00', 35);
     },
 
     startUI: function() {
@@ -508,7 +503,7 @@ Main.prototype = {
 
         _game = this.game;
         _unitGroupUI = this.unitGroupUI;
-        __gameHeight = _game.height;
+        __gameHeight = _game.height - 64;
         __gameWidth = _game.width;
 
 
@@ -523,7 +518,7 @@ Main.prototype = {
 
 
         // Create scrolling bar.  Needed to be created here.
-        this.scrollingBar = _game.add.graphics(0, 0);
+        this.scrollingBar = _game.add.graphics(0, 64);
         this.scrollingBar.lineStyle(1, 0x00ff00, 1);
         this.scrollingBar.beginFill(0x00ff00, 0.3);
         this.scrollingBar.drawRect(0, 0, 28, scrollingBarHeightVar);
@@ -550,18 +545,18 @@ Main.prototype = {
         //this.game.world.setBounds(0, 0, 100, 640); // ** Maybe adjust this for camera zooming
 
         // Gray timeline line bar container
-        this.timelineDrag = this.game.add.sprite(-18, 83, '');
+        this.timelineDrag = this.game.add.sprite(-18, 147, '');
         this.timelineDrag.width = 36;
-        this.timelineDrag.height = this.game.height - 83;
+        this.timelineDrag.height = this.game.height - 147;
         this.timelineDrag.inputEnabled = true;
         this.timelineDrag.input.enableDrag();
         //this.timelineDrag.input.enableSnap(3, 0, false, false);
         this.timelineDrag.input.allowVerticalDrag = false;
 
         // Gray line
-        this.timeline = this.game.add.graphics(0, 83);
+        this.timeline = this.game.add.graphics(0, 147);
         this.timeline.lineStyle(2, 0x666666, 1);
-        this.timeline.lineTo(0, (this.game.height - 83)) // figure out the timeline jump
+        this.timeline.lineTo(0, (this.game.height - 147)) // figure out the timeline jump
 
         // Timeline events
         this.timelineDrag.events.onDragUpdate.add(this.updateTimeline, this);
@@ -869,7 +864,7 @@ Main.prototype = {
 
     updateResources: function() {
 
-        console.log(this.timeValue);
+        //console.log(this.timeValue);
     },
 
     _crop: function(sprite) {
@@ -906,17 +901,31 @@ Main.prototype = {
         var index;
         var texture;
         var icon;
+        var name;
+        var underline;
         var _game;
+        var _unitGroupUI;
         var __gameWidth;
 
         _game = this.game;
+        _unitGroupUI = this.unitGroupUI;
 
         __gameWidth = this.game.width;
 
         index = 0;
 
-        this.unitGroupUI.x = __gameWidth - 310;
-        this.unitGroupUI.y = 10;
+        _unitGroupUI.x = __gameWidth - 310;
+        _unitGroupUI.y = 74;
+
+        name = _game.make.bitmapText(0, 0, 'Agency_35', 'Units', 35);
+        name.tint = 0x00ff00;
+
+        underline = this.game.add.graphics(0, 30);
+        underline.lineStyle(3, 0x00ff00, 1);
+        underline.lineTo(name.width, 0);
+
+        _unitGroupUI.add(name);
+        _unitGroupUI.add(underline);
 
         for (yy = 0; yy <= 7; yy++) {
 
@@ -933,17 +942,17 @@ Main.prototype = {
                     return;
 
                 x = xx * 62 + (xx * 7);
-                y = yy * 62 + (yy * 7);
+                y = yy * 62 + (yy * 7) + 35;
 
                 //icon = this.game.add.sprite(x - 3, y - 3, 'icon');
                 //icon.width = 66;
                 //icon.height = 66;
                 //icon.tint = 0x00ff00;
-                //this.unitGroupUI.add(icon);
+                //_unitGroupUI.add(icon);
 
                 texture = this._getUnitTexture(index);
 
-                this._createEntity(x, y, texture, this.unitGroupUI);
+                this._createEntity(x, y, texture, _unitGroupUI);
 
             }
         }
@@ -958,11 +967,27 @@ Main.prototype = {
         var index;
         var texture;
         var icon;
+        var name;
+        var underline;
+        var _structureCount;
+        var _structureGroupUI;
+
+        _structureCount = this.structureCount;
+        _structureGroupUI = this.structureGroupUI;
 
         index = 0;
 
         this.structureGroupUI.y = this.unitGroupUI.y + this.unitGroupUI.height + 10;
 
+        name = this.game.make.bitmapText(0, 0, 'Agency_35', 'Buildings', 35);
+        name.tint = 0x00ff00;
+
+        underline = this.game.add.graphics(0, 30);
+        underline.lineStyle(3, 0x00ff00, 1);
+        underline.lineTo(name.width, 0);
+
+        _structureGroupUI.add(name);
+        _structureGroupUI.add(underline);
 
         for (yy = 0; yy <= 7; yy++) {
 
@@ -979,7 +1004,7 @@ Main.prototype = {
                     return;
 
                 x = xx * 62 + (xx * 7);
-                y = yy * 62 + (yy * 7);
+                y = yy * 62 + (yy * 7) + 35;
 
                 //icon = this.game.add.sprite(x - 3, y - 2, 'icon');
                 //icon.width = 66;
@@ -1005,11 +1030,27 @@ Main.prototype = {
         var index;
         var texture;
         var icon;
+        var name;
+        var underline;
         var _game;
+        var _upgradeGroupUI;
+
+        _game = this.game;
+        _upgradeGroupUI = this.upgradeGroupUI;
 
         index = 0;
 
         this.upgradeGroupUI.y = this.unitGroupUI.y + this.unitGroupUI.height + this.structureGroupUI.height + 20;
+
+        name = this.game.make.bitmapText(0, 0, 'Agency_35', 'Upgrades', 35);
+        name.tint = 0x00ff00;
+
+        underline = this.game.add.graphics(0, 30);
+        underline.lineStyle(3, 0x00ff00, 1);
+        underline.lineTo(name.width, 0);
+
+        _upgradeGroupUI.add(name);
+        _upgradeGroupUI.add(underline);
 
         for (yy = 0; yy <= 7; yy++) {
 
@@ -1026,7 +1067,7 @@ Main.prototype = {
                     return;
 
                 x = xx * 62 + (xx * 7);
-                y = yy * 62 + (yy * 7);
+                y = yy * 62 + (yy * 7) + 35;
 
                 //icon = this.game.add.sprite(x - 3, y - 2, 'icon');
                 //icon.width = 66;
