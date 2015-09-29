@@ -148,10 +148,13 @@ Main.prototype = {
         this.bg.alpha = 0.2;
 
         this.timelineGroup = this.game.add.group();
-        this.starsCover = this.game.add.image(this.game.width - 334, 50, 'stars-cover');
+        this.starsCover = this.game.add.image(this.game.width - 334, 114, 'stars-cover');
         this.unitGroupUI = this.game.add.group();
         this.structureGroupUI = this.game.add.group();
         this.upgradeGroupUI = this.game.add.group();
+        this.starsCoverTop = this.game.add.image(this.game.width - 354, 0, 'stars-cover');
+        this.starsCoverTop.width = 354;
+        this.starsCoverTop.height = 68;
         this.lineGroupUI = this.game.add.group();
         this.workerGroup = this.game.add.group();
         this.baseGroup = this.game.add.group();
@@ -474,18 +477,18 @@ Main.prototype = {
         //this.game.world.setBounds(0, 0, 100, 640); // ** Maybe adjust this for camera zooming
 
         // Gray timeline line bar container
-        this.timelineDrag = this.game.add.sprite(-18, 83, '');
+        this.timelineDrag = this.game.add.sprite(-18, 147, '');
         this.timelineDrag.width = 36;
-        this.timelineDrag.height = this.game.height - 83;
+        this.timelineDrag.height = this.game.height - 147;
         this.timelineDrag.inputEnabled = true;
         this.timelineDrag.input.enableDrag();
         //this.timelineDrag.input.enableSnap(3, 0, false, false);
         this.timelineDrag.input.allowVerticalDrag = false;
 
         // Gray line
-        this.timeline = this.game.add.graphics(0, 83);
+        this.timeline = this.game.add.graphics(0, 147);
         this.timeline.lineStyle(2, 0x666666, 1);
-        this.timeline.lineTo(0, (this.game.height - 83)) // figure out the timeline jump
+        this.timeline.lineTo(0, (this.game.height - 147)) // figure out the timeline jump
 
         // Timeline events
         this.timelineDrag.events.onDragUpdate.add(this.updateTimeline, this);
@@ -595,10 +598,10 @@ Main.prototype = {
             this.bg.width = 960;
 
         // Control visibility of time indicators based on width
-        _timelineGroup.forEach(this._scaleUpdateVisibility, this, false, _timelineGroup, _endOfTimeline);
+        _timelineGroup.forEach(this._updateTimelineVisibility, this, false, _timelineGroup, _endOfTimeline);
     },
 
-    _scaleUpdateVisibility: function(sprite, _timelineGroup, _endOfTimeline) {
+    _updateTimelineVisibility: function(sprite, _timelineGroup, _endOfTimeline) {
 
         if (sprite.x + _timelineGroup.x > _endOfTimeline) {
             sprite.visible = false;
@@ -793,7 +796,7 @@ Main.prototype = {
 
     updateResources: function() {
 
-        console.log(this.timeValue);
+        //console.log(this.timeValue);
     },
 
     _crop: function(sprite) {
@@ -830,17 +833,31 @@ Main.prototype = {
         var index;
         var texture;
         var icon;
+        var name;
+        var underline;
         var _game;
+        var _unitGroupUI;
         var __gameWidth;
 
         _game = this.game;
+        _unitGroupUI = this.unitGroupUI;
 
         __gameWidth = this.game.width;
 
         index = 0;
 
-        this.unitGroupUI.x = __gameWidth - 310;
-        this.unitGroupUI.y = 74;
+        _unitGroupUI.x = __gameWidth - 310;
+        _unitGroupUI.y = 74;
+
+        name = _game.make.bitmapText(0, 0, 'Agency_35', 'Units', 35);
+        name.tint = 0x00ff00;
+
+        underline = this.game.add.graphics(0, 30);
+        underline.lineStyle(3, 0x00ff00, 1);
+        underline.lineTo(name.width, 0);
+
+        _unitGroupUI.add(name);
+        _unitGroupUI.add(underline);
 
         for (yy = 0; yy <= 7; yy++) {
 
@@ -857,17 +874,17 @@ Main.prototype = {
                     return;
 
                 x = xx * 62 + (xx * 7);
-                y = yy * 62 + (yy * 7);
+                y = yy * 62 + (yy * 7) + 35;
 
                 //icon = this.game.add.sprite(x - 3, y - 3, 'icon');
                 //icon.width = 66;
                 //icon.height = 66;
                 //icon.tint = 0x00ff00;
-                //this.unitGroupUI.add(icon);
+                //_unitGroupUI.add(icon);
 
                 texture = this._getUnitTexture(index);
 
-                this._createEntity(x, y, texture, this.unitGroupUI);
+                this._createEntity(x, y, texture, _unitGroupUI);
 
             }
         }
@@ -882,11 +899,27 @@ Main.prototype = {
         var index;
         var texture;
         var icon;
+        var name;
+        var underline;
+        var _structureCount;
+        var _structureGroupUI;
+
+        _structureCount = this.structureCount;
+        _structureGroupUI = this.structureGroupUI;
 
         index = 0;
 
         this.structureGroupUI.y = this.unitGroupUI.y + this.unitGroupUI.height + 10;
 
+        name = this.game.make.bitmapText(0, 0, 'Agency_35', 'Buildings', 35);
+        name.tint = 0x00ff00;
+
+        underline = this.game.add.graphics(0, 30);
+        underline.lineStyle(3, 0x00ff00, 1);
+        underline.lineTo(name.width, 0);
+
+        _structureGroupUI.add(name);
+        _structureGroupUI.add(underline);
 
         for (yy = 0; yy <= 7; yy++) {
 
@@ -903,7 +936,7 @@ Main.prototype = {
                     return;
 
                 x = xx * 62 + (xx * 7);
-                y = yy * 62 + (yy * 7);
+                y = yy * 62 + (yy * 7) + 35;
 
                 //icon = this.game.add.sprite(x - 3, y - 2, 'icon');
                 //icon.width = 66;
@@ -929,11 +962,27 @@ Main.prototype = {
         var index;
         var texture;
         var icon;
+        var name;
+        var underline;
         var _game;
+        var _upgradeGroupUI;
+
+        _game = this.game;
+        _upgradeGroupUI = this.upgradeGroupUI;
 
         index = 0;
 
         this.upgradeGroupUI.y = this.unitGroupUI.y + this.unitGroupUI.height + this.structureGroupUI.height + 20;
+
+        name = this.game.make.bitmapText(0, 0, 'Agency_35', 'Upgrades', 35);
+        name.tint = 0x00ff00;
+
+        underline = this.game.add.graphics(0, 30);
+        underline.lineStyle(3, 0x00ff00, 1);
+        underline.lineTo(name.width, 0);
+
+        _upgradeGroupUI.add(name);
+        _upgradeGroupUI.add(underline);
 
         for (yy = 0; yy <= 7; yy++) {
 
@@ -950,7 +999,7 @@ Main.prototype = {
                     return;
 
                 x = xx * 62 + (xx * 7);
-                y = yy * 62 + (yy * 7);
+                y = yy * 62 + (yy * 7) + 35;
 
                 //icon = this.game.add.sprite(x - 3, y - 2, 'icon');
                 //icon.width = 66;
