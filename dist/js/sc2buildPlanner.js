@@ -695,9 +695,8 @@ Main.prototype = {
         var _timeLandmarks;
         var __gameWidth;
 
-
         // Only update every 3 pixels (1 second)
-        if (this.timelineDrag.x % 3 != 0)
+        if (Math.floor(this.timelineDrag.x) % 3 != 0)
             return;
 
 
@@ -716,11 +715,12 @@ Main.prototype = {
         this.timeValue = (-(_timelineGroup.x / 3) + (_timeLandmarks * 30)) + ((_timelineDrag.x + 18) / 3);
         minutes = Math.floor(this.timeValue / 60).toString();
         seconds = this.pad((this.timeValue % 60), 2);
+        seconds = Math.floor(seconds);
         realTime = (minutes + ":" + seconds);
 
 
         // -----If timeline is dragged to maximum left, start scrolling backwards
-        if (_timelineDrag.x <= 10 && this.timeLandmarks != -1) {
+        if (_timelineDrag.x <= 20 && this.timeLandmarks != -1) {
 
             
             // Move time/line group
@@ -756,6 +756,9 @@ Main.prototype = {
 
 
             // Control visibility of passing timeline indicators
+            _timelineGroup.forEach(this._updateTimelineVisibility, this, false, _timelineGroup, this.endOfTimeline);
+
+            /*
             if (_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).x + _timelineGroup.x > _endOfTimeline)
                 _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).visible = false;
             else if (!_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).visible)
@@ -770,11 +773,11 @@ Main.prototype = {
                 _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).visible = false;
             else if (!_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).visible)
                 _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).visible = true;
-
+            */
 
 
         // -----If timeline moved within movable area
-        } else if (_timelineDrag.x < __gameWidth - 349 && _timelineDrag.x > -21) {
+        } else if (_timelineDrag.x < __gameWidth - 390 && _timelineDrag.x > -21) {
 
 
             // Update gray timeline bar location
@@ -787,7 +790,7 @@ Main.prototype = {
 
 
         // -----If timeline dragged maximum right, start scrolling
-        } else if (_timelineDrag.x >= __gameWidth - 349) {
+        } else if (_timelineDrag.x >= __gameWidth - 390) {
 
 
             // Move time/line group
@@ -822,6 +825,9 @@ Main.prototype = {
             }
 
             // Control visibility of passing timeline indicators
+            _timelineGroup.forEach(this._updateTimelineVisibility, this, false, _timelineGroup, this.endOfTimeline);
+
+            /*
             if (_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).x + _timelineGroup.x >= _endOfTimeline)
                 _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).visible = false;
             else if (!_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).visible)
@@ -836,6 +842,7 @@ Main.prototype = {
                 _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).visible = false;
             else if (!_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).visible)
                 _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).visible = true;
+            */
         }
 
         this.updateResources();
