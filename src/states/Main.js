@@ -631,6 +631,7 @@ Main.prototype = {
         if (Math.floor(this.timelineDrag.x) % 3 != 0)
             return;
 
+        
 
         _game = this.game;
         _timeIterations = this.timeIterations;
