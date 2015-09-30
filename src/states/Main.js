@@ -159,6 +159,9 @@ Main.prototype = {
         this.workerGroup = this.game.add.group();
         this.baseGroup = this.game.add.group();
 
+        this.timelineGroup.tween = this.game.add.tween(this.timelineGroup).to( { x: -90 }, 1000, Phaser.Easing.Quadratic.Out, false);
+        //tween.onComplete.addOnce(tween2, this);
+
         this.initTimeline();
 
         this.initUI();
@@ -482,7 +485,7 @@ Main.prototype = {
         this.timelineDrag.height = this.game.height - 147;
         this.timelineDrag.inputEnabled = true;
         this.timelineDrag.input.enableDrag();
-        //this.timelineDrag.input.enableSnap(3, 0, false, false);
+        this.timelineDrag.input.enableSnap(3, 0, true, false);
         this.timelineDrag.input.allowVerticalDrag = false;
 
         // Gray line
@@ -565,14 +568,11 @@ Main.prototype = {
         this.greenLineIndex = 1 + ((_timeIterations) * 3) - 1;
 
 
-        // Adjust gray timeline bar to scroll time backwards if desktop re-scaling maxes out the time distance (hits UI)
+        // DESKTOP - Adjust gray timeline bar to scroll time backwards if desktop re-scaling maxes out the time distance (hits UI)
         if (this.timeline.x > __gameWidth - 332) {
 
             this.timelineDrag.x = __gameWidth - 350;
             this.timeline.x = __gameWidth - 332;
-
-            // X value of the line sprite dragged by mouse
-            //x = Math.floor(this.timeline.x + (this.timeline.width / 2) - 0.5);
 
             // Get time string
             this.timeValue = Math.floor((-(_timelineGroup.x / 3) + (this.timeLandmarks * 30)) + (this.timeline.x / 3));
@@ -605,7 +605,7 @@ Main.prototype = {
 
         if (sprite.x + _timelineGroup.x > _endOfTimeline) {
             sprite.visible = false;
-        } else {
+        } else if (!sprite.visible) {
             sprite.visible = true;
         }
     },
@@ -625,13 +625,13 @@ Main.prototype = {
         var _timeline;
         var _timelineDrag;
         var _timeLandmarks;
+        var _timeValue;
         var __gameWidth;
 
         // Only update every 3 pixels (1 second)
-        if (Math.floor(this.timelineDrag.x) % 3 != 0)
-            return;
+        //if (Math.floor(this.timelineDrag.x) % 3 != 0)
+        //    return;
 
-        
 
         _game = this.game;
         _timeIterations = this.timeIterations;
@@ -646,9 +646,9 @@ Main.prototype = {
 
         // Get time string
         this.timeValue = (-(_timelineGroup.x / 3) + (_timeLandmarks * 30)) + ((_timelineDrag.x + 18) / 3);
-        minutes = Math.floor(this.timeValue / 60).toString();
-        seconds = this.pad((this.timeValue % 60), 2);
-        seconds = Math.floor(seconds);
+        _timeValue = this.timeValue;
+        minutes = Math.floor(_timeValue / 60).toString();
+        seconds = this.pad((_timeValue % 60), 2);
         realTime = (minutes + ":" + seconds);
 
 
@@ -676,9 +676,9 @@ Main.prototype = {
                 // Update time texts
                 for (i = 0; i < _timeIterations * 3; i++) {
 
-                    this.timeValue = (i + _timeLandmarks - 1) * 30;
-                    minutes = Math.floor(this.timeValue / 60).toString();
-                    seconds = this.pad((this.timeValue % 60), 2);
+                    _timeValue = (i + _timeLandmarks - 1) * 30;
+                    minutes = Math.floor(_timeValue / 60).toString();
+                    seconds = this.pad((_timeValue % 60), 2);
                     realTime = (minutes + ":" + seconds);
 
                     time = _timelineGroup.getAt((i * 3));
@@ -691,22 +691,6 @@ Main.prototype = {
             // Control visibility of passing timeline indicators
             _timelineGroup.forEach(this._updateTimelineVisibility, this, false, _timelineGroup, this.endOfTimeline);
 
-            /*
-            if (_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).x + _timelineGroup.x > _endOfTimeline)
-                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).visible = false;
-            else if (!_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).visible)
-                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).visible = true;
-
-            if (_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 2).x + _timelineGroup.x > _endOfTimeline)
-                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 2).visible = false;
-            else if (!_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 2).visible)
-                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 2).visible = true;
-
-            if (_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).x + _timelineGroup.x > _endOfTimeline)
-                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).visible = false;
-            else if (!_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).visible)
-                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).visible = true;
-            */
 
 
         // -----If timeline moved within movable area
@@ -725,9 +709,13 @@ Main.prototype = {
         // -----If timeline dragged maximum right, start scrolling
         } else if (_timelineDrag.x >= __gameWidth - 390) {
 
-
             // Move time/line group
-            _timelineGroup.x -= 3;
+            //_timelineGroup.x -= 3;
+            if (!_timelineGroup.tween.isRunning) {
+                            console.log(_timelineGroup.tween.isRunning)
+
+                _timelineGroup.tween.start();
+            }
 
 
             // Set the current time
@@ -736,6 +724,8 @@ Main.prototype = {
 
             // If scrolled past the width of a 30 second time block, reset lineGroup position and change times to align
             if (_timelineGroup.x <= -90) {
+
+                console.log("reset")
 
                 _timelineGroup.x = 0;
 
@@ -746,9 +736,9 @@ Main.prototype = {
                 // Update time texts
                 for (i = 0; i < _timeIterations * 3; i++) {
 
-                    this.timeValue = (i + _timeLandmarks - 1) * 30;
-                    minutes = Math.floor(this.timeValue / 60).toString();
-                    seconds = this.pad((this.timeValue % 60), 2);
+                    _timeValue = (i + _timeLandmarks - 1) * 30;
+                    minutes = Math.floor(_timeValue / 60).toString();
+                    seconds = this.pad((_timeValue % 60), 2);
                     realTime = (minutes + ":" + seconds);
 
                     time = _timelineGroup.getAt((i * 3));
@@ -759,23 +749,6 @@ Main.prototype = {
 
             // Control visibility of passing timeline indicators
             _timelineGroup.forEach(this._updateTimelineVisibility, this, false, _timelineGroup, this.endOfTimeline);
-
-            /*
-            if (_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).x + _timelineGroup.x >= _endOfTimeline)
-                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).visible = false;
-            else if (!_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).visible)
-                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 3).visible = true;
-
-            if (_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 2).x + _timelineGroup.x >= _endOfTimeline)
-                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 2).visible = false;
-            else if (!_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 2).visible)
-                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 2).visible = true;
-
-            if (_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).x + _timelineGroup.x >= _endOfTimeline)
-                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).visible = false;
-            else if (!_timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).visible)
-                _timelineGroup.getAt(3 + ((_timeIterations) * 3) - 1).visible = true;
-            */
         }
 
         this.updateResources();
