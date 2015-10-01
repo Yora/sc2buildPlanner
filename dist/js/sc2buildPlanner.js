@@ -780,7 +780,9 @@ Main.prototype = {
             // Move time/line group
             //_timelineGroup.x -= 3;
             if (!_timelineGroup.tween.isRunning) {
-                            console.log(_timelineGroup.tween.isRunning)
+                
+                console.log(_timelineGroup.x)
+                console.log(_timelineGroup.tween.isRunning)
 
                 _timelineGroup.tween.start();
             }
@@ -791,7 +793,9 @@ Main.prototype = {
 
 
             // If scrolled past the width of a 30 second time block, reset lineGroup position and change times to align
-            if (_timelineGroup.x <= -90) {
+            if (_timelineGroup.x < -90) {
+
+                console.log("reset")
 
                 console.log("reset")
 
