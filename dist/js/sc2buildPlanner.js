@@ -205,6 +205,8 @@ Main.prototype = {
         this.supplyIcon = null;
         this.supplyText = null;
 
+        this.supply = 0;
+
         if (this.race === 'zerg') {
             this.larvaIcon = null;
             this.larvaText = null;
@@ -223,6 +225,11 @@ Main.prototype = {
         this.starsCoverTop = this.game.add.image(this.game.width - 354, 0, 'stars-cover');
         this.starsCoverTop.width = 354;
         this.starsCoverTop.height = 68;
+        this.buildOrderGroup = this.game.add.group();
+        this.buildOrderGroup.x = 3;
+        this.buildOrderGroup.y = 1;
+        this.buildOrderGroup.maxDisplay = this.game.width / 65;
+        this.buildOrderGroup.staticX = 0;
         this.lineGroupUI = this.game.add.group();
         this.workerGroup = this.game.add.group();
         this.baseGroup = this.game.add.group();
@@ -250,7 +257,7 @@ Main.prototype = {
 
         // Next: boxes for constructing, use filled rectangles
 
-        this.timer = _game.time.create(true);
+            this.timer = _game.time.create(true);
     },
 
     update: function() {
@@ -553,7 +560,7 @@ Main.prototype = {
         this.timelineDrag.height = this.game.height - 147;
         this.timelineDrag.inputEnabled = true;
         this.timelineDrag.input.enableDrag();
-        this.timelineDrag.input.enableSnap(3, 0, true, false);
+        this.timelineDrag.input.enableSnap(3, 1, true, false);
         this.timelineDrag.input.allowVerticalDrag = false;
 
         // Gray line
@@ -595,6 +602,7 @@ Main.prototype = {
         this.upgradeGroupUI.x = uiPos;
 
         this.starsCover.x = __gameWidth - 318;
+        this.starsCoverTop.x = __gameWidth - 364;
         this.scrollBar.x = __gameWidth - 33;
         this.scrollingBar.x = __gameWidth - 32;
 
@@ -624,6 +632,7 @@ Main.prototype = {
             this.larvaText.x = __gameWidth - 250 - 100;
         }
 
+        // Stop timeline when it reaches UI
         this.endOfTimeline = __gameWidth - 319;
         _endOfTimeline = this.endOfTimeline;
 
@@ -635,6 +644,20 @@ Main.prototype = {
         // 'dynamic' green line, this index used to crop it off the side of the UI
         this.greenLineIndex = 1 + ((_timeIterations) * 3) - 1;
 
+
+        // Adjust build order sprite visibility
+        this.buildOrderGroup.maxDisplay = Math.floor(__gameWidth / 65);
+
+        //console.log(this.buildOrderGroup.x + " " + (this.buildOrderGroup.length / 2) + " " + this.buildOrderGroup.maxDisplay)
+        console.log("build order width: " + this.buildOrderGroup.width + "  game width: " + __gameWidth)
+
+        if (__gameWidth < this.buildOrderGroup.width) {
+
+            this.buildOrderGroup.x = this.buildOrderGroup.staticX - (this.buildOrderGroup.width - __gameWidth);
+        }
+
+        //if (this.buildOrderGroup.x < 0 && this.buildOrderGroup.maxDisplay)
+        //this.buildOrderGroup.forEach(this._checkBoundsOnScaleUpdate, this);
 
         // DESKTOP - Adjust gray timeline bar to scroll time backwards if desktop re-scaling maxes out the time distance (hits UI)
         if (this.timeline.x > __gameWidth - 332) {
@@ -695,6 +718,7 @@ Main.prototype = {
         var _timeLandmarks;
         var _timeValue;
         var __gameWidth;
+
 
         // Only update every 3 pixels (1 second)
         //if (Math.floor(this.timelineDrag.x) % 3 != 0)
@@ -1078,9 +1102,87 @@ Main.prototype = {
         group.add(sprite);
     },
 
-    unitPressed: function() {
+    unitPressed: function(unit) {
 
-        console.log(this)
+        var sprite;
+        var x;
+        var supply;
+        var spriteIndex;
+        var _game;
+        var _buildOrderGroup;
+
+        _game = this.game;
+        _buildOrderGroup = this.buildOrderGroup;
+
+        x = Math.floor(_buildOrderGroup.length / 2) * 65;
+
+        sprite = _game.add.sprite(x, 0, unit.texture);
+        sprite.inputEnabled = true;
+        sprite.events.onInputDown.add(this._removeBuildOrderSprite, this);
+        supply = _game.add.bitmapText(x, 0, 'Agency_35', this.supply.toString(), 28);
+        supply.tint = 0x00ff00;
+
+        _buildOrderGroup.add(sprite);
+        _buildOrderGroup.add(supply);
+
+        spriteIndex = ((sprite.z - 1) / 2);
+
+        //if (x > _game.width - 65) {
+        if (spriteIndex >= _buildOrderGroup.maxDisplay) {
+
+            _buildOrderGroup.staticX -= 65;
+            _buildOrderGroup.x -= 65;
+            _buildOrderGroup.forEach(this._checkBounds, this, false);
+        }
+
+        console.log(spriteIndex + " " + _buildOrderGroup.maxDisplay)
+    },
+
+    _checkBounds: function(sprite) {
+
+        if (sprite.x + sprite.parent.x < -65) {
+         
+            sprite.visible = false;
+            sprite.exists = false;
+
+        } else {
+
+            sprite.exists = true;
+            sprite.visible = true;
+        }
+    },
+
+    _checkBoundsOnScaleUpdate: function(sprite) {
+
+        //if (sprite.)
+    },
+
+    _removeBuildOrderSprite: function(sprite) {
+
+        var _buildOrderGroup;
+
+        _buildOrderGroup = this.buildOrderGroup;
+
+        // Remove build order sprite and supply number from group
+        _buildOrderGroup.removeBetween(sprite.z, sprite.z + 1, true);
+
+
+        // Reposition the rest of the build order group
+        _buildOrderGroup.forEach(this.__updateBuildOrderSprite, this);
+
+
+        // Shift build order group
+        if (_buildOrderGroup.x < 0) {
+
+            _buildOrderGroup.staticX += 65;
+            _buildOrderGroup.x += 65;
+            _buildOrderGroup.forEach(this._checkBounds, this, false);
+        }
+    },
+
+    __updateBuildOrderSprite: function(sprite) {
+
+        sprite.x = Math.floor(sprite.z / 2) * 65;
     },
 
     _getUnitTexture: function(index) {
