@@ -585,7 +585,7 @@ Main.prototype = {
 
         if (__gameWidth < this.buildOrderGroup.width) {
 
-            this.buildOrderGroup.x = this.buildOrderGroup.staticX - (this.buildOrderGroup.width - __gameWidth);
+            //this.buildOrderGroup.x = this.buildOrderGroup.staticX - (this.buildOrderGroup.width - __gameWidth);
         }
 
         //if (this.buildOrderGroup.x < 0 && this.buildOrderGroup.maxDisplay)
@@ -1050,7 +1050,7 @@ Main.prototype = {
 
         sprite = _game.add.sprite(x, 0, unit.texture);
         sprite.inputEnabled = true;
-        sprite.events.onInputDown.add(this._removeBuildOrderSprite, this);
+        sprite.events.onInputDown.add(this._removeBuildOrderSprite, this); // ***MAKE THIS ON RELEASE, SO YOU CAN DRAG THE BO BAR ALONG
         supply = _game.add.bitmapText(x, 0, 'Agency_35', this.supply.toString(), 28);
         supply.tint = 0x00ff00;
 
@@ -1060,6 +1060,7 @@ Main.prototype = {
         spriteIndex = ((sprite.z - 1) / 2);
 
         //if (x > _game.width - 65) {
+            console.log(_buildOrderGroup.maxDisplay);
         if (spriteIndex >= _buildOrderGroup.maxDisplay) {
 
             _buildOrderGroup.staticX -= 65;
