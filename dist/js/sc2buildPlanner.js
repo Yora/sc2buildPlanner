@@ -181,6 +181,9 @@ Main.prototype = {
         _game.scale.onSizeChange.add(this.scaleUpdate, this);
         _game.input.justReleasedRate = 10;
 
+        _game.input.holdRate = 500;
+        _game.input.onHold.add(this._inputHoldScrollBuildOrder, this)
+        _game.input.onUp.add(this._inputUp, this);
 
         // Assign state variables
         this.buildHash = window.location.hash;
@@ -205,6 +208,8 @@ Main.prototype = {
         this.supplyIcon = null;
         this.supplyText = null;
 
+        this.scrollBuildOrder = false;
+
         this.supply = 0;
 
         if (this.race === 'zerg') {
@@ -228,8 +233,7 @@ Main.prototype = {
         this.buildOrderGroup = this.game.add.group();
         this.buildOrderGroup.x = 3;
         this.buildOrderGroup.y = 1;
-        this.buildOrderGroup.maxDisplay = this.game.width / 65;
-        this.buildOrderGroup.staticX = 0;
+        this.buildOrderGroup.inputEnabled = true;
         this.lineGroupUI = this.game.add.group();
         this.workerGroup = this.game.add.group();
         this.baseGroup = this.game.add.group();
@@ -260,7 +264,25 @@ Main.prototype = {
             this.timer = _game.time.create(true);
     },
 
+    _inputHoldScrollBuildOrder: function () {
+
+        if (this.game.input.activePointer.y < 70)
+            this.scrollBuildOrder = true;
+    },
+
+    _inputUp: function() {
+
+        this.scrollBuildOrder = false;
+    },
+
     update: function() {
+
+        if (this.scrollBuildOrder) {
+            console.log(this.buildOrderGroup.x)
+
+            //find the difference just like scrollbar
+            this.buildOrderGroup.x = this.game.input.activePointer.x //- (this.game.input.activePointer.x - this.buildOrderGroup.x);
+        }
 
         if (this.isScrolling) {
 
@@ -644,20 +666,6 @@ Main.prototype = {
         // 'dynamic' green line, this index used to crop it off the side of the UI
         this.greenLineIndex = 1 + ((_timeIterations) * 3) - 1;
 
-
-        // Adjust build order sprite visibility
-        this.buildOrderGroup.maxDisplay = Math.floor(__gameWidth / 65);
-
-        //console.log("build order width: " + this.buildOrderGroup.width + "  game width: " + __gameWidth)
-        //console.log((Math.floor(this.buildOrderGroup.length / 2)) + " " + this.buildOrderGroup.maxDisplay)
-
-        if (__gameWidth < this.buildOrderGroup.width) {
-
-            //this.buildOrderGroup.x = this.buildOrderGroup.staticX - (this.buildOrderGroup.width - __gameWidth);
-        }
-
-        //if (this.buildOrderGroup.x < 0 && this.buildOrderGroup.maxDisplay)
-        //this.buildOrderGroup.forEach(this._checkBoundsOnScaleUpdate, this);
 
         // DESKTOP - Adjust gray timeline bar to scroll time backwards if desktop re-scaling maxes out the time distance (hits UI)
         if (this.timeline.x > __gameWidth - 332) {
@@ -1122,13 +1130,11 @@ Main.prototype = {
         supply = _game.add.bitmapText(x, 0, 'Agency_35', this.supply.toString(), 28);
         supply.tint = 0x00ff00;
         sprite.events.onInputUp.add(this._removeBuildOrderSprite, this, 0, supply);
-
         _buildOrderGroup.add(sprite);
         _buildOrderGroup.add(supply);
 
         if (sprite.x + _buildOrderGroup.x > this.game.width - 65) {
 
-            _buildOrderGroup.staticX -= 65;
             _buildOrderGroup.x -= 65;
             _buildOrderGroup.forEach(this._checkBounds, this, false);
         }
@@ -1178,6 +1184,11 @@ Main.prototype = {
             _buildOrderGroup.x += 65;
             _buildOrderGroup.forEach(this._checkBounds, this, false);
         }
+    },
+
+    _dragBuildOrder: function () {
+
+        console.log("aa")
     },
 
     __updateBuildOrderSprite: function(sprite) {
