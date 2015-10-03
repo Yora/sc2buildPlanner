@@ -580,8 +580,8 @@ Main.prototype = {
         // Adjust build order sprite visibility
         this.buildOrderGroup.maxDisplay = Math.floor(__gameWidth / 65);
 
-        //console.log(this.buildOrderGroup.x + " " + (this.buildOrderGroup.length / 2) + " " + this.buildOrderGroup.maxDisplay)
-        console.log("build order width: " + this.buildOrderGroup.width + "  game width: " + __gameWidth)
+        //console.log("build order width: " + this.buildOrderGroup.width + "  game width: " + __gameWidth)
+        //console.log((Math.floor(this.buildOrderGroup.length / 2)) + " " + this.buildOrderGroup.maxDisplay)
 
         if (__gameWidth < this.buildOrderGroup.width) {
 
@@ -1028,7 +1028,9 @@ Main.prototype = {
 
         var sprite;
 
-        sprite = this.game.make.button(x, y, this.race, this.unitPressed, this, texture + "-highlight", texture, texture, texture);
+        sprite = this.game.make.button(x, y, this.race, null, this, texture + "-highlight", texture, texture, texture);
+
+        sprite.onInputUp.add(this.unitPressed, this);
 
         //console.log(sprite.width) //lolol theres still a sprite in terran with 62 width
         group.add(sprite);
@@ -1039,7 +1041,6 @@ Main.prototype = {
         var sprite;
         var x;
         var supply;
-        var spriteIndex;
         var _game;
         var _buildOrderGroup;
 
@@ -1050,25 +1051,19 @@ Main.prototype = {
 
         sprite = _game.add.sprite(x, 0, unit.texture);
         sprite.inputEnabled = true;
-        sprite.events.onInputDown.add(this._removeBuildOrderSprite, this); // ***MAKE THIS ON RELEASE, SO YOU CAN DRAG THE BO BAR ALONG
         supply = _game.add.bitmapText(x, 0, 'Agency_35', this.supply.toString(), 28);
         supply.tint = 0x00ff00;
+        sprite.events.onInputUp.add(this._removeBuildOrderSprite, this, 0, supply);
 
         _buildOrderGroup.add(sprite);
         _buildOrderGroup.add(supply);
 
-        spriteIndex = ((sprite.z - 1) / 2);
-
-        //if (x > _game.width - 65) {
-            console.log(_buildOrderGroup.maxDisplay);
-        if (spriteIndex >= _buildOrderGroup.maxDisplay) {
+        if (sprite.x + _buildOrderGroup.x > this.game.width - 65) {
 
             _buildOrderGroup.staticX -= 65;
             _buildOrderGroup.x -= 65;
             _buildOrderGroup.forEach(this._checkBounds, this, false);
         }
-
-        console.log(spriteIndex + " " + _buildOrderGroup.maxDisplay)
     },
 
     _checkBounds: function(sprite) {
@@ -1090,14 +1085,19 @@ Main.prototype = {
         //if (sprite.)
     },
 
-    _removeBuildOrderSprite: function(sprite) {
+    _removeBuildOrderSprite: function(sprite, a, b, supply) {
 
         var _buildOrderGroup;
 
         _buildOrderGroup = this.buildOrderGroup;
 
+        if (!sprite.getBounds().contains(this.game.input.activePointer.x, this.game.input.activePointer.y)) 
+            return;
+        
+
         // Remove build order sprite and supply number from group
-        _buildOrderGroup.removeBetween(sprite.z, sprite.z + 1, true);
+        _buildOrderGroup.remove(sprite, true);
+        _buildOrderGroup.remove(supply, true);
 
 
         // Reposition the rest of the build order group
@@ -1107,7 +1107,6 @@ Main.prototype = {
         // Shift build order group
         if (_buildOrderGroup.x < 0) {
 
-            _buildOrderGroup.staticX += 65;
             _buildOrderGroup.x += 65;
             _buildOrderGroup.forEach(this._checkBounds, this, false);
         }
