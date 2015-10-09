@@ -181,7 +181,7 @@ Main.prototype = {
         _game.scale.onSizeChange.add(this.scaleUpdate, this);
         _game.input.justReleasedRate = 10;
 
-        _game.input.holdRate = 500;
+        _game.input.holdRate = 250;
         _game.input.onHold.add(this._inputHoldScrollBuildOrder, this)
         _game.input.onUp.add(this._inputUp, this);
 
@@ -195,6 +195,8 @@ Main.prototype = {
         this.maxScrollCount = 0;
         this.isScrolling = false;
         this.scrollDifference = 0;
+        this.heightDifferece = 0;
+        this.widthDifferece = 0;
         this.maxHeight = 0;
         this.timeIterations = 0;
         this.timeLandmarks = 0;
@@ -209,6 +211,8 @@ Main.prototype = {
         this.supplyText = null;
 
         this.scrollBuildOrder = false;
+        this.buildOrderStartX = 0;
+        this.buildOrderPointerStartX = 0;
 
         this.supply = 0;
 
@@ -266,8 +270,12 @@ Main.prototype = {
 
     _inputHoldScrollBuildOrder: function () {
 
-        if (this.game.input.activePointer.y < 70)
+        if (this.game.input.activePointer.y < 70) {
+
             this.scrollBuildOrder = true;
+            this.buildOrderStartX = this.buildOrderGroup.x;
+            this.buildOrderPointerStartX = this.game.input.activePointer.x;
+        }
     },
 
     _inputUp: function() {
@@ -277,11 +285,10 @@ Main.prototype = {
 
     update: function() {
 
+        // Scroll the top build order bar
         if (this.scrollBuildOrder) {
-            console.log(this.buildOrderGroup.x)
 
-            //find the difference just like scrollbar
-            this.buildOrderGroup.x = this.game.input.activePointer.x //- (this.game.input.activePointer.x - this.buildOrderGroup.x);
+            this.buildOrderGroup.x = this.buildOrderStartX - (this.game.input.activePointer.x - this.buildOrderPointerStartX);
         }
 
         if (this.isScrolling) {
@@ -306,15 +313,15 @@ Main.prototype = {
             _scrollingBar.y = scrollVal;
 
             // scroll bar at top
-            if (_scrollingBar.y < 64)
-                _scrollingBar.y = 64;
+            if (_scrollingBar.y < 67)
+                _scrollingBar.y = 67;
 
             // scroll bar at bottom
             else if (_scrollingBar.y > (_game.height - _scrollingBar.height))
                 _scrollingBar.y = (_game.height - _scrollingBar.height);
 
             // Get the percentage Y value to adjust the unit group by relevant to scroll bar
-            val = this.heightDifferece * ((_scrollingBar.y - 64) / this.gameAndScrollHeight) - 10;
+            val = this.heightDifferece * ((_scrollingBar.y - 67) / this.gameAndScrollHeight) - 10;
             
             _unitGroupUI.y = -val + 64;
 
@@ -384,9 +391,9 @@ Main.prototype = {
         __gameHeight = _game.height;
 
         // Static scroll bar button
-        this.scrollBar = _game.add.button(__gameWidth - 42, 64, '', this._scrollBar, this);
+        this.scrollBar = _game.add.button(__gameWidth - 42, 67, '', this._scrollBar, this);
         this.scrollBar.width = 42;
-        this.scrollBar.height = __gameHeight - 64;
+        this.scrollBar.height = __gameHeight - 67;
         this.scrollBar.onInputDown.add(this._scrollBar, this);
 
 
@@ -394,10 +401,13 @@ Main.prototype = {
         line = _game.make.graphics(__gameWidth - 330, 115);
         line.lineStyle(3, 0x00ff00, 1);
         line.lineTo(10, 10);
-        line.lineTo(10, __gameHeight - 118);
-        line.lineTo(328, __gameHeight - 118);
-        line.lineTo(328, -50);
-        line.lineTo(296, -50);
+        line.lineTo(10, __gameHeight - 117);
+        line.lineTo(328, __gameHeight - 117);
+        line.lineTo(328, -48);
+        line.lineStyle(3, 0x00ff00, 0.2);
+        line.moveTo(296, -48);
+        //line.lineTo(296, -48);
+        line.lineStyle(3, 0x00ff00, 1);
         line.lineTo(296, __gameHeight - 64);
 
 
@@ -409,7 +419,7 @@ Main.prototype = {
 
         // top of screen
         line3 = _game.make.graphics(0, 65);
-        line3.lineStyle(3, 0x00ff00, 1);
+        line3.lineStyle(3, 0x00ff00, 0.2);
         line3.lineTo(__gameWidth, 0);
 
 
@@ -518,6 +528,12 @@ Main.prototype = {
 
         // Current time
         this.currentTimeText = _game.add.bitmapText(10, 74, 'Agency_35', '0:00', 35);
+
+
+        //Build order scroll bar
+        this.buildOrderScrollBar = _game.add.graphics(0, 65);
+        this.buildOrderScrollBar.lineStyle(3, 0x00ff00, 1);
+        this.buildOrderScrollBar.lineTo(__gameWidth, 0);
     },
 
     startUI: function() {
@@ -535,7 +551,7 @@ Main.prototype = {
 
         _game = this.game;
         _unitGroupUI = this.unitGroupUI;
-        __gameHeight = _game.height - 64;
+        __gameHeight = _game.height - 67;
         __gameWidth = _game.width;
 
 
@@ -550,7 +566,7 @@ Main.prototype = {
 
 
         // Create scrolling bar.  Needed to be created here.
-        this.scrollingBar = _game.add.graphics(0, 64);
+        this.scrollingBar = _game.add.graphics(0, 67);
         this.scrollingBar.lineStyle(1, 0x00ff00, 1);
         this.scrollingBar.beginFill(0x00ff00, 0.3);
         this.scrollingBar.drawRect(0, 0, 28, scrollingBarHeightVar);
@@ -603,6 +619,8 @@ Main.prototype = {
         var seconds;
         var minutes;
         var realTime;
+        var maxWidthVar;
+        var newWidth;
         var _game;
         var _timelineGroup;
         var _lineGroupUI;
@@ -696,8 +714,32 @@ Main.prototype = {
         else if (this.bg !== null)
             this.bg.width = 960;
 
+
         // Control visibility of time indicators based on width
         _timelineGroup.forEach(this._updateTimelineVisibility, this, false, _timelineGroup, _endOfTimeline);
+
+
+        // Variables for width of build order scroll bar
+        if (((this.buildOrderGroup.length / 2) * 65) > this.game.width) {
+
+            maxWidthVar = ((this.buildOrderGroup.length / 2) * 65)
+
+            this.widthDifferece = maxWidthVar - __gameWidth;
+
+            newWidth = __gameWidth - (__gameWidth * ((maxWidthVar - __gameWidth) / maxWidthVar));
+
+            this.buildOrderScrollBar.clear();
+            this.buildOrderScrollBar.moveTo(0, 0);
+            this.buildOrderScrollBar.lineStyle(3, 0x00ff00, 1);
+            this.buildOrderScrollBar.lineTo(newWidth, 0);
+
+        } else {
+
+            this.buildOrderScrollBar.clear();
+            this.buildOrderScrollBar.moveTo(0, 0);
+            this.buildOrderScrollBar.lineStyle(3, 0x00ff00, 1);
+            this.buildOrderScrollBar.lineTo(__gameWidth, 0);        
+        }
     },
 
     _updateTimelineVisibility: function(sprite, _timelineGroup, _endOfTimeline) {
@@ -1117,11 +1159,18 @@ Main.prototype = {
         var sprite;
         var x;
         var supply;
+        var newWidth;
+        var maxWidthVar;
         var _game;
         var _buildOrderGroup;
+        var __gameWidth;
+        var __gameHeight;
 
         _game = this.game;
         _buildOrderGroup = this.buildOrderGroup;
+
+        __gameWidth = _game.width;
+        __gameHeight = _game.height;
 
         x = Math.floor(_buildOrderGroup.length / 2) * 65;
 
@@ -1133,10 +1182,23 @@ Main.prototype = {
         _buildOrderGroup.add(sprite);
         _buildOrderGroup.add(supply);
 
+        // If the added selection exceeds the width of the screen
         if (sprite.x + _buildOrderGroup.x > this.game.width - 65) {
 
             _buildOrderGroup.x -= 65;
             _buildOrderGroup.forEach(this._checkBounds, this, false);
+
+            // Variables for width of build order scroll bar
+            maxWidthVar = ((_buildOrderGroup.length / 2) * 65)
+
+            //this.widthDifferece = maxWidthVar - __gameWidth;
+
+            newWidth = __gameWidth - (__gameWidth * ((maxWidthVar - __gameWidth) / maxWidthVar));
+
+            this.buildOrderScrollBar.clear();
+            this.buildOrderScrollBar.moveTo(0, 0);
+            this.buildOrderScrollBar.lineStyle(3, 0x00ff00, 1);
+            this.buildOrderScrollBar.lineTo(newWidth, 0);
         }
     },
 
