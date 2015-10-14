@@ -193,6 +193,8 @@ Main.prototype = {
 
         this.scrollBar = null;
         this.scrollingBar = null;
+        this.gameAndScrollHeight = 0;
+        this.gameAndBuildOrderWidth = 0;
         this.buildOrderScrollBar = null;
         this.buildOrderScrollingBar = null;
         this.timeline = null;
@@ -200,7 +202,8 @@ Main.prototype = {
         this.isScrolling = false;
         this.scrollDifference = 0;
         this.buildOrderScrollDifference = 0;
-        this.heightDifferece = 0;
+        this.heightDifference = 0;
+        this.widthDifference = 0;
         this.maxHeight = 0;
         this.timeIterations = 0;
         this.timeLandmarks = 0;
@@ -302,18 +305,33 @@ Main.prototype = {
             if (newWidth > __gameWidth)
                 newWidth = __gameWidth;
 
+            _buildOrderGroup.forEachDead(this._checkBounds, this);
 
             // Scroll the build order 
             scrollVal = _game.input.activePointer.x - this.buildOrderScrollDifference;
 
 
-            // Keep build order scroll bar within bounds.  If in bounds, set x to scrollVal
-            if (scrollVal < 0)
+            // Keep build order scroll bar within bounds.  
+            if (scrollVal < 0) {
+
                 _buildOrderScrollingBar.x = 0;
-            else if (scrollVal + newWidth >= __gameWidth)
+            }
+
+            // Off right side of screen, auto-adjust
+            else if (scrollVal + newWidth >= __gameWidth) {
+
                 _buildOrderScrollingBar.x = __gameWidth - newWidth;
-            else 
+            }
+
+            // In scrollable area of screen, actively adjust
+            else {
+
                 _buildOrderScrollingBar.x = scrollVal;
+            }
+
+            val = this.widthDifference * (_buildOrderScrollingBar.x / this.gameAndBuildOrderWidth);
+            this.buildOrderGroup.x = -val + 3;
+            
         }
 
         if (this.isScrolling) {
@@ -664,12 +682,14 @@ Main.prototype = {
         var _lineGroupUI;
         var _endOfTimeline;
         var _timeIterations;
+        var _buildOrderGroup;
         var __gameWidth;
         var val;
 
         _game = this.game;
         _timelineGroup = this.timelineGroup;
         _lineGroupUI = this.lineGroupUI;
+        _buildOrderGroup = this.buildOrderGroup;
 
         __gameWidth = _game.width;
 
@@ -758,6 +778,39 @@ Main.prototype = {
 
 
         // Variables for width of build order scroll bar
+        
+        if (((this.buildOrderGroup.length / 2) * 65) > this.game.width) {
+            maxWidthVar = ((_buildOrderGroup.length / 2) * 65)
+            newWidth = __gameWidth - (__gameWidth * ((maxWidthVar - __gameWidth) / maxWidthVar));
+            startX = 0;//__gameWidth - newWidth;
+
+
+            // Few little things:
+            // add/remove from build order can mess things up
+            // when scaling window past the full length while scroll bar != gamewidth, scroll bar doesnt adjust size to compensate
+
+
+            // Redraw the build order scroll bar line
+            //this.buildOrderScrollingBar.x = startX;
+            this.buildOrderScrollingBar.clear();
+            this.buildOrderScrollingBar.moveTo(0, 0);
+            this.buildOrderScrollingBar.lineStyle(3, 0x00ff00, 1);
+            this.buildOrderScrollingBar.lineTo(newWidth, 0);
+
+
+            // Update variables relevant to scrolling
+            this.widthDifference = maxWidthVar - __gameWidth;
+            this.gameAndBuildOrderWidth = __gameWidth - newWidth;
+
+
+            // Move build order group to compensate for screen pushing
+            val = this.widthDifference * (this.buildOrderScrollingBar.x / this.gameAndBuildOrderWidth);
+            this.buildOrderGroup.x = -val + 3;
+            _buildOrderGroup.forEach(this._checkBounds, this, false);
+        }   
+        
+
+        /*
         if (((this.buildOrderGroup.length / 2) * 65) > this.game.width) {
 
             maxWidthVar = ((this.buildOrderGroup.length / 2) * 65)
@@ -776,6 +829,8 @@ Main.prototype = {
             this.buildOrderScrollingBar.lineStyle(3, 0x00ff00, 1);
             this.buildOrderScrollingBar.lineTo(__gameWidth, 0);        
         }
+        */
+        
     },
 
     _updateTimelineVisibility: function(sprite, _timelineGroup, _endOfTimeline) {
@@ -1216,6 +1271,8 @@ Main.prototype = {
         var supply;
         var newWidth;
         var maxWidthVar;
+        var startX;
+        var val;
         var _game;
         var _buildOrderGroup;
         var __gameWidth;
@@ -1238,20 +1295,30 @@ Main.prototype = {
         _buildOrderGroup.add(supply);
 
         // If the added selection exceeds the width of the screen
-        if (sprite.x + _buildOrderGroup.x > this.game.width - 65) {
-
-            _buildOrderGroup.x -= 65;
-            _buildOrderGroup.forEach(this._checkBounds, this, false);
+        if (sprite.x + _buildOrderGroup.x > __gameWidth - 65) {
 
             // Variables for width of build order scroll bar
             maxWidthVar = ((_buildOrderGroup.length / 2) * 65)
-
             newWidth = __gameWidth - (__gameWidth * ((maxWidthVar - __gameWidth) / maxWidthVar));
+            startX = __gameWidth - newWidth;
 
+            // Redraw the build order scroll bar line
+            this.buildOrderScrollingBar.x = startX;
             this.buildOrderScrollingBar.clear();
             this.buildOrderScrollingBar.moveTo(0, 0);
             this.buildOrderScrollingBar.lineStyle(3, 0x00ff00, 1);
             this.buildOrderScrollingBar.lineTo(newWidth, 0);
+
+
+            // Update variables relevant to scrolling
+            this.widthDifference = maxWidthVar - __gameWidth;
+            this.gameAndBuildOrderWidth = __gameWidth - newWidth;
+
+
+            // Move build order group to compensate for screen pushing
+            val = this.widthDifference * (this.buildOrderScrollingBar.x / this.gameAndBuildOrderWidth);
+            this.buildOrderGroup.x = -val + 3;
+            _buildOrderGroup.forEach(this._checkBounds, this, false);
         }
     },
 
@@ -1259,6 +1326,7 @@ Main.prototype = {
 
         if (sprite.x + sprite.parent.x < -65) {
          
+            sprite.alive = false;
             sprite.visible = false;
             sprite.exists = false;
 
@@ -1266,6 +1334,7 @@ Main.prototype = {
 
             sprite.exists = true;
             sprite.visible = true;
+            sprite.alive = true;
         }
     },
 
@@ -1277,10 +1346,17 @@ Main.prototype = {
     _removeBuildOrderSprite: function(sprite, a, b, supply) {
 
         var _buildOrderGroup;
+        var _game;
+        var _buildOrderScrollingBar;
+        var __gameWidth;
 
         _buildOrderGroup = this.buildOrderGroup;
+        _buildOrderScrollingBar = this.buildOrderScrollingBar;
+        _game = this.game;
+        __gameWidth = _game.width;
 
-        if (!sprite.getBounds().contains(this.game.input.activePointer.x, this.game.input.activePointer.y)) 
+
+        if (!sprite.getBounds().contains(_game.input.activePointer.x, _game.input.activePointer.y)) 
             return;
         
 
@@ -1303,20 +1379,22 @@ Main.prototype = {
 
         // Variables for width of build order scroll bar
         maxWidthVar = ((_buildOrderGroup.length / 2) * 65)
+        newWidth = __gameWidth - (__gameWidth * ((maxWidthVar - __gameWidth) / maxWidthVar));
 
-        newWidth = this.game.width - (this.game.width * ((maxWidthVar - this.game.width) / maxWidthVar));
 
-        console.log((newWidth + this.buildOrderScrollingBar.x));
+        // Shift scroll bar if it goes offscreen
+        if ((newWidth + _buildOrderScrollingBar.x) > __gameWidth)
+            _buildOrderScrollingBar.x -= (newWidth + _buildOrderScrollingBar.x)
 
-        this.buildOrderScrollingBar.clear();
-        this.buildOrderScrollingBar.moveTo(0, 0);
-        this.buildOrderScrollingBar.lineStyle(3, 0x00ff00, 1);
-        this.buildOrderScrollingBar.lineTo(newWidth, 0);
-    },
+        if (_buildOrderScrollingBar.x < 0)
+            _buildOrderScrollingBar.x = 0;
 
-    _dragBuildOrder: function () {
 
-        console.log("aa")
+        // Resize scroll bar
+        _buildOrderScrollingBar.clear();
+        _buildOrderScrollingBar.moveTo(0, 0);
+        _buildOrderScrollingBar.lineStyle(3, 0x00ff00, 1);
+        _buildOrderScrollingBar.lineTo(newWidth, 0);
     },
 
     __updateBuildOrderSprite: function(sprite) {
