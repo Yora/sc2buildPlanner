@@ -567,6 +567,7 @@ Main.prototype = {
         this.mineralIcon = _game.add.sprite(__gameWidth - 800, 71, 'minerals');
         this.mineralIcon.width = 40;
         this.mineralIcon.height = 40;
+        this.mineralIcon.tint = 0xff0000;
 
         this.mineralText = _game.add.bitmapText(__gameWidth - 750, 74, 'Agency_35', '0', 35);
         this.mineralText.tint = 0x00ff00;
