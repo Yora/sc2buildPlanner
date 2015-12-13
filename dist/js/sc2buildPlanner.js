@@ -499,9 +499,8 @@ Main.prototype = {
         this.scrollBar.width = 42;
         this.scrollBar.height = __gameHeight - 67;
         this.scrollBar.onInputDown.add(this._scrollBar, this);
-        this.scrollBar.tint = 0xff0000;
-
         
+
         // Selection UI
         line = _game.make.graphics(__gameWidth - 330, 115);
         line.lineStyle(3, 0x00ff00, 1);
@@ -513,8 +512,6 @@ Main.prototype = {
         line.moveTo(296, -48);
         line.lineStyle(3, 0x00ff00, 1);
         line.lineTo(296, __gameHeight - 64);
-
-        line.tint = 0xff0000;
 
 
         // 2nd down from top
@@ -565,9 +562,8 @@ Main.prototype = {
         
         // Mineral / gas / supply icons
         this.mineralIcon = _game.add.sprite(__gameWidth - 800, 71, 'minerals');
-        this.mineralIcon.width = 40;
-        this.mineralIcon.height = 40;
-        this.mineralIcon.tint = 0xff0000;
+        this.mineralIcon.width = 40 / 4;
+        this.mineralIcon.height = 40 / 4;
 
         this.mineralText = _game.add.bitmapText(__gameWidth - 750, 74, 'Agency_35', '0', 35);
         this.mineralText.tint = 0x00ff00;
