@@ -137,6 +137,8 @@ Main.prototype = {
         this.unitCount = 0;
         this.structureCount = 0;
         this.workerCount = 12;
+        
+        this.uiColor = 0x87CEFF;
 
         this.scrollBar = null;
         this.scrollingBar = null;
@@ -407,6 +409,7 @@ Main.prototype = {
         var _timelineGroup;
         var _lineGroupUI;
         var _timeValue;
+        var _uiColor;
         var __gameWidth;
         var __gameHeight;
 
@@ -414,6 +417,7 @@ Main.prototype = {
         _timelineGroup = this.timelineGroup;
         _lineGroupUI = this.lineGroupUI;
         _timeValue = this.timeValue;
+        _uiColor = this.uiColor;
 
         __gameWidth = _game.width;
         __gameHeight = _game.height;
@@ -424,41 +428,40 @@ Main.prototype = {
         this.scrollBar.height = __gameHeight - 67;
         this.scrollBar.onInputDown.add(this._scrollBar, this);
         
-
         // Selection UI
         line = _game.make.graphics(__gameWidth - 330, 115);
-        line.lineStyle(3, 0x00ff00, 1);
+        line.lineStyle(3, _uiColor, 1);
         line.lineTo(10, 10);
         line.lineTo(10, __gameHeight - 117);
         line.lineTo(328, __gameHeight - 117);
         line.lineTo(328, -48);
-        line.lineStyle(3, 0x00ff00, 0.2);
+        line.lineStyle(3, _uiColor, 0.2);
         line.moveTo(296, -48);
-        line.lineStyle(3, 0x00ff00, 1);
+        line.lineStyle(3, _uiColor, 1);
         line.lineTo(296, __gameHeight - 64);
 
 
         // 2nd down from top
         line2 = _game.make.graphics(__gameWidth - 329, 115);
-        line2.lineStyle(3, 0x00ff00, 1);
+        line2.lineStyle(3, _uiColor, 1);
         line2.lineTo(-__gameWidth + 323, 0);
 
 
         // top of screen
         line3 = _game.make.graphics(0, 65);
-        line3.lineStyle(3, 0x00ff00, 0.2);
+        line3.lineStyle(3, _uiColor, 0.2);
         line3.lineTo(__gameWidth, 0);
 
 
         // small left end of screen
         line4 = _game.make.graphics(1, 65);
-        line4.lineStyle(3, 0x00ff00, 1);
+        line4.lineStyle(3, _uiColor, 1);
         line4.lineTo(0, 51);
 
 
         // Line under times
         line5 = _game.make.graphics(0, 145);
-        line5.lineStyle(3, 0x00ff00, 1);
+        line5.lineStyle(3, _uiColor, 1);
         line5.lineTo(__gameWidth - 320, 0);
         
 
@@ -486,25 +489,25 @@ Main.prototype = {
         
         // Mineral / gas / supply icons
         this.mineralIcon = _game.add.sprite(__gameWidth - 800, 71, 'minerals');
-        this.mineralIcon.width = 40 / 4;
-        this.mineralIcon.height = 40 / 4;
+        this.mineralIcon.width = 40;
+        this.mineralIcon.height = 40;
 
         this.mineralText = _game.add.bitmapText(__gameWidth - 750, 74, 'Agency_35', '0', 35);
-        this.mineralText.tint = 0x00ff00;
+        this.mineralText.tint = _uiColor;
 
         this.gasIcon = _game.add.sprite(__gameWidth - 650, 71, 'gas');
         this.gasIcon.width = 40;
         this.gasIcon.height = 40;
 
         this.gasText = _game.add.bitmapText(__gameWidth - 600, 74, 'Agency_35', '0', 35);
-        this.gasText.tint = 0x00ff00;
+        this.gasText.tint = _uiColor;
 
         this.supplyIcon = _game.add.sprite(__gameWidth - 500, 70, 'supply');
         this.supplyIcon.width = 42;
         this.supplyIcon.height = 42;
 
         this.supplyText = _game.add.bitmapText(__gameWidth - 450, 74, 'Agency_35', '12/15', 35);
-        //this.supplyText.tint = 0x00ff00;
+        //this.supplyText.tint = _uiColor;
 
         this.energyIcon = _game.add.sprite(__gameWidth - 375, 70, 'energy');
         this.energyIcon.width = 42;
@@ -555,22 +558,28 @@ Main.prototype = {
 
             var timeString = (timeString1 + ":" + timeString2);
 
-            var _time = _game.add.bitmapText(0, 0, 'Agency_35', timeString, 25);
-            var texture = _time.generateTexture();
-            var time = _game.add.image(-85 + (i * 90), 122, texture);
-            _time.destroy();
+            //var _time = _game.add.bitmapText(0, 0, 'Agency_35', timeString, 25);
+            var time = _game.add.bitmapText(-85 + (i * 90), 122, 'Agency_35', timeString, 25);
+            //var texture = _time.generateTexture();
+            //var time = _game.add.image(-85 + (i * 90), 122, texture);
+            //_time.destroy();
 
-            time.tint = 0x00ff00;
+            time.tint = _uiColor;
             time.index = i;
             time.seconds = _timeValue;
 
-            line = _game.make.image(-90 + (i * 90), 136, 'icon');
+            line = _game.make.image(-90 + (i * 90), 136, 'ui-white-square');
             line.width = 3;
             line.height = 8;
 
-            line2 = _game.make.image(-90 + (i * 90), 144, 'icon');
+            line2 = _game.make.image(-90 + (i * 90), 144, 'ui-white-square');
             line2.width = 1;
             line2.height = this.game.height - 50;
+
+            time.tint = 0x87CEFF;
+            line.tint = 0x87CEFF;
+            line2.tint = 0x87CEFF;
+
 
             _timelineGroup.add(time);
             _timelineGroup.add(line);
@@ -589,7 +598,7 @@ Main.prototype = {
 
 
         //Build order scroll bar
-        this.buildOrderScrollingBar = _game.add.image(0, 65, 'icon');
+        this.buildOrderScrollingBar = _game.add.image(0, 65, 'ui-white-square');
         this.buildOrderScrollingBar.width = __gameWidth;
         this.buildOrderScrollingBar.height = 3;
         
@@ -603,7 +612,7 @@ Main.prototype = {
             testGroup.add(test2);
 
             test.destroy();
-            //test.lineStyle(3, 0x00ff00, 1);
+            //test.lineStyle(3, this.uiColor, 1);
             //test.lineTo(100, 0);
             //testGroup.add(test);
         }
@@ -642,12 +651,13 @@ Main.prototype = {
 
 
         // Create scrolling bar.  Needed to be created here.
-        this.scrollingBar = _game.add.image(0, 67, 'icon');
+        this.scrollingBar = _game.add.image(0, 67, 'ui-white-square');
         this.scrollingBar.width = 28;
         this.scrollingBar.height = scrollingBarHeightVar;
+        this.scrollingBar.tint = this.uiColor;
         //this.scrollingBar = _game.add.graphics(0, 67);
-        //this.scrollingBar.lineStyle(1, 0x00ff00, 1);
-        //this.scrollingBar.beginFill(0x00ff00, 0.3);
+        //this.scrollingBar.lineStyle(1, this.uiColor, 1);
+        //this.scrollingBar.beginFill(this.uiColor, 0.3);
         //this.scrollingBar.drawRect(0, 0, 28, scrollingBarHeightVar);
 
 
@@ -672,7 +682,8 @@ Main.prototype = {
         //this.game.world.setBounds(0, 0, 100, 640); // ** Maybe adjust this for camera zooming
 
         // Gray timeline line bar container
-        this.timelineDrag = this.game.add.image(-24, 147, 'icon');
+        this.timelineDrag = this.game.add.image(-24, 147, 'ui-blue-timeline-bar');
+        this.timelineDrag.alpha =0.2;
         this.timelineDrag.width = 51;
         this.timelineDrag.height = this.game.height - 147;
         this.timelineDrag.inputEnabled = true;
@@ -682,8 +693,8 @@ Main.prototype = {
         //this.timelineDrag.alpha = 0;
 
         // Gray line
-        this.timeline = this.game.add.image(0, 147, 'icon');//this.game.add.graphics(0, 147);
-        this.timeline.width = 2;
+        this.timeline = this.game.add.image(0, 147, 'ui-blue-timeline-bar');//this.game.add.graphics(0, 147);
+        this.timeline.width = 3;
         this.timeline.height = this.game.height - 147;
         //this.timeline.lineStyle(2, 0x666666, 1);
         //this.timeline.lineTo(0, (this.game.height - 147)) // figure out the timeline jump
@@ -728,7 +739,7 @@ Main.prototype = {
         this.starsCover.x = __gameWidth - 321;
         this.starsCoverTop.x = __gameWidth - 364;
         this.scrollBar.x = __gameWidth - 33;
-        this.scrollingBar.x = __gameWidth - 32;
+        this.scrollingBar.x = __gameWidth - 30;
 
         if (this.race !== 'zerg') {
 
@@ -774,19 +785,22 @@ Main.prototype = {
         // 'dynamic' green line, this index used to crop it off the side of the UI
         this.greenLineIndex = 1 + ((_timeIterations) * 3) - 1;
 
+        //if (_timelineDrag.x > __gameWidth - 390 - (__gameWidth % 3)) 
+        //    _timeline.x = __gameWidth - 366 - (__gameWidth % 3);
 
         // DESKTOP - Adjust gray timeline bar to scroll time backwards if desktop re-scaling maxes out the time distance (hits UI)
-        if (this.timeline.x > __gameWidth - 332) {
+        if (this.timelineDrag.x > __gameWidth - 390 - (__gameWidth % 3)) {
 
-            this.timelineDrag.x = __gameWidth - 390;
-            this.timeline.x = __gameWidth - 332;
+            this.timeline.x = __gameWidth - 366 - (__gameWidth % 3);
+            this.timelineDrag.x = __gameWidth - 390 - (__gameWidth % 3);
+            //this.timeline.x = __gameWidth - 332;
 
             // Get time string
             this.timeValue = Math.floor((-(_timelineGroup.x / 3) + (this.timeLandmarks * 30)) + (this.timeline.x / 3));
             minutes = Math.floor(this.timeValue / 60).toString();
             seconds = this.pad((this.timeValue % 60), 2);
             realTime = (minutes + ":" + seconds);
-            //this.currentTimeText.setText(realTime);
+            this.currentTimeText.setText(realTime);
         }
 
         _lineGroupUI.getAt(0).x = __gameWidth - 330;
@@ -795,13 +809,13 @@ Main.prototype = {
         _lineGroupUI.getAt(1).x = __gameWidth - 329;
         _lineGroupUI.getAt(1).clear();
         _lineGroupUI.getAt(1).moveTo(0, 0);
-        _lineGroupUI.getAt(1).lineStyle(3, 0x00ff00, 1);
+        _lineGroupUI.getAt(1).lineStyle(3, this.uiColor, 1);
         _lineGroupUI.getAt(1).lineTo(-__gameWidth + 320, 0);
 
         // Build order UI line
         _lineGroupUI.getAt(2).clear();
         _lineGroupUI.getAt(2).moveTo(0, 0);
-        _lineGroupUI.getAt(2).lineStyle(3, 0x00ff00, 0.5);
+        _lineGroupUI.getAt(2).lineStyle(3, this.uiColor, 0.5);
         _lineGroupUI.getAt(2).lineTo(__gameWidth + 10, 0);
 
         _lineGroupUI.getAt(4).moveTo(0, 0);
@@ -829,7 +843,7 @@ Main.prototype = {
             // Redraw the build order scroll bar line
             //this.buildOrderScrollingBar.clear();
             //this.buildOrderScrollingBar.moveTo(0, 0);
-            //this.buildOrderScrollingBar.lineStyle(3, 0x00ff00, 1);
+            //this.buildOrderScrollingBar.lineStyle(3, this.uiColor, 1);
             //this.buildOrderScrollingBar.lineTo(newWidth, 0);
             this.buildOrderScrollingBar.width = newWidth;
 
@@ -854,7 +868,7 @@ Main.prototype = {
 
             //this.buildOrderScrollingBar.clear();
             //this.buildOrderScrollingBar.moveTo(0, 0);
-            //this.buildOrderScrollingBar.lineStyle(3, 0x00ff00, 1);
+            //this.buildOrderScrollingBar.lineStyle(3, this.uiColor, 1);
             //this.buildOrderScrollingBar.lineTo(__gameWidth, 0);
             this.buildOrderScrollingBar.width = __gameWidth;
         }
@@ -901,10 +915,9 @@ Main.prototype = {
         _timeLandmarks = this.timeLandmarks;
         __gameWidth = _game.width;
 
- 
     
         // Move timeline bar to maximum right distance
-        if (_timelineDrag.x > __gameWidth - 390) 
+        if (_timelineDrag.x > __gameWidth - 390 - (__gameWidth % 3)) 
             _timeline.x = __gameWidth - 366 - (__gameWidth % 3);
         // Move timeline bar to active dragging position
         else if (_timeline.x >= 0)
@@ -912,7 +925,6 @@ Main.prototype = {
         // Limit timeline bar below 0 afterward
         if (_timeline.x < 0)
             _timeline.x = 0;
-
 
         // Get time string
         this.timeValue = (-(_timelineGroup.x / 3) + (_timeLandmarks * 30)) + ((_timeline.x) / 3);
@@ -1025,9 +1037,9 @@ Main.prototype = {
 
         this.timelineScrolling = false;
 
-        if (line.x >= this.game.width - 390) {
+        if (line.x >= this.game.width - 390 - (this.game.width % 3)) {
 
-            line.x = this.game.width - 390;
+            line.x = this.game.width - 390 - (this.game.width % 3);
         }
 
         if (line.x < 0 && this.timeLandmarks != -1)
@@ -1135,7 +1147,7 @@ Main.prototype = {
         
 
         //underline = this.game.add.graphics(0, 30);
-        //underline.lineStyle(3, 0x00ff00, 1);
+        //underline.lineStyle(3, this.uiColor, 1);
         //underline.lineTo(name.width, 0);
 
         //_unitGroupUI.add(name);
@@ -1161,7 +1173,7 @@ Main.prototype = {
                 //icon = this.game.add.sprite(x - 3, y - 3, 'icon');
                 //icon.width = 66;
                 //icon.height = 66;
-                //icon.tint = 0x00ff00;
+                //icon.tint = this.uiColor;
                 //_unitGroupUI.add(icon);
 
                 var texture = this._getUnitTexture(index);
@@ -1198,10 +1210,10 @@ Main.prototype = {
         //var _name = _game.make.bitmapText(0, 0, 'Agency_35', 'Buildings', 35);
         //var text_texture = _name.generateTexture();
         //name = _game.make.image(0, 0, text_texture);
-        //name.tint = 0x00ff00;
+        //name.tint = this.uiColor;
 
         //underline = this.game.add.graphics(0, 30);
-        //underline.lineStyle(3, 0x00ff00, 1);
+        //underline.lineStyle(3, this.uiColor, 1);
         //underline.lineTo(name.width, 0);
 
         //_structureGroupUI.add(name);
@@ -1263,10 +1275,10 @@ Main.prototype = {
         //var _name = _game.make.bitmapText(0, 0, 'Agency_35', 'Upgrades', 35);
         //text_texture = _name.generateTexture();
         //name = _game.make.image(0, 0, text_texture);
-        //name.tint = 0x00ff00;
+        //name.tint = this.uiColor;
 
         //underline = this.game.add.graphics(0, 30);
-        //underline.lineStyle(3, 0x00ff00, 1);
+        //underline.lineStyle(3, this.uiColor, 1);
         //underline.lineTo(name.width, 0);
 
         //_upgradeGroupUI.add(name);
@@ -1340,7 +1352,7 @@ Main.prototype = {
         sprite = _game.add.sprite(x, 0, unit.texture);
         sprite.inputEnabled = true;
         supply = _game.add.bitmapText(x, 0, 'Agency_35', this.supply.toString(), 28);
-        supply.tint = 0x00ff00;
+        supply.tint = this.uiColor;
         sprite.events.onInputUp.add(this._removeBuildOrderSprite, this, 0, supply);
         _buildOrderGroup.add(sprite);
         _buildOrderGroup.add(supply);
@@ -1442,7 +1454,7 @@ Main.prototype = {
         // Redraw the build order scroll bar line
         //this.buildOrderScrollingBar.clear();
         //this.buildOrderScrollingBar.moveTo(0, 0);
-        //this.buildOrderScrollingBar.lineStyle(3, 0x00ff00, 1);
+        //this.buildOrderScrollingBar.lineStyle(3, this.uiColor, 1);
         //this.buildOrderScrollingBar.lineTo(newWidth, 0);
         this.buildOrderScrollingBar.width = newWidth;
 
