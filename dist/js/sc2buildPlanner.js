@@ -148,6 +148,8 @@ I see. In that case you need to adjust it by adding pause.
 
 // next: timeline reset fix
 
+// IT IS TIME!!!!!!!!!!!!!!!!!!!
+
 // ***** REMOVED ALL GRAPHIC LINES BESIDES TIMELINE
 
 // next: keep the timeline text as bitmapcached, but make it much longer and reset less often
@@ -199,8 +201,6 @@ Main.prototype = {
 
         _game = this.game;
 
-
-        //_game.world.setBounds(0, 0, 1960, 640);
         _game.scale.onSizeChange.add(this.scaleUpdate, this);
         _game.input.justReleasedRate = 10;
 
@@ -298,11 +298,9 @@ Main.prototype = {
 
         this.initWorkers();
 
-
         //this.unitGroupUI.cacheAsBitmap = true;
         //this.structureGroupUI.cacheAsBitmap = true;
         //this.upgradeGroupUI.cacheAsBitmap = true;
-
 
         // Next: boxes for constructing, use filled rectangles
 
@@ -323,14 +321,148 @@ Main.prototype = {
 
     update: function() {
 
-
+        // Scrolling timeline bar
         if (this.timelineScrolling) {
+       
+            var i;
+            var x;
+            var seconds;
+            var minutes;
+            var realTime;
+            var _game;
+            var _timeIterations;
+            var _timelineGroup;
+            var _endOfTimeline;
+            var _timeline;
+            var _timelineDrag;
+            var _timeLandmarks;
+            var _timeValue;
+            var __gameWidth;
 
-            this.updateTimeline();
 
+            _game = this.game;
+            _timeIterations = this.timeIterations;
+            _timelineGroup = this.timelineGroup;
+            _endOfTimeline = this.endOfTimeline;
+            _timeline = this.timeline;
+            _timelineDrag = this.timelineDrag;
+            _timeLandmarks = this.timeLandmarks;
+            __gameWidth = _game.width;
+
+            
+            // Move timeline bar to maximum right distance
+            if (_timelineDrag.x > __gameWidth - 390 - (__gameWidth % 3)) 
+                _timeline.x = __gameWidth - 366 - (__gameWidth % 3);
+            // Move timeline bar to active dragging position
+            else if (_timeline.x >= 0)
+                _timeline.x = _timelineDrag.x + 24;
+            // Limit timeline bar below 0 afterward
+            if (_timeline.x < 0)
+                _timeline.x = 0;
+
+            // Get time string
+            this.timeValue = (-(_timelineGroup.x / 3) + (_timeLandmarks * 30)) + ((_timeline.x) / 3);
+            _timeValue = this.timeValue;
+            minutes = Math.floor(_timeValue / 60).toString();
+            seconds = this.pad((_timeValue % 60), 2);
+            realTime = (minutes + ":" + seconds);
+
+
+            // Set the time according to timeline location
+            this.currentTimeText.setText(realTime);
+
+
+            // -----If timeline is dragged to maximum left, start scrolling backwards
+            if (_timelineDrag.x <= 20 && this.timeLandmarks != -1) {
+
+
+                // Move time/line group
+                _timelineGroup.x += 3;
+
+
+                // If scrolled past the width of a 30 second time block, reset lineGroup position and change times to align
+                if (_timelineGroup.x >= 0) {
+
+                    _timelineGroup.x = -90;
+
+                    this.timeLandmarks--;
+                    _timeLandmarks = this.timeLandmarks;
+
+
+                    // Update time texts
+                    for (i = 0; i < _timeIterations * 3; i++) {
+
+                        _timeValue = (i + _timeLandmarks - 1) * 30;
+                        minutes = Math.floor(_timeValue / 60).toString();
+                        seconds = this.pad((_timeValue % 60), 2);
+                        realTime = (minutes + ":" + seconds);
+
+                        time = _timelineGroup.getAt((i * 3));
+
+                        time.text = realTime;
+                    }
+                }
+
+
+                // Control visibility of passing timeline indicators
+                _timelineGroup.forEach(this._updateTimelineVisibility, this, false, _timelineGroup, this.endOfTimeline);
+
+             
+                // -----If timeline dragged maximum right, start scrolling
+            } else if (_timelineDrag.x > __gameWidth - 390) {
+            
+
+                // Adjust the speed the timelineGroup will move at based on distance of cursor
+                if (_timelineDrag.x > __gameWidth - 390 && _timelineDrag.x <= __gameWidth - 380)
+                    this.timelineMoveDelay += 2;
+                else if (_timelineDrag.x > __gameWidth - 380 && _timelineDrag.x <= __gameWidth - 370)
+                    this.timelineMoveDelay += 5;
+                else if (_timelineDrag.x > __gameWidth - 370)
+                    this.timelineMoveDelay += 10;
+
+
+                // Only move timeline when delay cap is reached
+                if (this.timelineMoveDelay >= 10) {
+
+                    _timelineGroup.x -= 3;
+                    this.timelineMoveDelay = 0;
+                }
+
+
+                // If scrolled past the width of a 30 second time block, reset lineGroup position and change times to align
+                if (_timelineGroup.x <= -90) {
+
+                    _timelineGroup.x = 0;
+
+                    this.timeLandmarks++;
+                    _timeLandmarks = this.timeLandmarks;
+
+
+                    // Update time texts
+                    for (i = 0; i < _timeIterations * 3; i++) {
+
+                        _timeValue = (i + _timeLandmarks - 1) * 30;
+                        minutes = Math.floor(_timeValue / 60).toString();
+                        seconds = this.pad((_timeValue % 60), 2);
+                        realTime = (minutes + ":" + seconds);
+
+                        time = _timelineGroup.getAt((i * 3));
+
+                        time.text = realTime;
+                    }
+                }
+
+
+                // Control visibility of passing timeline indicators
+                _timelineGroup.forEach(this._updateTimelineVisibility, this, false, _timelineGroup, this.endOfTimeline);
+            }
+
+
+
+            this.updateResources();
         }
 
-        // Scroll the top build order bar
+        // Scrolling top build order bar
         if (this.scrollBuildOrder) {
 
             var val;
@@ -384,10 +516,9 @@ Main.prototype = {
 
             val = this.widthDifference * (_buildOrderScrollingBar.x / this.gameAndBuildOrderWidth);
             this.buildOrderGroup.x = -val + 3;
-
         }
 
-        // Scrolling unit/struct/upgrade UI
+        // Scrolling side UI
         if (this.isScrolling) {
 
             var val;
@@ -427,10 +558,10 @@ Main.prototype = {
 
 
             // Get the percentage Y value to adjust the unit group by relevant to scroll bar
-            val = (_heightDifference * ((_scrollingBar.y - 67) / _gameAndScrollHeight) - 10) >> 0;
+            val = (_heightDifference * ((_scrollingBar.y - 67) / _gameAndScrollHeight) - 10) - 74 >> 0;
 
 
-            _unitGroupUI.y = -val + 64;
+            _unitGroupUI.y = -val;
             structureY = _unitGroupUI.y + _unitGroupUI.height + 10;
             upgradeY = _unitGroupUI.y + _unitGroupUI.height + _structureGroupUI.height + 20;
 
@@ -553,9 +684,6 @@ Main.prototype = {
         // Compress graphics into UI wireframe texture for mobile
         if (!_game.device.desktop) {
             _lineGroupUI.cacheAsBitmap = true;
-            //var line_texture = _lineGroupUI.generateTexture();
-            //this.uiImage = _game.add.image(-9, 62, line_texture);
-            //_lineGroupUI.destroy();
             line.destroy();
             line2.destroy();
             line3.destroy();
@@ -583,7 +711,6 @@ Main.prototype = {
         this.supplyIcon.height = 42;
 
         this.supplyText = _game.add.bitmapText(__gameWidth - 450, 74, 'Agency_35', '12/15', 35);
-        //this.supplyText.tint = _uiColor;
 
         this.energyIcon = _game.add.sprite(__gameWidth - 375, 70, 'energy');
         this.energyIcon.width = 42;
@@ -611,34 +738,16 @@ Main.prototype = {
             this.timeIterations = Math.floor((__gameWidth - 232) / 90) + 1;
         }
 
-        /*
-        var _name = _game.add.image(0, 0, 'icon');
-        var text_texture = _name.generateTexture();
-        name = _game.add.image(200, 200, text_texture);
-
-        var _name = _game.add.image(0, 0, 'icon');
-        var text_texture = _name.generateTexture();
-        name = _game.add.image(300, 200, text_texture);
-        */
 
         // Time texts
-        //_timeGroup = this.game.add.group();
         for (i = 0; i < this.timeIterations; i++) {
-
-            //For mobile, maybe make this one big bitmapdata
 
             _timeValue = (i - 1) * 30;
 
             var timeString1 = Math.floor(_timeValue / 60).toString();
             var timeString2 = this.pad((_timeValue % 60), 2);
-
             var timeString = (timeString1 + ":" + timeString2);
-
-            //var _time = _game.add.bitmapText(0, 0, 'Agency_35', timeString, 25);
             var time = _game.add.bitmapText(-85 + (i * 90), 122, 'Agency_35', timeString, 25);
-            //var texture = _time.generateTexture();
-            //var time = _game.add.image(-85 + (i * 90), 122, texture);
-            //_time.destroy();
 
             time.tint = _uiColor;
             time.index = i;
@@ -677,24 +786,6 @@ Main.prototype = {
         this.buildOrderScrollingBar = _game.add.image(0, 65, 'ui-white-square');
         this.buildOrderScrollingBar.width = __gameWidth;
         this.buildOrderScrollingBar.height = 3;
-        
-        /*
-        var testGroup = this.game.add.group();
-        for (var i = 0; i <= 500; i++) {
-            var test = _game.add.bitmapText(0, i, 'Agency_35', '0:00', 35);
-
-            var test2 = _game.add.image(50, i, test.generateTexture());
-
-            testGroup.add(test2);
-
-            test.destroy();
-            //test.lineStyle(3, this.uiColor, 1);
-            //test.lineTo(100, 0);
-            //testGroup.add(test);
-        }
-        var test3 = _game.add.image(100, 0, testGroup.generateTexture());
-        testGroup.destroy();
-        */
     },
 
     startUI: function() {
@@ -720,7 +811,7 @@ Main.prototype = {
         maxHeightVar = this.unitGroupUI.height + this.structureGroupUI.height + this.upgradeGroupUI.height + 20;
         this.maxHeight = maxHeightVar;
 
-        heightDiffereceVar = (this.maxHeight - __gameHeight + 20);
+        heightDiffereceVar = (this.maxHeight - __gameHeight + 30);
         this.heightDifferece = heightDiffereceVar;
 
         scrollingBarHeightVar = __gameHeight * ((this.maxHeight - __gameHeight) / this.maxHeight);
@@ -731,10 +822,6 @@ Main.prototype = {
         this.scrollingBar.width = 28;
         this.scrollingBar.height = scrollingBarHeightVar;
         this.scrollingBar.tint = this.uiColor;
-        //this.scrollingBar = _game.add.graphics(0, 67);
-        //this.scrollingBar.lineStyle(1, this.uiColor, 1);
-        //this.scrollingBar.beginFill(this.uiColor, 0.3);
-        //this.scrollingBar.drawRect(0, 0, 28, scrollingBarHeightVar);
 
 
         // Used in update to properly adjust unit groups based on game height
@@ -759,7 +846,7 @@ Main.prototype = {
 
         // Gray timeline line bar container
         this.timelineDrag = this.game.add.image(-24, 147, 'ui-blue-timeline-bar');
-        this.timelineDrag.alpha =0.2;
+        this.timelineDrag.alpha = 0.2;
         this.timelineDrag.width = 51;
         this.timelineDrag.height = this.game.height - 147;
         this.timelineDrag.inputEnabled = true;
@@ -815,7 +902,7 @@ Main.prototype = {
         this.starsCover.x = __gameWidth - 321;
         this.starsCoverTop.x = __gameWidth - 364;
         this.scrollBar.x = __gameWidth - 33;
-        this.scrollingBar.x = __gameWidth - 30;
+        this.scrollingBar.x = __gameWidth - 31;
 
         if (this.race !== 'zerg') {
 
@@ -964,146 +1051,6 @@ Main.prototype = {
         }
     },
 
-    updateTimeline: function() {
-
-        var i;
-        var x;
-        var seconds;
-        var minutes;
-        var realTime;
-        var _game;
-        var _timeIterations;
-        var _timelineGroup;
-        var _endOfTimeline;
-        var _timeline;
-        var _timelineDrag;
-        var _timeLandmarks;
-        var _timeValue;
-        var __gameWidth;
-
-
-        _game = this.game;
-        _timeIterations = this.timeIterations;
-        _timelineGroup = this.timelineGroup;
-        _endOfTimeline = this.endOfTimeline;
-        _timeline = this.timeline;
-        _timelineDrag = this.timelineDrag;
-        _timeLandmarks = this.timeLandmarks;
-        __gameWidth = _game.width;
-
-    
-        // Move timeline bar to maximum right distance
-        if (_timelineDrag.x > __gameWidth - 390 - (__gameWidth % 3)) 
-            _timeline.x = __gameWidth - 366 - (__gameWidth % 3);
-        // Move timeline bar to active dragging position
-        else if (_timeline.x >= 0)
-            _timeline.x = _timelineDrag.x + 24;
-        // Limit timeline bar below 0 afterward
-        if (_timeline.x < 0)
-            _timeline.x = 0;
-
-        // Get time string
-        this.timeValue = (-(_timelineGroup.x / 3) + (_timeLandmarks * 30)) + ((_timeline.x) / 3);
-        _timeValue = this.timeValue;
-        minutes = Math.floor(_timeValue / 60).toString();
-        seconds = this.pad((_timeValue % 60), 2);
-        realTime = (minutes + ":" + seconds);
-
-
-        // Set the time according to timeline location
-        this.currentTimeText.setText(realTime);
-
-
-        // -----If timeline is dragged to maximum left, start scrolling backwards
-        if (_timelineDrag.x <= 20 && this.timeLandmarks != -1) {
-
-
-            // Move time/line group
-            _timelineGroup.x += 3;
-
-
-            // If scrolled past the width of a 30 second time block, reset lineGroup position and change times to align
-            if (_timelineGroup.x >= 0) {
-
-                _timelineGroup.x = -90;
-
-                this.timeLandmarks--;
-                _timeLandmarks = this.timeLandmarks;
-
-
-                // Update time texts
-                for (i = 0; i < _timeIterations * 3; i++) {
-
-                    _timeValue = (i + _timeLandmarks - 1) * 30;
-                    minutes = Math.floor(_timeValue / 60).toString();
-                    seconds = this.pad((_timeValue % 60), 2);
-                    realTime = (minutes + ":" + seconds);
-
-                    time = _timelineGroup.getAt((i * 3));
-
-                    time.text = realTime;
-                }
-            }
-
-
-            // Control visibility of passing timeline indicators
-            _timelineGroup.forEach(this._updateTimelineVisibility, this, false, _timelineGroup, this.endOfTimeline);
-
-         
-            // -----If timeline dragged maximum right, start scrolling
-        } else if (_timelineDrag.x > __gameWidth - 390) {
-   
-
-            // Adjust the speed the timelineGroup will move at based on distance of cursor
-            if (_timelineDrag.x > __gameWidth - 390 && _timelineDrag.x <= __gameWidth - 380)
-                this.timelineMoveDelay += 2;
-            else if (_timelineDrag.x > __gameWidth - 380 && _timelineDrag.x <= __gameWidth - 370)
-                this.timelineMoveDelay += 5;
-            else if (_timelineDrag.x > __gameWidth - 370)
-                this.timelineMoveDelay += 10;
-
-
-            // Only move timeline when delay cap is reached
-            if (this.timelineMoveDelay >= 10) {
-
-                _timelineGroup.x -= 3;
-                this.timelineMoveDelay = 0;
-            }
-
-
-            // If scrolled past the width of a 30 second time block, reset lineGroup position and change times to align
-            if (_timelineGroup.x <= -90) {
-
-                _timelineGroup.x = 0;
-
-                this.timeLandmarks++;
-                _timeLandmarks = this.timeLandmarks;
-
-
-                // Update time texts
-                for (i = 0; i < _timeIterations * 3; i++) {
-
-                    _timeValue = (i + _timeLandmarks - 1) * 30;
-                    minutes = Math.floor(_timeValue / 60).toString();
-                    seconds = this.pad((_timeValue % 60), 2);
-                    realTime = (minutes + ":" + seconds);
-
-                    time = _timelineGroup.getAt((i * 3));
-
-                    time.text = realTime;
-                }
-            }
-
-
-            // Control visibility of passing timeline indicators
-            _timelineGroup.forEach(this._updateTimelineVisibility, this, false, _timelineGroup, this.endOfTimeline);
-        }
-
-
-
-        this.updateResources();
-    },
-
     _startTimeline: function(line) {
 
         this.timelineScrolling = true;
@@ -1205,7 +1152,7 @@ Main.prototype = {
         var text_texture;
         var icon;
         var name;
-        //var underline;
+        var underline;
         var _game;
         var _unitGroupUI;
         var __gameWidth;
@@ -1218,16 +1165,21 @@ Main.prototype = {
         index = 0;
 
         _unitGroupUI.x = __gameWidth - 310;
-        _unitGroupUI.y = 74;
+        _unitGroupUI.y = 84;
 
-        
+        var _name = _game.make.bitmapText(0, 0, 'Agency_35', 'Units', 35);
+        var text_texture = _name.generateTexture();
+        name = _game.make.image(5, 5, text_texture);
+        name.tint = this.uiColor;
+        _name.destroy();
 
-        //underline = this.game.add.graphics(0, 30);
-        //underline.lineStyle(3, this.uiColor, 1);
-        //underline.lineTo(name.width, 0);
+        underline = _game.make.image(2, 30, 'ui-white-square');
+        underline.tint = this.uiColor;
+        underline.height = 1;
+        underline.width = name.width + 5;
 
-        //_unitGroupUI.add(name);
-        //_unitGroupUI.add(underline);
+        _unitGroupUI.add(name);
+        _unitGroupUI.add(underline);
 
         for (yy = 0; yy <= 7; yy++) {
 
@@ -1270,7 +1222,7 @@ Main.prototype = {
         var text_texture;
         var icon;
         var name;
-        //var underline;
+        var underline;
         var _game;
         var _structureCount;
         var _structureGroupUI;
@@ -1283,17 +1235,19 @@ Main.prototype = {
 
         this.structureGroupUI.y = this.unitGroupUI.y + this.unitGroupUI.height + 10;
 
-        //var _name = _game.make.bitmapText(0, 0, 'Agency_35', 'Buildings', 35);
-        //var text_texture = _name.generateTexture();
-        //name = _game.make.image(0, 0, text_texture);
-        //name.tint = this.uiColor;
+        var _name = _game.make.bitmapText(0, 0, 'Agency_35', 'Buildings', 35);
+        var text_texture = _name.generateTexture();
+        name = _game.make.image(5, 5, text_texture);
+        name.tint = this.uiColor;
+        _name.destroy();
 
-        //underline = this.game.add.graphics(0, 30);
-        //underline.lineStyle(3, this.uiColor, 1);
-        //underline.lineTo(name.width, 0);
+        underline = _game.make.image(2, 30, 'ui-white-square');
+        underline.tint = this.uiColor;
+        underline.height = 1;
+        underline.width = name.width + 5;
 
-        //_structureGroupUI.add(name);
-        //_structureGroupUI.add(underline);
+        _structureGroupUI.add(name);
+        _structureGroupUI.add(underline);
 
         for (yy = 0; yy <= 7; yy++) {
 
@@ -1337,7 +1291,7 @@ Main.prototype = {
         var text_texture;
         var icon;
         var name;
-        //var underline;
+        var underline;
         var _game;
         var _upgradeGroupUI;
 
@@ -1348,17 +1302,19 @@ Main.prototype = {
 
         this.upgradeGroupUI.y = this.unitGroupUI.y + this.unitGroupUI.height + this.structureGroupUI.height + 20;
 
-        //var _name = _game.make.bitmapText(0, 0, 'Agency_35', 'Upgrades', 35);
-        //text_texture = _name.generateTexture();
-        //name = _game.make.image(0, 0, text_texture);
-        //name.tint = this.uiColor;
+        var _name = _game.make.bitmapText(0, 0, 'Agency_35', 'Upgrades', 35);
+        var text_texture = _name.generateTexture();
+        name = _game.make.image(5, 5, text_texture);
+        name.tint = this.uiColor;
+        _name.destroy();
 
-        //underline = this.game.add.graphics(0, 30);
-        //underline.lineStyle(3, this.uiColor, 1);
-        //underline.lineTo(name.width, 0);
+        underline = _game.make.image(2, 30, 'ui-white-square');
+        underline.tint = this.uiColor;
+        underline.height = 1;
+        underline.width = name.width + 5;
 
-        //_upgradeGroupUI.add(name);
-        //_upgradeGroupUI.add(underline);
+        _upgradeGroupUI.add(name);
+        _upgradeGroupUI.add(underline);
 
         for (yy = 0; yy <= 7; yy++) {
 
@@ -2351,7 +2307,7 @@ MainMenu.prototype = {
 		this.startButton = this.add.button(this.game.width / 2, 200, 'loaderFull', this.startGame, this, 2, 0, 1);
 		this.startButton.anchor.set(0.5,0);
 
-		this.game.state.start('Main', true, false, 'zerg');
+		this.game.state.start('Main', true, false, 'protoss');
 	},
 
 	startGame: function() {
