@@ -373,7 +373,7 @@ Main.prototype = {
 
 
             // -----If timeline is dragged to maximum left, start scrolling backwards
-            if (_timelineDrag.x <= 20 && this.timeLandmarks != -1) {
+            if (_timelineDrag.x <= 20 && this.timeLandmarks != -4) {
 
 
                 // Move time/line group
@@ -383,9 +383,9 @@ Main.prototype = {
                 // If scrolled past the width of a 30 second time block, reset lineGroup position and change times to align
                 if (_timelineGroup.x >= 0) {
 
-                    _timelineGroup.x = -90;
+                    _timelineGroup.x = -360;
 
-                    this.timeLandmarks--;
+                    this.timeLandmarks -= 4;
                     _timeLandmarks = this.timeLandmarks;
 
 
@@ -430,11 +430,11 @@ Main.prototype = {
 
 
                 // If scrolled past the width of a 30 second time block, reset lineGroup position and change times to align
-                if (_timelineGroup.x <= -90) {
+                if (_timelineGroup.x <= -360) {
 
                     _timelineGroup.x = 0;
 
-                    this.timeLandmarks++;
+                    this.timeLandmarks += 4;
                     _timeLandmarks = this.timeLandmarks;
 
 
