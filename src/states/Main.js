@@ -70,14 +70,7 @@ I see. In that case you need to adjust it by adding pause.
 
 
 
-// next: timeline reset fix
-
 // IT IS TIME!!!!!!!!!!!!!!!!!!!
-
-// ***** REMOVED ALL GRAPHIC LINES BESIDES TIMELINE
-
-// next: keep the timeline text as bitmapcached, but make it much longer and reset less often
-//       also, use Line instead of Graphic
 
 Main.prototype = {
 
@@ -93,7 +86,7 @@ Main.prototype = {
         this.load.image('icon', 'assets/icon.png');
         this.load.image('stars', 'assets/stars.png');
         this.load.image('stars-cover', 'assets/stars-cover.png');
-
+        this.game.load.json('terran-units', 'assets/terran-units.json');
 
         switch (this.race) {
 
@@ -183,11 +176,42 @@ Main.prototype = {
         //this.bg = this.game.add.image(0, 0, 'stars')
         //this.bg.alpha = 0.2;
 
+        switch (this.race) {
+
+            case 'terran':
+                startingBuilding = 'command-center';
+                startingWorker = 'scv';
+                break;
+
+            case 'protoss':
+                startingBuilding = 'nexus';
+                startingWorker = 'probe';
+                break;
+
+            case 'zerg':
+                startingBuilding = 'hatchery';
+                startingWorker = 'drone';
+                break;
+        }
+
+        this.structureArray = [];
+        this.workerArray = [];
+        this.unitArray = [];
+        this.upgradeArray = [];
+
+        this.structureArray[0] = startingBuilding;
+        for (var i = 0; i < 12; i++)
+            this.workerArray[i] = startingWorker;
+    
+
         this.timelineGroup = this.game.add.group();
         this.starsCover = this.game.add.image(this.game.width - 334, 114, 'stars-cover');
         this.unitGroupUI = this.game.add.group();
         this.structureGroupUI = this.game.add.group();
         this.upgradeGroupUI = this.game.add.group();
+        this.unitTimelineGroup = this.game.add.group();
+        this.structureTimelineGroup = this.game.add.group();
+        this.upgradeTimelineGroup = this.game.add.group();
         this.starsCoverTop = this.game.add.image(this.game.width - 354, 0, 'stars-cover');
         this.starsCoverTop.width = 354;
         this.starsCoverTop.height = 68;
@@ -199,10 +223,6 @@ Main.prototype = {
         this.workerGroup = this.game.add.group();
         this.baseGroup = this.game.add.group();
 
-        this.timelineGroup.tween = this.game.add.tween(this.timelineGroup).to({
-            x: -90
-        }, 1000, Phaser.Easing.Quadratic.Out, false);
-        //tween.onComplete.addOnce(tween2, this);
 
         this.initTimeline();
 
@@ -284,6 +304,7 @@ Main.prototype = {
             if (_timeline.x < 0)
                 _timeline.x = 0;
 
+
             // Get time string
             this.timeValue = (-(_timelineGroup.x / 3) + (_timeLandmarks * 30)) + ((_timeline.x) / 3);
             _timeValue = this.timeValue;
@@ -296,8 +317,8 @@ Main.prototype = {
             this.currentTimeText.setText(realTime);
 
 
-            // -----If timeline is dragged to maximum left, start scrolling backwards
-            if (_timelineDrag.x <= 20 && this.timeLandmarks != -4) {
+                // -----If timeline is dragged to maximum left, start scrolling backwards
+            if (_timelineDrag.x <= 20 && this.timeLandmarks != -1) {
 
 
                 // Move time/line group
@@ -307,9 +328,9 @@ Main.prototype = {
                 // If scrolled past the width of a 30 second time block, reset lineGroup position and change times to align
                 if (_timelineGroup.x >= 0) {
 
-                    _timelineGroup.x = -360;
+                    _timelineGroup.x = -90;
 
-                    this.timeLandmarks -= 4;
+                    this.timeLandmarks -= 1;
                     _timeLandmarks = this.timeLandmarks;
 
 
@@ -354,11 +375,11 @@ Main.prototype = {
 
 
                 // If scrolled past the width of a 30 second time block, reset lineGroup position and change times to align
-                if (_timelineGroup.x <= -360) {
+                if (_timelineGroup.x <= -90) {
 
                     _timelineGroup.x = 0;
 
-                    this.timeLandmarks += 4;
+                    this.timeLandmarks += 1;
                     _timeLandmarks = this.timeLandmarks;
 
 
@@ -386,7 +407,7 @@ Main.prototype = {
             this.updateResources();
         }
 
-        // Scrolling top build order bar
+            // Scrolling top build order bar
         if (this.scrollBuildOrder) {
 
             var val;
@@ -442,7 +463,7 @@ Main.prototype = {
             this.buildOrderGroup.x = -val + 3;
         }
 
-        // Scrolling side UI
+            // Scrolling side UI
         if (this.isScrolling) {
 
             var val;
@@ -509,7 +530,7 @@ Main.prototype = {
         switch (race) {
 
             case 'terran':
-                this.unitCount = 15;
+                this.unitCount = 16;
                 this.structureCount = 17;
                 this.upgradeCount = 25;
                 break;
@@ -620,7 +641,7 @@ Main.prototype = {
         this.mineralIcon.width = 40;
         this.mineralIcon.height = 40;
 
-        this.mineralText = _game.add.bitmapText(__gameWidth - 750, 74, 'Agency_35', '0', 35);
+        this.mineralText = _game.add.bitmapText(__gameWidth - 750, 74, 'Agency_35', '50', 35);
         this.mineralText.tint = _uiColor;
 
         this.gasIcon = _game.add.sprite(__gameWidth - 650, 71, 'gas');
@@ -1019,7 +1040,117 @@ Main.prototype = {
 
     updateResources: function() {
 
-        //console.log(this.timeValue);
+        var val;
+        var workerCount;
+        var _timeValue;
+        var _workerCount;
+
+        _timeValue = this.timeValue;
+
+
+        workerCount = 12;
+
+        // Base 12 worker mineral value
+        val = ((_timeValue - 7) * workerCount) - (((_timeValue - 7) * workerCount) % 5) + 50;
+
+
+
+
+        // Minimum minerals
+        if (val < 50)
+            val = 50;
+
+        // Set mineral text
+        this.mineralText.text = val;
+    },
+
+    unitPressed: function(unit) {
+
+        var sprite;
+        var x;
+        var supply;
+        var newWidth;
+        var maxWidthVar;
+        var startX;
+        var val;
+        var _game;
+        var _buildOrderGroup;
+        var __gameWidth;
+        var __gameHeight;
+
+        _game = this.game;
+        _buildOrderGroup = this.buildOrderGroup;
+
+        __gameWidth = _game.width;
+        __gameHeight = _game.height;
+
+        x = Math.floor(_buildOrderGroup.length / 2) * 65;
+
+        //if ()
+
+
+
+        var pressedUnit;
+        var string;
+        var _game;
+        var _structureTimelineGroup;
+        var _unitTimelineGroup;
+
+        _game = this.game;
+        _structureTimelineGroup = this.structureTimelineGroup;
+        _unitTimelineGroup = this.unitTimelineGroup;
+
+
+        pressedUnit = _game.make.image(0, 0, 'ui-white-square');
+        pressedUnit.buildTime = 20;
+        pressedUnit.width = pressedUnit.buildTime * 3;
+        pressedUnit.height = 30;
+        pressedUnit.name = unit.frameName;
+
+
+        _structureTimelineGroup.add(pressedUnit);
+
+        _structureTimelineGroup.y = 150;
+
+
+
+
+        ////////////////////////////////////////////////////////////////////////////////////
+        // Create sprite on build order bar
+        sprite = _game.add.sprite(x, 0, unit.texture);
+        sprite.inputEnabled = true;
+        supply = _game.add.bitmapText(x, 0, 'Agency_35', this.supply.toString(), 28);
+        supply.tint = this.uiColor;
+        sprite.events.onInputUp.add(this._removeBuildOrderSprite, this, 0, supply);
+        _buildOrderGroup.add(sprite);
+        _buildOrderGroup.add(supply);
+
+        // If the added selection exceeds the width of the screen
+        if (sprite.x + _buildOrderGroup.x > __gameWidth - 65) {
+
+
+            // Variables for width of build order scroll bar
+            maxWidthVar = ((_buildOrderGroup.length / 2) * 65)
+            newWidth = __gameWidth - (__gameWidth * ((maxWidthVar - __gameWidth) / maxWidthVar));
+            startX = __gameWidth - newWidth;
+
+
+            // Redraw the build order scroll bar line
+            this.buildOrderScrollingBar.x = startX;
+            this.buildOrderScrollingBar.width = newWidth;
+
+
+            // Update variables relevant to scrolling
+            this.widthDifference = maxWidthVar - __gameWidth;
+            this.gameAndBuildOrderWidth = __gameWidth - newWidth;
+
+
+            // Move build order group to compensate for screen pushing
+            val = this.widthDifference * (this.buildOrderScrollingBar.x / this.gameAndBuildOrderWidth);
+            this.buildOrderGroup.x = -val + 3;
+            _buildOrderGroup.forEach(this._checkBounds, this, false, __gameWidth);
+        }
+
     },
 
     _crop: function(sprite) {
@@ -1072,6 +1203,7 @@ Main.prototype = {
         var yy;
         var x;
         var y;
+        var unitJSON;
         var index;
         var text_texture;
         var icon;
@@ -1086,6 +1218,7 @@ Main.prototype = {
 
         __gameWidth = this.game.width;
 
+        unitJSON = this.game.cache.getJSON('terran-units');
         index = 0;
 
         _unitGroupUI.x = __gameWidth - 310;
@@ -1126,9 +1259,10 @@ Main.prototype = {
                 //icon.width = 66;
                 //icon.height = 66;
                 //icon.tint = this.uiColor;
-                //_unitGroupUI.add(icon);
+                //_unitGroupUI.add(icon);   
 
-                var texture = this._getUnitTexture(index);
+                var texture = unitJSON.units[index - 1].name;
+                //var texture = this._getUnitTexture(index);
 
                 this._createEntity(x, y, texture, _unitGroupUI);
 
@@ -1279,63 +1413,8 @@ Main.prototype = {
 
         sprite.onInputUp.add(this.unitPressed, this);
 
-        //console.log(sprite.width) //lolol theres still a sprite in terran with 62 width
+        console.log(sprite.width) //lolol theres still a sprite in terran with 62 width
         group.add(sprite);
-    },
-
-    unitPressed: function(unit) {
-
-        var sprite;
-        var x;
-        var supply;
-        var newWidth;
-        var maxWidthVar;
-        var startX;
-        var val;
-        var _game;
-        var _buildOrderGroup;
-        var __gameWidth;
-        var __gameHeight;
-
-        _game = this.game;
-        _buildOrderGroup = this.buildOrderGroup;
-
-        __gameWidth = _game.width;
-        __gameHeight = _game.height;
-
-        x = Math.floor(_buildOrderGroup.length / 2) * 65;
-
-        sprite = _game.add.sprite(x, 0, unit.texture);
-        sprite.inputEnabled = true;
-        supply = _game.add.bitmapText(x, 0, 'Agency_35', this.supply.toString(), 28);
-        supply.tint = this.uiColor;
-        sprite.events.onInputUp.add(this._removeBuildOrderSprite, this, 0, supply);
-        _buildOrderGroup.add(sprite);
-        _buildOrderGroup.add(supply);
-
-        // If the added selection exceeds the width of the screen
-        if (sprite.x + _buildOrderGroup.x > __gameWidth - 65) {
-
-            // Variables for width of build order scroll bar
-            maxWidthVar = ((_buildOrderGroup.length / 2) * 65)
-            newWidth = __gameWidth - (__gameWidth * ((maxWidthVar - __gameWidth) / maxWidthVar));
-            startX = __gameWidth - newWidth;
-
-            // Redraw the build order scroll bar line
-            this.buildOrderScrollingBar.x = startX;
-            this.buildOrderScrollingBar.width = newWidth;
-
-
-            // Update variables relevant to scrolling
-            this.widthDifference = maxWidthVar - __gameWidth;
-            this.gameAndBuildOrderWidth = __gameWidth - newWidth;
-
-
-            // Move build order group to compensate for screen pushing
-            val = this.widthDifference * (this.buildOrderScrollingBar.x / this.gameAndBuildOrderWidth);
-            this.buildOrderGroup.x = -val + 3;
-            _buildOrderGroup.forEach(this._checkBounds, this, false, __gameWidth);
-        }
     },
 
     _checkBounds: function(sprite, _gameWidth) {
@@ -1440,6 +1519,10 @@ Main.prototype = {
     _getUnitTexture: function(index) {
 
         var texture;
+
+        var unitJSON = this.game.cache.getJSON('terran-units');
+
+        console.log(unitJSON.units[index].name);
 
         if (this.race === 'terran')
             switch (index) {
