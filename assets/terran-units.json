@@ -129,5 +129,18 @@
                 "supply": "6",
                 "builtFrom": "starport",
                 "requires": ["starport","tech-lab","fusion-core"]
+    }],
+    
+    "structures": [{
+
+                "name": "scv",
+                "buildTime": "12",
+                "mineralCost": "50",
+                "gasCost": "0",
+                "supply": "1",
+                "builtFrom": "command-center",
+                "requires": ["command-center"]
+            }, {
+
     }]
 }

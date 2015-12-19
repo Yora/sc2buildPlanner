@@ -52,7 +52,7 @@ Boot.prototype = {
 		    //this.game.scale.minHeight = 640;
 		    this.game.scale.maxWidth = 2220;
 
-		    this.game.scale.onSizeChange.add(function () {this.game.scale.setGameSize(window.innerWidth, window.innerHeight)}, this)
+		    //this.game.scale.onSizeChange.add(function () {this.game.scale.setGameSize(window.innerWidth, window.innerHeight)}, this)
 
 		} else {
 
@@ -162,7 +162,6 @@ Main.prototype = {
         this.load.image('icon', 'assets/icon.png');
         this.load.image('stars', 'assets/stars.png');
         this.load.image('stars-cover', 'assets/stars-cover.png');
-        this.game.load.json('terran-units', 'assets/terran-units.json');
 
         switch (this.race) {
 
@@ -170,12 +169,14 @@ Main.prototype = {
                 this.game.load.atlas('terran', 'assets/terran.png', 'assets/terran.json');
                 this.load.image('gas', 'assets/terran-gas.png');
                 this.load.image('supply', 'assets/depot-supply.png');
+                this.game.load.json('terran-data', 'assets/terran-data.json');
                 break;
 
             case 'protoss':
                 this.game.load.atlas('protoss', 'assets/protoss.png', 'assets/protoss.json');
                 this.load.image('gas', 'assets/protoss-gas.png');
                 this.load.image('supply', 'assets/pylon-supply.png');
+                this.game.load.json('protoss-data', 'assets/protoss-data.json');
                 break;
 
             case 'zerg':
@@ -183,6 +184,7 @@ Main.prototype = {
                 this.load.image('gas', 'assets/zerg-gas.png');
                 this.load.image('supply', 'assets/overlord-supply.png');
                 this.load.image('larva', 'assets/larva.png');
+                this.game.load.json('zerg-data', 'assets/zerg-data.json');
                 break;
 
         }
@@ -248,7 +250,6 @@ Main.prototype = {
         }
 
         //this.bg = null;
-
         //this.bg = this.game.add.image(0, 0, 'stars')
         //this.bg.alpha = 0.2;
 
@@ -306,11 +307,11 @@ Main.prototype = {
 
         this.initRace();
 
-        this.createUnits();
+        this.createSelectionUI();
 
-        this.createStructures();
+        //this.createStructures();
 
-        this.createUpgrades();
+        //this.createUpgrades();
 
         this.startUI();
 
@@ -1226,7 +1227,6 @@ Main.prototype = {
             this.buildOrderGroup.x = -val + 3;
             _buildOrderGroup.forEach(this._checkBounds, this, false, __gameWidth);
         }
-
     },
 
     _crop: function(sprite) {
@@ -1273,13 +1273,17 @@ Main.prototype = {
         }
     },
 
-    createUnits: function() {
+    createSelectionUI: function() {
 
         var xx;
         var yy;
+        var xx2;
+        var yy2;
+        var xx3;
+        var yy3;
         var x;
         var y;
-        var unitJSON;
+        var raceJSON;
         var index;
         var text_texture;
         var icon;
@@ -1287,14 +1291,35 @@ Main.prototype = {
         var underline;
         var _game;
         var _unitGroupUI;
+        var _structureGroupUI;
+        var _upgradeGroupUI;
+        var _unitCount;
+        var _structureCount;
+        var _upgradeCount;
+        var _race;
+        var _uiColor;
+        var _unitPressed;
         var __gameWidth;
+
 
         _game = this.game;
         _unitGroupUI = this.unitGroupUI;
-
+        _structureGroupUI = this.structureGroupUI;
+        _upgradeGroupUI = this.upgradeGroupUI;
+        _unitCount = this.unitCount;
+        _structureCount = this.structureCount;
+        _upgradeCount = this.upgradeCount;
+        _race = this.race;
+        _uiColor = this.uiColor;
+        _unitPressed = this.unitPressed;
         __gameWidth = this.game.width;
 
-        unitJSON = this.game.cache.getJSON('terran-units');
+
+        raceJSON = this.game.cache.getJSON(_race + '-data');
+
+        ///////////////////////////////////////////////////////////
+        //                       UNITS                           //
+        ///////////////////////////////////////////////////////////
         index = 0;
 
         _unitGroupUI.x = __gameWidth - 310;
@@ -1303,11 +1328,11 @@ Main.prototype = {
         var _name = _game.make.bitmapText(0, 0, 'Agency_35', 'Units', 35);
         var text_texture = _name.generateTexture();
         name = _game.make.image(5, 5, text_texture);
-        name.tint = this.uiColor;
+        name.tint = _uiColor;
         _name.destroy();
 
         underline = _game.make.image(2, 30, 'ui-white-square');
-        underline.tint = this.uiColor;
+        underline.tint = _uiColor;
         underline.height = 1;
         underline.width = name.width + 5;
 
@@ -1316,8 +1341,8 @@ Main.prototype = {
 
         for (yy = 0; yy <= 7; yy++) {
 
-            if (index + 1 > this.unitCount)
-                return;
+            if (index + 1 > _unitCount)
+                break;
 
             this.maxScrollCount++;
 
@@ -1325,125 +1350,92 @@ Main.prototype = {
 
                 index++;
 
-                if (index > this.unitCount)
-                    return;
+                if (index > _unitCount)
+                    break;
 
                 var x = xx * 62 + (xx * 7);
                 var y = yy * 62 + (yy * 7) + 35;
 
-                //icon = this.game.add.sprite(x - 3, y - 3, 'icon');
-                //icon.width = 66;
-                //icon.height = 66;
-                //icon.tint = this.uiColor;
-                //_unitGroupUI.add(icon);   
+                icon = _game.add.sprite(x - 3, y - 3, 'ui-white-square');
+                icon.width = 66;
+                icon.height = 66;
+                icon.tint = _uiColor;
+                _unitGroupUI.add(icon);                   
 
-                var texture = unitJSON.units[index - 1].name;
-                //var texture = this._getUnitTexture(index);
-
-                this._createEntity(x, y, texture, _unitGroupUI);
-
+                var texture = raceJSON.units[index - 1].name;
+                var sprite = _game.make.button(x, y, _race, null, this, texture + "-highlight", texture, texture, texture);
+                sprite.onInputUp.add(_unitPressed, this);
+                //console.log(sprite.width) //lolol theres still a sprite in terran with 62 width
+                _unitGroupUI.add(sprite);
             }
         }
-    },
 
-    createStructures: function() {
-
-        var xx;
-        var yy;
-        var x;
-        var y;
-        var index;
-        var text_texture;
-        var icon;
-        var name;
-        var underline;
-        var _game;
-        var _structureCount;
-        var _structureGroupUI;
-
-        _game = this.game;
-        _structureCount = this.structureCount;
-        _structureGroupUI = this.structureGroupUI;
-
+        ///////////////////////////////////////////////////////////
+        //                      STRUCTURES                       //
+        ///////////////////////////////////////////////////////////        
         index = 0;
 
-        this.structureGroupUI.y = this.unitGroupUI.y + this.unitGroupUI.height + 10;
+        _structureGroupUI.y = _unitGroupUI.y + _unitGroupUI.height + 10;
 
         var _name = _game.make.bitmapText(0, 0, 'Agency_35', 'Buildings', 35);
         var text_texture = _name.generateTexture();
-        name = _game.make.image(5, 5, text_texture);
-        name.tint = this.uiColor;
+        var name = _game.make.image(5, 5, text_texture);
+        name.tint = _uiColor;
         _name.destroy();
 
         underline = _game.make.image(2, 30, 'ui-white-square');
-        underline.tint = this.uiColor;
+        underline.tint = _uiColor;
         underline.height = 1;
         underline.width = name.width + 5;
 
         _structureGroupUI.add(name);
         _structureGroupUI.add(underline);
 
-        for (yy = 0; yy <= 7; yy++) {
 
-            if (index + 1 > this.structureCount)
-                return;
+        for (yy2 = 0; yy2 <= 7; yy2++) {
+
+            if (index + 1 > _structureCount)
+                break;
 
             this.maxScrollCount++;
 
-            for (xx = 0; xx < 4; xx++) {
+            for (xx2 = 0; xx2 < 4; xx2++) {
 
                 index++;
 
-                if (index > this.structureCount)
-                    return;
+                if (index > _structureCount)
+                    break;
 
-                var x = xx * 62 + (xx * 7);
-                var y = yy * 62 + (yy * 7) + 35;
+                var x = xx2 * 62 + (xx2 * 7);
+                var y = yy2 * 62 + (yy2 * 7) + 35;
 
-                //icon = this.game.add.sprite(x - 3, y - 2, 'icon');
-                //icon.width = 66;
-                //icon.height = 66;
-                //icon.tint = 0xff0000;
+                icon = _game.add.sprite(x - 3, y - 2, 'ui-white-square');
+                icon.width = 66;
+                icon.height = 66;
+                icon.tint = _uiColor;
+                _structureGroupUI.add(icon);
 
-                //this.structureGroupUI.add(icon);
-
-                var texture = this._getStructureTexture(index);
-
-                this._createEntity(x, y, texture, this.structureGroupUI);
-
+                var texture = raceJSON.structures[index - 1].name;
+                var sprite = _game.make.button(x, y, _race, null, this, texture + "-highlight", texture, texture, texture);
+                sprite.onInputUp.add(_unitPressed, this);
+                _structureGroupUI.add(sprite);
             }
         }
-    },
-
-    createUpgrades: function() {
-
-        var xx;
-        var yy;
-        var x;
-        var y;
-        var index;
-        var text_texture;
-        var icon;
-        var name;
-        var underline;
-        var _game;
-        var _upgradeGroupUI;
-
-        _game = this.game;
-        _upgradeGroupUI = this.upgradeGroupUI;
-
+        ///////////////////////////////////////////////////////////
+        //                      UPGRADES                         //
+        ///////////////////////////////////////////////////////////
         index = 0;
 
-        this.upgradeGroupUI.y = this.unitGroupUI.y + this.unitGroupUI.height + this.structureGroupUI.height + 20;
+        _upgradeGroupUI.y = _unitGroupUI.y + _unitGroupUI.height + _structureGroupUI.height + 20;
 
         var _name = _game.make.bitmapText(0, 0, 'Agency_35', 'Upgrades', 35);
         var text_texture = _name.generateTexture();
         name = _game.make.image(5, 5, text_texture);
-        name.tint = this.uiColor;
+        name.tint = _uiColor;
         _name.destroy();
 
         underline = _game.make.image(2, 30, 'ui-white-square');
-        underline.tint = this.uiColor;
+        underline.tint = _uiColor;
         underline.height = 1;
         underline.width = name.width + 5;
 
@@ -1452,8 +1444,8 @@ Main.prototype = {
 
         for (yy = 0; yy <= 7; yy++) {
 
-            if (index + 1 > this.upgradeCount)
-                return;
+            if (index + 1 > _upgradeCount)
+                break;
 
             this.maxScrollCount++;
 
@@ -1461,36 +1453,24 @@ Main.prototype = {
 
                 index++;
 
-                if (index > this.upgradeCount)
-                    return;
+                if (index > _upgradeCount)
+                    break;
 
                 var x = xx * 62 + (xx * 7);
                 var y = yy * 62 + (yy * 7) + 35;
 
-                //icon = this.game.add.sprite(x - 3, y - 2, 'icon');
-                //icon.width = 66;
-                //icon.height = 66;
+                icon = _game.add.sprite(x - 3, y - 2, 'ui-white-square');
+                icon.width = 66;
+                icon.height = 66;
+                icon.tint = _uiColor;
+                _upgradeGroupUI.add(icon);
 
-                //this.upgradeGroupUI.add(icon);
-
-                var texture = this._getUpgradeTexture(index);
-
-                this._createEntity(x, y, texture, this.upgradeGroupUI);
-
+                var texture = raceJSON.upgrades[index - 1].name;
+                var sprite = _game.make.button(x, y, _race, null, this, texture + "-highlight", texture, texture, texture);
+                sprite.onInputUp.add(_unitPressed, this);
+                _upgradeGroupUI.add(sprite);
             }
         }
-    },
-
-    _createEntity: function(x, y, texture, group) {
-
-        var sprite;
-
-        sprite = this.game.make.button(x, y, this.race, null, this, texture + "-highlight", texture, texture, texture);
-
-        sprite.onInputUp.add(this.unitPressed, this);
-
-        console.log(sprite.width) //lolol theres still a sprite in terran with 62 width
-        group.add(sprite);
     },
 
     _checkBounds: function(sprite, _gameWidth) {
@@ -1590,768 +1570,6 @@ Main.prototype = {
     __updateBuildOrderSprite: function(sprite) {
 
         sprite.x = Math.floor(sprite.z / 2) * 65;
-    },
-
-    _getUnitTexture: function(index) {
-
-        var texture;
-
-        var unitJSON = this.game.cache.getJSON('terran-units');
-
-        console.log(unitJSON.units[index].name);
-
-        if (this.race === 'terran')
-            switch (index) {
-
-                case 1:
-                    texture = 'scv';
-                    break;
-
-                case 2:
-                    texture = 'reaper';
-                    break;
-
-                case 3:
-                    texture = 'marauder';
-                    break;
-
-                case 4:
-                    texture = 'ghost';
-                    break;
-
-                case 5:
-                    texture = 'hellion';
-                    break;
-
-                case 6:
-                    texture = 'widow-mine';
-                    break;
-
-                case 7:
-                    texture = 'siege-tank';
-                    break;
-
-                case 8:
-                    texture = 'cyclone';
-                    break;
-
-                case 9:
-                    texture = 'thor';
-                    break;
-
-                case 10:
-                    texture = 'viking';
-                    break;
-
-                case 11:
-                    texture = 'medivac';
-                    break;
-
-                case 12:
-                    texture = 'liberator';
-                    break;
-
-                case 13:
-                    texture = 'raven';
-                    break;
-
-                case 14:
-                    texture = 'banshee';
-                    break;
-
-                case 15:
-                    texture = 'battlecruiser';
-                    break;
-            } else if (this.race === 'protoss')
-                switch (index) {
-
-                    case 1:
-                        texture = 'probe';
-                        break;
-
-                    case 2:
-                        texture = 'zealot';
-                        break;
-
-                    case 3:
-                        texture = 'adept';
-                        break;
-
-                    case 4:
-                        texture = 'sentry';
-                        break;
-
-                    case 5:
-                        texture = 'stalker';
-                        break;
-
-                    case 6:
-                        texture = 'dark-templar';
-                        break;
-
-                    case 7:
-                        texture = 'high-templar';
-                        break;
-
-                    case 8:
-                        texture = 'archon';
-                        break;
-
-                    case 9:
-                        texture = 'observer';
-                        break;
-
-                    case 10:
-                        texture = 'void-prism';
-                        break;
-
-                    case 11:
-                        texture = 'immortal';
-                        break;
-
-                    case 12:
-                        texture = 'collosus';
-                        break;
-
-                    case 13:
-                        texture = 'disruptor';
-                        break;
-
-                    case 14:
-                        texture = 'phoenix';
-                        break;
-
-                    case 15:
-                        texture = 'void-ray';
-                        break;
-
-                    case 16:
-                        texture = 'oracle';
-                        break;
-
-                    case 17:
-                        texture = 'tempest';
-                        break;
-
-                    case 18:
-                        texture = 'carrier';
-                        break;
-
-                    case 19:
-                        texture = 'mothership-core';
-                        break;
-
-                    case 20:
-                        texture = 'mothership';
-                        break;
-                } else if (this.race === 'zerg')
-                    switch (index) {
-
-                        case 1:
-                            texture = 'larva';
-                            break;
-
-                        case 2:
-                            texture = 'drone';
-                            break;
-
-                        case 3:
-                            texture = 'zergling';
-                            break;
-
-                        case 4:
-                            texture = 'baneling';
-                            break;
-
-                        case 5:
-                            texture = 'roach';
-                            break;
-
-                        case 6:
-                            texture = 'ravager';
-                            break;
-
-                        case 7:
-                            texture = 'hydralisk';
-                            break;
-
-                        case 8:
-                            texture = 'lurker';
-                            break;
-
-                        case 9:
-                            texture = 'viper';
-                            break;
-
-                        case 10:
-                            texture = 'mutalisk';
-                            break;
-
-                        case 11:
-                            texture = 'corruptor';
-                            break;
-
-                        case 12:
-                            texture = 'swarm-host';
-                            break;
-
-                        case 13:
-                            texture = 'infestor';
-                            break;
-
-                        case 14:
-                            texture = 'ultralisk';
-                            break;
-
-                        case 15:
-                            texture = 'broodlord';
-                            break;
-
-                        case 16:
-                            texture = 'overlord';
-                            break;
-
-                        case 17:
-                            texture = 'overseer';
-                            break;
-
-                        case 18:
-                            texture = 'queen';
-                            break;
-                    }
-
-        return texture;
-    },
-
-    _getStructureTexture: function(index) {
-
-        var texture;
-
-        if (this.race === 'terran')
-            switch (index) {
-
-                case 1:
-                    texture = 'command-center';
-                    break;
-
-                case 2:
-                    texture = 'orbital';
-                    break;
-
-                case 3:
-                    texture = 'planetary-fortress';
-                    break;
-
-                case 4:
-                    texture = 'refinery';
-                    break;
-
-                case 5:
-                    texture = 'supply-depot';
-                    break;
-
-                case 6:
-                    texture = 'barracks';
-                    break;
-
-                case 7:
-                    texture = 'engineering-bay';
-                    break;
-
-                case 8:
-                    texture = 'bunker';
-                    break;
-
-                case 9:
-                    texture = 'turret';
-                    break;
-
-                case 10:
-                    texture = 'sensor-tower';
-                    break;
-
-                case 11:
-                    texture = 'ghost-academy';
-                    break;
-
-                case 12:
-                    texture = 'factory';
-                    break;
-
-                case 13:
-                    texture = 'armory';
-                    break;
-
-                case 14:
-                    texture = 'starport';
-                    break;
-
-                case 15:
-                    texture = 'fusion-core';
-                    break;
-
-                case 16:
-                    texture = 'tech-lab';
-                    break;
-
-                case 17:
-                    texture = 'reactor';
-                    break;
-
-            } else if (this.race === 'protoss')
-                switch (index) {
-
-                    case 1:
-                        texture = 'nexus';
-                        break;
-
-                    case 2:
-                        texture = 'assimilator';
-                        break;
-
-                    case 3:
-                        texture = 'pylon';
-                        break;
-
-                    case 4:
-                        texture = 'gateway';
-                        break;
-
-                    case 5:
-                        texture = 'forge';
-                        break;
-
-                    case 6:
-                        texture = 'cybernetics-core';
-                        break;
-
-                    case 7:
-                        texture = 'cannon';
-                        break;
-
-                    case 8:
-                        texture = 'twilight-council';
-                        break;
-
-                    case 9:
-                        texture = 'stargate';
-                        break;
-
-                    case 10:
-                        texture = 'robotics-facility';
-                        break;
-
-                    case 11:
-                        texture = 'templar-archives';
-                        break;
-
-                    case 12:
-                        texture = 'fleet-beacon';
-                        break;
-
-                    case 13:
-                        texture = 'robotics-bay';
-                        break;
-
-                    case 14:
-                        texture = 'dark-shrine';
-                        break;
-                } else if (this.race === 'zerg')
-                    switch (index) {
-
-                        case 1:
-                            texture = 'hatchery';
-                            break;
-
-                        case 2:
-                            texture = 'lair';
-                            break;
-
-                        case 3:
-                            texture = 'hive';
-                            break;
-
-                        case 4:
-                            texture = 'extractor';
-                            break;
-
-                        case 5:
-                            texture = 'spawning-pool';
-                            break;
-
-                        case 6:
-                            texture = 'evolution-chamber';
-                            break;
-
-                        case 7:
-                            texture = 'roach-warren';
-                            break;
-
-                        case 8:
-                            texture = 'baneling-nest';
-                            break;
-
-                        case 9:
-                            texture = 'spine-crawler';
-                            break;
-
-                        case 10:
-                            texture = 'spore-crawler';
-                            break;
-
-                        case 11:
-                            texture = 'hydralisk-den';
-                            break;
-
-                        case 12:
-                            texture = 'lurker-den';
-                            break;
-
-                        case 13:
-                            texture = 'infestation-pit';
-                            break;
-
-                        case 14:
-                            texture = 'spire';
-                            break;
-
-                        case 15:
-                            texture = 'greater-spire';
-                            break;
-
-                        case 16:
-                            texture = 'nydus-network';
-                            break;
-
-                        case 17:
-                            texture = 'ultralisk-cavern';
-                            break;
-                    }
-
-        return texture;
-    },
-
-    _getUpgradeTexture: function(index) {
-
-        var texture;
-
-        if (this.race === 'terran')
-            switch (index) {
-
-                case 1:
-                    texture = 'infantry-weapons-1';
-                    break;
-
-                case 2:
-                    texture = 'infantry-weapons-2';
-                    break;
-
-                case 3:
-                    texture = 'infantry-weapons-3';
-                    break;
-
-                case 4:
-                    texture = 'vehicle-weapons-1';
-                    break;
-
-                case 5:
-                    texture = 'vehicle-weapons-2';
-                    break;
-
-                case 6:
-                    texture = 'vehicle-weapons-3';
-                    break;
-
-                case 7:
-                    texture = 'infantry-armor-1';
-                    break;
-
-                case 8:
-                    texture = 'infantry-armor-2';
-                    break;
-
-                case 9:
-                    texture = 'infantry-armor-3';
-                    break;
-
-                case 10:
-                    texture = 'vehicle-plating-1';
-                    break;
-
-                case 11:
-                    texture = 'vehicle-plating-2';
-                    break;
-
-                case 12:
-                    texture = 'vehicle-plating-3';
-                    break;
-
-                case 13:
-                    texture = 'hisec-auto-tracking';
-                    break;
-
-                case 14:
-                    texture = 'cloaking-field';
-                    break;
-
-                case 15:
-                    texture = 'stimpack';
-                    break;
-
-                case 16:
-                    texture = 'yamato-cannon';
-                    break;
-
-                case 17:
-                    texture = 'behemoth-reactor';
-                    break;
-
-                case 18:
-                    texture = 'corvid-reactor';
-                    break;
-
-                case 19:
-                    texture = 'moebius-reactor';
-                    break;
-
-                case 20:
-                    texture = 'drilling-claws';
-                    break;
-
-                case 21:
-                    texture = 'building-armor';
-                    break;
-
-                case 22:
-                    texture = 'combat-shield';
-                    break;
-
-                case 23:
-                    texture = 'durable-materials';
-                    break;
-
-                case 24:
-                    texture = 'infernal-preigniter';
-                    break;
-
-                case 25:
-                    texture = 'neosteel-frames';
-                    break;
-            } else if (this.race === 'protoss')
-                switch (index) {
-
-                    case 1:
-                        texture = 'ground-weapons-1';
-                        break;
-
-                    case 2:
-                        texture = 'ground-weapons-2';
-                        break;
-
-                    case 3:
-                        texture = 'ground-weapons-3';
-                        break;
-
-                    case 4:
-                        texture = 'air-weapons-1';
-                        break;
-
-                    case 5:
-                        texture = 'air-weapons-2';
-                        break;
-
-                    case 6:
-                        texture = 'air-weapons-3';
-                        break;
-
-                    case 7:
-                        texture = 'ground-armor-1';
-                        break;
-
-                    case 8:
-                        texture = 'ground-armor-2';
-                        break;
-
-                    case 9:
-                        texture = 'ground-armor-3';
-                        break;
-
-                    case 10:
-                        texture = 'air-armor-1';
-                        break;
-
-                    case 11:
-                        texture = 'air-armor-2';
-                        break;
-
-                    case 12:
-                        texture = 'air-armor-3';
-                        break;
-
-                    case 13:
-                        texture = 'shields-1';
-                        break;
-
-                    case 14:
-                        texture = 'shields-2';
-                        break;
-
-                    case 15:
-                        texture = 'shields-3';
-                        break;
-
-                    case 16:
-                        texture = 'charge';
-                        break;
-
-                    case 17:
-                        texture = 'gravitic-booster';
-                        break;
-
-                    case 18:
-                        texture = 'gravitic-drive';
-                        break;
-
-                    case 19:
-                        texture = 'anion-pulse-crystals';
-                        break;
-
-                    case 20:
-                        texture = 'extended-thermal-lances';
-                        break;
-
-                    case 21:
-                        texture = 'psionic-storm';
-                        break;
-
-                    case 22:
-                        texture = 'blink';
-                        break;
-
-                    case 23:
-                        texture = 'hallucination';
-                        break;
-
-                    case 24:
-                        texture = 'graviton-catapult';
-                        break;
-                } else if (this.race === 'zerg')
-                    switch (index) {
-
-                        case 1:
-                            texture = 'melee-attacks-1';
-                            break;
-
-                        case 2:
-                            texture = 'melee-attacks-2';
-                            break;
-
-                        case 3:
-                            texture = 'melee-attacks-3';
-                            break;
-
-                        case 4:
-                            texture = 'missile-attacks-1';
-                            break;
-
-                        case 5:
-                            texture = 'missile-attacks-2';
-                            break;
-
-                        case 6:
-                            texture = 'missile-attacks-3';
-                            break;
-
-                        case 7:
-                            texture = 'flyer-attacks-1';
-                            break;
-
-                        case 8:
-                            texture = 'flyer-attacks-2';
-                            break;
-
-                        case 9:
-                            texture = 'flyer-attacks-3';
-                            break;
-
-                        case 10:
-                            texture = 'ground-carapace-1';
-                            break;
-
-                        case 11:
-                            texture = 'ground-carapace-2';
-                            break;
-
-                        case 12:
-                            texture = 'ground-carapace-3';
-                            break;
-
-                        case 13:
-                            texture = 'flyer-carapace-1';
-                            break;
-
-                        case 14:
-                            texture = 'flyer-carapace-2';
-                            break;
-
-                        case 15:
-                            texture = 'flyer-carapace-3';
-                            break;
-
-                        case 16:
-                            texture = 'chitinous-plating';
-                            break;
-
-                        case 17:
-                            texture = 'centrifugal-hooks';
-                            break;
-
-                        case 18:
-                            texture = 'glial-reconstitution';
-                            break;
-
-                        case 19:
-                            texture = 'metabolic-boost';
-                            break;
-
-                        case 20:
-                            texture = 'pneumatized-carapace';
-                            break;
-
-                        case 21:
-                            texture = 'muscular-augments';
-                            break;
-
-                        case 22:
-                            texture = 'grooved-spines';
-                            break;
-
-                        case 23:
-                            texture = 'burrow';
-                            break;
-
-                        case 24:
-                            texture = 'neural-parasite';
-                            break;
-
-                        case 25:
-                            texture = 'pathogen-glands';
-                            break;
-
-                        case 26:
-                            texture = 'adrenal-glands';
-                            break;
-
-                        case 27:
-                            texture = 'tunneling-claws';
-                            break;
-
-                        case 28:
-                            texture = 'flying-locust';
-                            break;
-                    }
-
-        return texture;
     },
 
     newArray: function(size) {
