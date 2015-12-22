@@ -900,16 +900,23 @@ Main.prototype = {
                 var x = xx0 * 62 + (xx0 * 7);
                 var y = yy0 * 62 + (yy0 * 7) + 35;
 
-                //var icon = _game.make.image(x - 3, y - 3, 'ui-white-square');
+                //var textureGroup = _game.make.group();
+                //var icon = _game.make.image(x - 3, y - 2, 'ui-white-square');
                 //icon.width = 66;
                 //icon.height = 66;
                 //icon.tint = _uiColor;
-                //_actionGroupUI.add(icon);                   
+                //var textureName = raceJSON.actions[index - 1].name;
+                //var image = _game.make.image(x, y, _race, textureName);
+                //textureGroup.add(icon);
+                //textureGroup.add(image);
+                //var texture = textureGroup.generateTexture();
+                //textureGroup.destroy();
 
-                var texture = "scv-worker-out";//raceJSON.units[index - 1].name;
+                var texture = "scv-worker-out";
 
-                var sprite = _game.make.button(x, y, _race, null, this, texture /*+ "-highlight"*/, texture, texture, texture);
-                sprite.onInputUp.add(_unitPressed, this);
+                var sprite = _game.make.sprite(x, y, _race, texture);
+                sprite.inputEnabled = true;
+                sprite.events.onInputUp.add(_unitPressed, this);
                 _actionGroupUI.add(sprite);
             }
         }
@@ -953,16 +960,21 @@ Main.prototype = {
                 var x = xx0 * 62 + (xx0 * 7);
                 var y = yy1 * 62 + (yy1 * 7) + 35;
 
-                //var icon = _game.make.image(x - 3, y - 3, 'ui-white-square');
-                //icon.width = 66;
-                //icon.height = 66;
-                //icon.tint = _uiColor;
-                //_unitGroupUI.add(icon);                   
+                var textureGroup = _game.make.group();
+                var icon = _game.make.image(x - 3, y - 2, 'ui-white-square');
+                icon.width = 66;
+                icon.height = 66;
+                icon.tint = _uiColor;
+                var textureName = raceJSON.units[index - 1].name;
+                var image = _game.make.image(x, y, _race, textureName);
+                textureGroup.add(icon);
+                textureGroup.add(image);
+                var texture = textureGroup.generateTexture();
+                textureGroup.destroy();
 
-                var texture = raceJSON.units[index - 1].name;
-
-                var sprite = _game.make.button(x, y, _race, null, this, texture + "-highlight", texture, texture, texture);
-                sprite.onInputUp.add(_unitPressed, this);
+                var sprite = _game.make.sprite(x, y, texture);
+                sprite.inputEnabled = true;
+                sprite.events.onInputUp.add(_unitPressed, this);
                 _unitGroupUI.add(sprite);
             }
         }
@@ -1007,15 +1019,21 @@ Main.prototype = {
                 var x = xx2 * 62 + (xx2 * 7);
                 var y = yy2 * 62 + (yy2 * 7) + 35;
 
-                //var icon = _game.make.image(x - 3, y - 2, 'ui-white-square');
-                //icon.width = 66;
-                //icon.height = 66;
-                //icon.tint = _uiColor;
-                //_structureGroupUI.add(icon);
+                var textureGroup = _game.make.group();
+                var icon = _game.make.image(x - 3, y - 2, 'ui-white-square');
+                icon.width = 66;
+                icon.height = 66;
+                icon.tint = _uiColor;
+                var textureName = raceJSON.structures[index - 1].name;
+                var image = _game.make.image(x, y, _race, textureName);
+                textureGroup.add(icon);
+                textureGroup.add(image);
+                var texture = textureGroup.generateTexture();
+                textureGroup.destroy();
 
-                var texture = raceJSON.structures[index - 1].name;
-                var sprite = _game.make.button(x, y, _race, null, this, texture + "-highlight", texture, texture, texture);
-                sprite.onInputUp.add(_unitPressed, this);
+                var sprite = _game.make.sprite(x, y, texture);
+                sprite.inputEnabled = true;
+                sprite.events.onInputUp.add(_unitPressed, this);
                 _structureGroupUI.add(sprite);
             }
         }
@@ -1058,31 +1076,20 @@ Main.prototype = {
                 var x = xx * 62 + (xx * 7);
                 var y = yy * 62 + (yy * 7) + 35;
 
-                var textureGroup = _game.add.group();
+                var textureGroup = _game.make.group();
                 var icon = _game.make.image(x - 3, y - 2, 'ui-white-square');
                 icon.width = 66;
                 icon.height = 66;
                 icon.tint = _uiColor;
-                //_upgradeGroupUI.add(icon);
-
-                console.log(_game.cache)
-
-                var texture = raceJSON.upgrades[index - 1].name;
-                var image = _game.make.image(x, y, _race, texture);
-
+                var textureName = raceJSON.upgrades[index - 1].name;
+                var image = _game.make.image(x, y, _race, textureName);
                 textureGroup.add(icon);
                 textureGroup.add(image);
-
-                var textureTest = textureGroup.generateTexture();
-
-                console.log(textureTest);
-                console.log(texture);
-
+                var texture = textureGroup.generateTexture();
                 textureGroup.destroy();
 
-                var sprite = _game.make.sprite(x, y, _race, texture);
+                var sprite = _game.make.sprite(x, y, texture);
                 sprite.inputEnabled = true;
-                //var sprite = _game.make.button(x, y, _race, null, this, textureTest, textureTest, textureTest, textureTest);
                 sprite.events.onInputUp.add(_unitPressed, this);
                 _upgradeGroupUI.add(sprite);
             }
