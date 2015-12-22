@@ -1,0 +1,197 @@
+{
+    "font": {
+        "info": {
+            "_face": "AgencyFB",
+            "_size": "35",
+            "_bold": "0",
+            "_italic": "0",
+            "_charset": "",
+            "_unicode": "1",
+            "_stretchH": "100",
+            "_smooth": "1",
+            "_aa": "1",
+            "_padding": "0,0,0,0",
+            "_spacing": "1,1",
+            "_outline": "0"
+        },
+        "common": {
+            "_lineHeight": "34",
+            "_base": "28",
+            "_scaleW": "128",
+            "_scaleH": "64",
+            "_pages": "1",
+            "_packed": "0",
+            "_alphaChnl": "0",
+            "_redChnl": "4",
+            "_greenChnl": "4",
+            "_blueChnl": "4"
+        },
+        "pages": {
+            "page": {
+                "_id": "0",
+                "_file": "agency_35_nums_0.png"
+            }
+        },
+        "chars": {
+            "char": [
+                {
+                    "_id": "45",
+                    "_x": "26",
+                    "_y": "24",
+                    "_width": "9",
+                    "_height": "3",
+                    "_xoffset": "0",
+                    "_yoffset": "18",
+                    "_xadvance": "9",
+                    "_page": "0",
+                    "_chnl": "15"
+                },
+                {
+                    "_id": "47",
+                    "_x": "0",
+                    "_y": "0",
+                    "_width": "14",
+                    "_height": "23",
+                    "_xoffset": "0",
+                    "_yoffset": "5",
+                    "_xadvance": "13",
+                    "_page": "0",
+                    "_chnl": "15"
+                },
+                {
+                    "_id": "48",
+                    "_x": "58",
+                    "_y": "0",
+                    "_width": "12",
+                    "_height": "23",
+                    "_xoffset": "1",
+                    "_yoffset": "5",
+                    "_xadvance": "14",
+                    "_page": "0",
+                    "_chnl": "15"
+                },
+                {
+                    "_id": "49",
+                    "_x": "13",
+                    "_y": "24",
+                    "_width": "6",
+                    "_height": "23",
+                    "_xoffset": "0",
+                    "_yoffset": "5",
+                    "_xadvance": "7",
+                    "_page": "0",
+                    "_chnl": "15"
+                },
+                {
+                    "_id": "50",
+                    "_x": "30",
+                    "_y": "0",
+                    "_width": "13",
+                    "_height": "23",
+                    "_xoffset": "0",
+                    "_yoffset": "5",
+                    "_xadvance": "13",
+                    "_page": "0",
+                    "_chnl": "15"
+                },
+                {
+                    "_id": "51",
+                    "_x": "71",
+                    "_y": "0",
+                    "_width": "12",
+                    "_height": "23",
+                    "_xoffset": "1",
+                    "_yoffset": "5",
+                    "_xadvance": "14",
+                    "_page": "0",
+                    "_chnl": "15"
+                },
+                {
+                    "_id": "52",
+                    "_x": "15",
+                    "_y": "0",
+                    "_width": "14",
+                    "_height": "23",
+                    "_xoffset": "0",
+                    "_yoffset": "5",
+                    "_xadvance": "14",
+                    "_page": "0",
+                    "_chnl": "15"
+                },
+                {
+                    "_id": "53",
+                    "_x": "84",
+                    "_y": "0",
+                    "_width": "12",
+                    "_height": "23",
+                    "_xoffset": "1",
+                    "_yoffset": "5",
+                    "_xadvance": "14",
+                    "_page": "0",
+                    "_chnl": "15"
+                },
+                {
+                    "_id": "54",
+                    "_x": "97",
+                    "_y": "0",
+                    "_width": "12",
+                    "_height": "23",
+                    "_xoffset": "1",
+                    "_yoffset": "5",
+                    "_xadvance": "14",
+                    "_page": "0",
+                    "_chnl": "15"
+                },
+                {
+                    "_id": "55",
+                    "_x": "44",
+                    "_y": "0",
+                    "_width": "13",
+                    "_height": "23",
+                    "_xoffset": "0",
+                    "_yoffset": "5",
+                    "_xadvance": "13",
+                    "_page": "0",
+                    "_chnl": "15"
+                },
+                {
+                    "_id": "56",
+                    "_x": "110",
+                    "_y": "0",
+                    "_width": "12",
+                    "_height": "23",
+                    "_xoffset": "1",
+                    "_yoffset": "5",
+                    "_xadvance": "14",
+                    "_page": "0",
+                    "_chnl": "15"
+                },
+                {
+                    "_id": "57",
+                    "_x": "0",
+                    "_y": "24",
+                    "_width": "12",
+                    "_height": "23",
+                    "_xoffset": "1",
+                    "_yoffset": "5",
+                    "_xadvance": "14",
+                    "_page": "0",
+                    "_chnl": "15"
+                },
+                {
+                    "_id": "58",
+                    "_x": "20",
+                    "_y": "24",
+                    "_width": "5",
+                    "_height": "13",
+                    "_xoffset": "0",
+                    "_yoffset": "15",
+                    "_xadvance": "5",
+                    "_page": "0",
+                    "_chnl": "15"
+                }
+            ],
+            "_count": "13"
+        }
+    }
+}

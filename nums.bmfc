@@ -5,7 +5,7 @@ fileVersion=1
 fontName=AgencyFB
 fontFile=
 charSet=0
-fontSize=15
+fontSize=35
 aa=1
 scaleH=100
 useSmoothing=1
@@ -30,8 +30,8 @@ useFixedHeight=0
 forceZero=0
 
 # output file
-outWidth=32
-outHeight=32
+outWidth=128
+outHeight=64
 outBitDepth=32
 fontDescFormat=1
 fourChnlPacked=0
@@ -50,6 +50,6 @@ invB=0
 outlineThickness=0
 
 # selected chars
-chars=47-58
+chars=45,47-58
 
 # imported icon images

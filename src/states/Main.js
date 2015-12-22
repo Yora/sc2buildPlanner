@@ -644,27 +644,27 @@ Main.prototype = {
         this.mineralIcon.width = 40;
         this.mineralIcon.height = 40;
 
-        this.mineralText = _game.add.bitmapText(__gameWidth - 750, 74, 'Agency_35', '50', 35);
+        this.mineralText = _game.add.bitmapText(__gameWidth - 750, 74, 'Agency_35_nums', '50', 35);
         this.mineralText.tint = _uiColor;
 
         this.gasIcon = _game.add.sprite(__gameWidth - 650, 71, 'gas');
         this.gasIcon.width = 40;
         this.gasIcon.height = 40;
 
-        this.gasText = _game.add.bitmapText(__gameWidth - 600, 74, 'Agency_35', '0', 35);
+        this.gasText = _game.add.bitmapText(__gameWidth - 600, 74, 'Agency_35_nums', '0', 35);
         this.gasText.tint = _uiColor;
 
         this.supplyIcon = _game.add.sprite(__gameWidth - 500, 70, 'supply');
         this.supplyIcon.width = 42;
         this.supplyIcon.height = 42;
 
-        this.supplyText = _game.add.bitmapText(__gameWidth - 450, 74, 'Agency_35', '12/15', 35);
+        this.supplyText = _game.add.bitmapText(__gameWidth - 450, 74, 'Agency_35_nums', '12/15', 35);
 
         this.energyIcon = _game.add.sprite(__gameWidth - 375, 70, 'energy');
         this.energyIcon.width = 42;
         this.energyIcon.height = 42;
 
-        this.energyText = _game.add.bitmapText(__gameWidth - 325, 74, 'Agency_35', '0', 35);
+        this.energyText = _game.add.bitmapText(__gameWidth - 325, 74, 'Agency_35_nums', '0', 35);
 
         if (this.race === 'zerg') {
 
@@ -672,7 +672,7 @@ Main.prototype = {
             this.larvaIcon.width = 42;
             this.larvaIcon.height = 42;
 
-            this.larvaText = _game.add.bitmapText(__gameWidth - 325, 74, 'Agency_35', '0', 35);
+            this.larvaText = _game.add.bitmapText(__gameWidth - 325, 74, 'Agency_35_nums', '0', 35);
         }
 
 
@@ -694,8 +694,8 @@ Main.prototype = {
 
             var timeString1 = Math.floor(_timeValue / 60).toString();
             var timeString2 = this.pad((_timeValue % 60), 2);
-            var timeString = (timeString1 + ":" + timeString2);
-            var time = _game.add.bitmapText(-85 + (i * 90), 122, 'Agency_35', timeString, 25);
+            var timeString = timeString1 + ":" + timeString2;
+            var time = _game.add.bitmapText(-85 + (i * 90), 122, 'Agency_35_nums', timeString, 25);
 
             time.tint = _uiColor;
             time.index = i;
@@ -727,7 +727,7 @@ Main.prototype = {
         }
 
         // Current time
-        this.currentTimeText = _game.add.bitmapText(10, 74, 'Agency_35', '0:00', 35);
+        this.currentTimeText = _game.add.bitmapText(10, 74, 'Agency_35_nums', '0:00', 35);
 
 
         //Build order scroll bar
@@ -1408,7 +1408,7 @@ Main.prototype = {
         // Create sprite on build order bar
         var group = this.game.add.group();
         baseSprite = _game.make.sprite(0, 0, unit.texture);
-        supply = _game.make.bitmapText(0, 0, 'Agency_35', this.supply.toString(), 28);
+        supply = _game.make.bitmapText(0, 0, 'Agency_35_nums', this.supply.toString(), 28);
         supply.tint = this.uiColor;
 
         group.add(baseSprite);
