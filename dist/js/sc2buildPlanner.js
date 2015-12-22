@@ -1727,7 +1727,7 @@ Preloader.prototype = {
 		//this.load.image('stars', 'assets/stars.png');
 		//this.load.image('stars-cover', 'assets/stars-cover.png');
 
-		this.load.bitmapFont('Agency_35', 'assets/fonts/agency_35_0.png', 'assets/fonts/agency_35.xml' /*+ fileFormat*/);
+		this.load.bitmapFont('Agency_35', 'assets/fonts/agency_35_letters_0.png', 'assets/fonts/agency_35_letters.json' /*+ fileFormat*/);
 		this.load.bitmapFont('Agency_35_nums', 'assets/fonts/agency_35_nums_0.png', 'assets/fonts/agency_35_nums.json' /*+ fileFormat*/);
 
 
