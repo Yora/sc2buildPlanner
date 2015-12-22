@@ -210,6 +210,10 @@ Main.prototype = {
         this.workerCount = 12;
         
         this.uiColor = 0x87CEFF;
+        this.actionGroupUIHeight = 0;
+        this.unitGroupUIHeight = 0;
+        this.structureGroupUIHeight = 0;
+        this.upgradeGroupUIHeight = 0;
 
         this.scrollBar = null;
         this.scrollingBar = null;
@@ -258,31 +262,48 @@ Main.prototype = {
             case 'terran':
                 startingBuilding = 'command-center';
                 startingWorker = 'scv';
+                this.actionCount = 6;
+                this.unitCount = 16;
+                this.structureCount = 17;
+                this.upgradeCount = 25;
                 break;
 
             case 'protoss':
                 startingBuilding = 'nexus';
                 startingWorker = 'probe';
+                this.actionCount = 6;
+                this.unitCount = 22;
+                this.structureCount = 14;
+                this.upgradeCount = 25;
                 break;
 
             case 'zerg':
                 startingBuilding = 'hatchery';
                 startingWorker = 'drone';
+                this.actionCount = 6;
+                this.unitCount = 16;
+                this.structureCount = 17;
+                this.upgradeCount = 28;
                 break;
         }
 
-        this.structureArray = [];
-        this.workerArray = [];
-        this.unitArray = [];
-        this.upgradeArray = [];
 
+        this.structureArray = this.createArray(80, 2);
+        this.unitArray = this.createArray(100, 2);
+        this.upgradeArray = this.createArray(80, 2);
+
+        this.workerArray = this.createArray(80, 2);
         this.structureArray[0] = startingBuilding;
-        for (var i = 0; i < 12; i++)
-            this.workerArray[i] = startingWorker;
+
+        for (var i = 0; i < 12; i++) {
+            this.workerArray[i][0] = startingWorker;
+            this.workerArray[i][1] = 0;
+        }
     
 
         this.timelineGroup = this.game.add.group();
         this.starsCover = this.game.add.image(this.game.width - 334, 114, 'stars-cover');
+        this.actionGroupUI = this.game.add.group();
         this.unitGroupUI = this.game.add.group();
         this.structureGroupUI = this.game.add.group();
         this.upgradeGroupUI = this.game.add.group();
@@ -305,13 +326,7 @@ Main.prototype = {
 
         this.initUI();
 
-        this.initRace();
-
         this.createSelectionUI();
-
-        //this.createStructures();
-
-        //this.createUpgrades();
 
         this.startUI();
 
@@ -319,6 +334,7 @@ Main.prototype = {
 
         this.initWorkers();
 
+        //this.actionGroupUI.cacheAsBitmap = true;
         //this.unitGroupUI.cacheAsBitmap = true;
         //this.structureGroupUI.cacheAsBitmap = true;
         //this.upgradeGroupUI.cacheAsBitmap = true;
@@ -326,18 +342,6 @@ Main.prototype = {
         // Next: boxes for constructing, use filled rectangles
 
         this.timer = _game.time.create(true);
-    },
-
-    _inputUp: function() {
-
-        this.scrollBuildOrder = false;
-
-        this.game.time.events.add(10, this.__allowRemove, this)
-    },
-
-    __allowRemove: function() {
-
-        this.allowRemove = true;
     },
 
     update: function() {
@@ -545,23 +549,35 @@ Main.prototype = {
 
             var val;
             var scrollVal;
-            var _upgradeY;
+            var unitY;
+            var structureY;
+            var upgradeY;
             var _scrollingBar;
             var _game;
+            var _actionGroupUI;
             var _unitGroupUI;
             var _structureGroupUI;
             var _upgradeGroupUI;
             var _heightDifference;
             var _gameAndScrollHeight;
+            var _actionGroupUIHeight;
+            var _unitGroupUIHeight;
+            var _structureGroupUIHeight;
+            var _upgradeGroupUIHeight;
 
 
             _scrollingBar = this.scrollingBar;
             _game = this.game;
+            _actionGroupUI = this.actionGroupUI;
             _unitGroupUI = this.unitGroupUI;
             _structureGroupUI = this.structureGroupUI;
             _upgradeGroupUI = this.upgradeGroupUI;
             _heightDifference = this.heightDifferece;
             _gameAndScrollHeight = this.gameAndScrollHeight;
+            _actionGroupUIHeight = this.actionGroupUIHeight;
+            _unitGroupUIHeight = this.unitGroupUIHeight;
+            _structureGroupUIHeight = this.structureGroupUIHeight;
+            _upgradeGroupUIHeight = this.upgradeGroupUIHeight;
 
 
             // follow input with scroll bar
@@ -583,48 +599,34 @@ Main.prototype = {
             val = (_heightDifference * ((_scrollingBar.y - 67) / _gameAndScrollHeight) - 10) - 74 >> 0;
 
 
-            _unitGroupUI.y = -val;
-            structureY = _unitGroupUI.y + _unitGroupUI.height + 10;
-            upgradeY = _unitGroupUI.y + _unitGroupUI.height + _structureGroupUI.height + 20;
+            _actionGroupUI.y = -val;
+            unitY = _actionGroupUI.y + _actionGroupUIHeight + 10;
+            structureY = _actionGroupUI.y + _actionGroupUIHeight + _unitGroupUIHeight + 20;
+            upgradeY = _actionGroupUI.y + + _actionGroupUIHeight + _unitGroupUIHeight + _structureGroupUIHeight + 30;
 
-
+            _unitGroupUI.y = unitY;
             _structureGroupUI.y = structureY;
             _upgradeGroupUI.y = upgradeY;
 
 
             // Cropping icons
-            //_structureGroupUI.forEach(this._crop, this);
-            //_upgradeGroupUI.forEach(this._crop, this);
+            _actionGroupUI.forEach(this._crop, this);
+            _unitGroupUI.forEach(this._crop, this);
+            _structureGroupUI.forEach(this._crop, this);
+            _upgradeGroupUI.forEach(this._crop, this);
         }
     },
 
-    initRace: function() {
+    _inputUp: function() {
 
-        var race;
+        this.scrollBuildOrder = false;
 
-        race = this.race;
+        this.game.time.events.add(10, this.__allowRemove, this)
+    },
 
-        switch (race) {
+    __allowRemove: function() {
 
-            case 'terran':
-                this.unitCount = 16;
-                this.structureCount = 17;
-                this.upgradeCount = 25;
-                break;
-
-            case 'protoss':
-                this.unitCount = 20;
-                this.structureCount = 14;
-                this.upgradeCount = 24;
-                break;
-
-            case 'zerg':
-                this.unitCount = 18;
-                this.structureCount = 18;
-                this.upgradeCount = 28;
-                break;
-
-        }
+        this.allowRemove = true;
     },
 
     initUI: function() {
@@ -810,6 +812,284 @@ Main.prototype = {
         this.buildOrderScrollingBar.height = 3;
     },
 
+    createSelectionUI: function() {
+
+        var xx0;
+        var yy0;
+        var xx1;
+        var yy1;
+        var xx2;
+        var yy2;
+        var xx3;
+        var yy3;
+        var x;
+        var y;
+        var raceJSON;
+        var index;
+        var text_texture;
+        var icon;
+        var name;
+        var underline;
+        var _game;
+        var _actionGroupUI;
+        var _unitGroupUI;
+        var _structureGroupUI;
+        var _upgradeGroupUI;
+        var _actionCount;
+        var _unitCount;
+        var _structureCount;
+        var _upgradeCount;
+        var _race;
+        var _uiColor;
+        var _unitPressed;
+        var __gameWidth;
+
+
+        _game = this.game;
+        _actionGroupUI = this.actionGroupUI;
+        _unitGroupUI = this.unitGroupUI;
+        _structureGroupUI = this.structureGroupUI;
+        _upgradeGroupUI = this.upgradeGroupUI;
+        _actionCount = this.actionCount;
+        _unitCount = this.unitCount;
+        _structureCount = this.structureCount;
+        _upgradeCount = this.upgradeCount;
+        _race = this.race;
+        _uiColor = this.uiColor;
+        _unitPressed = this.unitPressed;
+        __gameWidth = this.game.width;
+
+
+        raceJSON = this.game.cache.getJSON(_race + '-data');
+
+
+
+        ///////////////////////////////////////////////////////////
+        //                       ACTIONS                         //
+        ///////////////////////////////////////////////////////////
+        index = 0;
+
+        _actionGroupUI.x = __gameWidth - 310;
+        _actionGroupUI.y = 84;
+
+        var _name = _game.make.bitmapText(0, 0, 'Agency_35', 'Actions', 35);
+        var text_texture = _name.generateTexture();
+        name = _game.make.image(5, 5, text_texture);
+        name.tint = _uiColor;
+        _name.destroy();
+
+        underline = _game.make.image(2, 30, 'ui-white-square');
+        underline.tint = _uiColor;
+        underline.height = 1;
+        underline.width = name.width + 5;
+
+        _actionGroupUI.add(name);
+        _actionGroupUI.add(underline);
+
+        for (yy0 = 0; yy0 <= 1; yy0++) {
+
+            this.maxScrollCount++;
+
+            for (xx0 = 0; xx0 < 4; xx0++) {
+
+                index++;
+
+                if (index > _actionCount)
+                    break;
+
+                var x = xx0 * 62 + (xx0 * 7);
+                var y = yy0 * 62 + (yy0 * 7) + 35;
+
+                //var icon = _game.make.image(x - 3, y - 3, 'ui-white-square');
+                //icon.width = 66;
+                //icon.height = 66;
+                //icon.tint = _uiColor;
+                //_actionGroupUI.add(icon);                   
+
+                var texture = "scv-worker-out";//raceJSON.units[index - 1].name;
+
+                var sprite = _game.make.button(x, y, _race, null, this, texture /*+ "-highlight"*/, texture, texture, texture);
+                sprite.onInputUp.add(_unitPressed, this);
+                _actionGroupUI.add(sprite);
+            }
+        }
+        this.actionGroupUIHeight = _actionGroupUI.height;
+
+        ///////////////////////////////////////////////////////////
+        //                       UNITS                           //
+        ///////////////////////////////////////////////////////////
+        index = 0;
+
+        _unitGroupUI.y = _actionGroupUI.y + _actionGroupUI.height + 10;
+
+        var _name = _game.make.bitmapText(0, 0, 'Agency_35', 'Units', 35);
+        var text_texture = _name.generateTexture();
+        name = _game.make.image(5, 5, text_texture);
+        name.tint = _uiColor;
+        _name.destroy();
+
+        underline = _game.make.image(2, 30, 'ui-white-square');
+        underline.tint = _uiColor;
+        underline.height = 1;
+        underline.width = name.width + 5;
+
+        _unitGroupUI.add(name);
+        _unitGroupUI.add(underline);
+
+        for (yy1 = 0; yy1 <= 7; yy1++) {
+
+            if (index + 1 > _unitCount)
+                break;
+
+            this.maxScrollCount++;
+
+            for (xx0 = 0; xx0 < 4; xx0++) {
+
+                index++;
+
+                if (index > _unitCount)
+                    break;
+
+                var x = xx0 * 62 + (xx0 * 7);
+                var y = yy1 * 62 + (yy1 * 7) + 35;
+
+                //var icon = _game.make.image(x - 3, y - 3, 'ui-white-square');
+                //icon.width = 66;
+                //icon.height = 66;
+                //icon.tint = _uiColor;
+                //_unitGroupUI.add(icon);                   
+
+                var texture = raceJSON.units[index - 1].name;
+
+                var sprite = _game.make.button(x, y, _race, null, this, texture + "-highlight", texture, texture, texture);
+                sprite.onInputUp.add(_unitPressed, this);
+                _unitGroupUI.add(sprite);
+            }
+        }
+        this.unitGroupUIHeight = _unitGroupUI.height;
+
+        ///////////////////////////////////////////////////////////
+        //                      STRUCTURES                       //
+        ///////////////////////////////////////////////////////////        
+        index = 0;
+
+        _structureGroupUI.y = _actionGroupUI.y + _actionGroupUI.height + _unitGroupUI.height + 20;
+
+        var _name = _game.make.bitmapText(0, 0, 'Agency_35', 'Buildings', 35);
+        var text_texture = _name.generateTexture();
+        var name = _game.make.image(5, 5, text_texture);
+        name.tint = _uiColor;
+        _name.destroy();
+
+        underline = _game.make.image(2, 30, 'ui-white-square');
+        underline.tint = _uiColor;
+        underline.height = 1;
+        underline.width = name.width + 5;
+
+        _structureGroupUI.add(name);
+        _structureGroupUI.add(underline);
+
+
+        for (yy2 = 0; yy2 <= 7; yy2++) {
+
+            if (index + 1 > _structureCount)
+                break;
+
+            this.maxScrollCount++;
+
+            for (xx2 = 0; xx2 < 4; xx2++) {
+
+                index++;
+
+                if (index > _structureCount)
+                    break;
+
+                var x = xx2 * 62 + (xx2 * 7);
+                var y = yy2 * 62 + (yy2 * 7) + 35;
+
+                //var icon = _game.make.image(x - 3, y - 2, 'ui-white-square');
+                //icon.width = 66;
+                //icon.height = 66;
+                //icon.tint = _uiColor;
+                //_structureGroupUI.add(icon);
+
+                var texture = raceJSON.structures[index - 1].name;
+                var sprite = _game.make.button(x, y, _race, null, this, texture + "-highlight", texture, texture, texture);
+                sprite.onInputUp.add(_unitPressed, this);
+                _structureGroupUI.add(sprite);
+            }
+        }
+        this.structureGroupUIHeight = _structureGroupUI.height;
+        ///////////////////////////////////////////////////////////
+        //                      UPGRADES                         //
+        ///////////////////////////////////////////////////////////
+        index = 0;
+
+        _upgradeGroupUI.y = _actionGroupUI.y + _actionGroupUI.height + _unitGroupUI.height + _structureGroupUI.height + 30;
+
+        var _name = _game.make.bitmapText(0, 0, 'Agency_35', 'Upgrades', 35);
+        var text_texture = _name.generateTexture();
+        name = _game.make.image(5, 5, text_texture);
+        name.tint = _uiColor;
+        _name.destroy();
+
+        underline = _game.make.image(2, 30, 'ui-white-square');
+        underline.tint = _uiColor;
+        underline.height = 1;
+        underline.width = name.width + 5;
+
+        _upgradeGroupUI.add(name);
+        _upgradeGroupUI.add(underline);
+
+        for (yy = 0; yy <= 7; yy++) {
+
+            if (index + 1 > _upgradeCount)
+                break;
+
+            this.maxScrollCount++;
+
+            for (xx = 0; xx < 4; xx++) {
+
+                index++;
+
+                if (index > _upgradeCount)
+                    break;
+
+                var x = xx * 62 + (xx * 7);
+                var y = yy * 62 + (yy * 7) + 35;
+
+                var textureGroup = _game.add.group();
+                var icon = _game.make.image(x - 3, y - 2, 'ui-white-square');
+                icon.width = 66;
+                icon.height = 66;
+                icon.tint = _uiColor;
+                //_upgradeGroupUI.add(icon);
+
+                console.log(_game.cache)
+
+                var texture = raceJSON.upgrades[index - 1].name;
+                var image = _game.make.image(x, y, _race, texture);
+
+                textureGroup.add(icon);
+                textureGroup.add(image);
+
+                var textureTest = textureGroup.generateTexture();
+
+                console.log(textureTest);
+                console.log(texture);
+
+                textureGroup.destroy();
+
+                var sprite = _game.make.sprite(x, y, _race, texture);
+                sprite.inputEnabled = true;
+                //var sprite = _game.make.button(x, y, _race, null, this, textureTest, textureTest, textureTest, textureTest);
+                sprite.events.onInputUp.add(_unitPressed, this);
+                _upgradeGroupUI.add(sprite);
+            }
+        }
+        this.upgradeGroupUIHeight = _upgradeGroupUI.height;
+    },
+
     startUI: function() {
 
         var maxHeightVar;
@@ -818,22 +1098,21 @@ Main.prototype = {
         var gameAndScrollHeightVar;
         var structureY;
         var upgradeY;
-        var _game;
-        var _unitGroupUI;
+        var _actionGroupUI;
         var __gameHeight;
         var __gameWidth;
 
         _game = this.game;
-        _unitGroupUI = this.unitGroupUI;
+        _actionGroupUI = this.actionGroupUI;
         __gameHeight = _game.height - 67;
         __gameWidth = _game.width;
 
 
         // Set state-wide size variables
-        maxHeightVar = this.unitGroupUI.height + this.structureGroupUI.height + this.upgradeGroupUI.height + 20;
+        maxHeightVar = this.actionGroupUI.height + this.unitGroupUI.height + this.structureGroupUI.height + this.upgradeGroupUI.height + 20;
         this.maxHeight = maxHeightVar;
 
-        heightDiffereceVar = (this.maxHeight - __gameHeight + 30);
+        heightDiffereceVar = (this.maxHeight - __gameHeight + 40);
         this.heightDifferece = heightDiffereceVar;
 
         scrollingBarHeightVar = __gameHeight * ((this.maxHeight - __gameHeight) / this.maxHeight);
@@ -852,8 +1131,8 @@ Main.prototype = {
 
 
         // Cropping icons
-        //this.structureGroupUI.forEach(this._crop, this);
-        //this.upgradeGroupUI.forEach(this._crop, this);
+        this.structureGroupUI.forEach(this._crop, this);
+        this.upgradeGroupUI.forEach(this._crop, this);
 
 
         this.scaleUpdate();
@@ -917,6 +1196,7 @@ Main.prototype = {
 
         uiPos = __gameWidth - 310;
 
+        this.actionGroupUI.x = uiPos;
         this.unitGroupUI.x = uiPos;
         this.structureGroupUI.x = uiPos;
         this.upgradeGroupUI.x = uiPos;
@@ -1144,6 +1424,7 @@ Main.prototype = {
     unitPressed: function(unit) {
 
         var sprite;
+        var baseSprite;
         var x;
         var supply;
         var newWidth;
@@ -1194,13 +1475,23 @@ Main.prototype = {
 
         ////////////////////////////////////////////////////////////////////////////////////
         // Create sprite on build order bar
-        sprite = _game.add.sprite(x, 0, unit.texture);
-        sprite.inputEnabled = true;
-        supply = _game.add.bitmapText(x, 0, 'Agency_35', this.supply.toString(), 28);
+        var group = this.game.add.group();
+        baseSprite = _game.make.sprite(0, 0, unit.texture);
+        supply = _game.make.bitmapText(0, 0, 'Agency_35', this.supply.toString(), 28);
         supply.tint = this.uiColor;
+
+        group.add(baseSprite);
+        group.add(supply);
+
+        var texture = group.generateTexture(); 
+
+        sprite = _game.add.sprite(x, 0, texture);
+        sprite.inputEnabled = true;
+
         sprite.events.onInputUp.add(this._removeBuildOrderSprite, this, 0, supply);
         _buildOrderGroup.add(sprite);
         _buildOrderGroup.add(supply);
+        group.destroy();
 
         // If the added selection exceeds the width of the screen
         if (sprite.x + _buildOrderGroup.x > __gameWidth - 65) {
@@ -1231,7 +1522,8 @@ Main.prototype = {
 
     _crop: function(sprite) {
 
-        if ((sprite.y + sprite.parent.y) > this.game.height) {
+        if ((sprite.y + sprite.parent.y) > this.game.height || 
+            (sprite.y + sprite.parent.y) < 0) {
 
             sprite.visible = false;
         } else if (!sprite.visible) {
@@ -1273,206 +1565,6 @@ Main.prototype = {
         }
     },
 
-    createSelectionUI: function() {
-
-        var xx;
-        var yy;
-        var xx2;
-        var yy2;
-        var xx3;
-        var yy3;
-        var x;
-        var y;
-        var raceJSON;
-        var index;
-        var text_texture;
-        var icon;
-        var name;
-        var underline;
-        var _game;
-        var _unitGroupUI;
-        var _structureGroupUI;
-        var _upgradeGroupUI;
-        var _unitCount;
-        var _structureCount;
-        var _upgradeCount;
-        var _race;
-        var _uiColor;
-        var _unitPressed;
-        var __gameWidth;
-
-
-        _game = this.game;
-        _unitGroupUI = this.unitGroupUI;
-        _structureGroupUI = this.structureGroupUI;
-        _upgradeGroupUI = this.upgradeGroupUI;
-        _unitCount = this.unitCount;
-        _structureCount = this.structureCount;
-        _upgradeCount = this.upgradeCount;
-        _race = this.race;
-        _uiColor = this.uiColor;
-        _unitPressed = this.unitPressed;
-        __gameWidth = this.game.width;
-
-
-        raceJSON = this.game.cache.getJSON(_race + '-data');
-
-        ///////////////////////////////////////////////////////////
-        //                       UNITS                           //
-        ///////////////////////////////////////////////////////////
-        index = 0;
-
-        _unitGroupUI.x = __gameWidth - 310;
-        _unitGroupUI.y = 84;
-
-        var _name = _game.make.bitmapText(0, 0, 'Agency_35', 'Units', 35);
-        var text_texture = _name.generateTexture();
-        name = _game.make.image(5, 5, text_texture);
-        name.tint = _uiColor;
-        _name.destroy();
-
-        underline = _game.make.image(2, 30, 'ui-white-square');
-        underline.tint = _uiColor;
-        underline.height = 1;
-        underline.width = name.width + 5;
-
-        _unitGroupUI.add(name);
-        _unitGroupUI.add(underline);
-
-        for (yy = 0; yy <= 7; yy++) {
-
-            if (index + 1 > _unitCount)
-                break;
-
-            this.maxScrollCount++;
-
-            for (xx = 0; xx < 4; xx++) {
-
-                index++;
-
-                if (index > _unitCount)
-                    break;
-
-                var x = xx * 62 + (xx * 7);
-                var y = yy * 62 + (yy * 7) + 35;
-
-                icon = _game.add.sprite(x - 3, y - 3, 'ui-white-square');
-                icon.width = 66;
-                icon.height = 66;
-                icon.tint = _uiColor;
-                _unitGroupUI.add(icon);                   
-
-                var texture = raceJSON.units[index - 1].name;
-                var sprite = _game.make.button(x, y, _race, null, this, texture + "-highlight", texture, texture, texture);
-                sprite.onInputUp.add(_unitPressed, this);
-                //console.log(sprite.width) //lolol theres still a sprite in terran with 62 width
-                _unitGroupUI.add(sprite);
-            }
-        }
-
-        ///////////////////////////////////////////////////////////
-        //                      STRUCTURES                       //
-        ///////////////////////////////////////////////////////////        
-        index = 0;
-
-        _structureGroupUI.y = _unitGroupUI.y + _unitGroupUI.height + 10;
-
-        var _name = _game.make.bitmapText(0, 0, 'Agency_35', 'Buildings', 35);
-        var text_texture = _name.generateTexture();
-        var name = _game.make.image(5, 5, text_texture);
-        name.tint = _uiColor;
-        _name.destroy();
-
-        underline = _game.make.image(2, 30, 'ui-white-square');
-        underline.tint = _uiColor;
-        underline.height = 1;
-        underline.width = name.width + 5;
-
-        _structureGroupUI.add(name);
-        _structureGroupUI.add(underline);
-
-
-        for (yy2 = 0; yy2 <= 7; yy2++) {
-
-            if (index + 1 > _structureCount)
-                break;
-
-            this.maxScrollCount++;
-
-            for (xx2 = 0; xx2 < 4; xx2++) {
-
-                index++;
-
-                if (index > _structureCount)
-                    break;
-
-                var x = xx2 * 62 + (xx2 * 7);
-                var y = yy2 * 62 + (yy2 * 7) + 35;
-
-                icon = _game.add.sprite(x - 3, y - 2, 'ui-white-square');
-                icon.width = 66;
-                icon.height = 66;
-                icon.tint = _uiColor;
-                _structureGroupUI.add(icon);
-
-                var texture = raceJSON.structures[index - 1].name;
-                var sprite = _game.make.button(x, y, _race, null, this, texture + "-highlight", texture, texture, texture);
-                sprite.onInputUp.add(_unitPressed, this);
-                _structureGroupUI.add(sprite);
-            }
-        }
-        ///////////////////////////////////////////////////////////
-        //                      UPGRADES                         //
-        ///////////////////////////////////////////////////////////
-        index = 0;
-
-        _upgradeGroupUI.y = _unitGroupUI.y + _unitGroupUI.height + _structureGroupUI.height + 20;
-
-        var _name = _game.make.bitmapText(0, 0, 'Agency_35', 'Upgrades', 35);
-        var text_texture = _name.generateTexture();
-        name = _game.make.image(5, 5, text_texture);
-        name.tint = _uiColor;
-        _name.destroy();
-
-        underline = _game.make.image(2, 30, 'ui-white-square');
-        underline.tint = _uiColor;
-        underline.height = 1;
-        underline.width = name.width + 5;
-
-        _upgradeGroupUI.add(name);
-        _upgradeGroupUI.add(underline);
-
-        for (yy = 0; yy <= 7; yy++) {
-
-            if (index + 1 > _upgradeCount)
-                break;
-
-            this.maxScrollCount++;
-
-            for (xx = 0; xx < 4; xx++) {
-
-                index++;
-
-                if (index > _upgradeCount)
-                    break;
-
-                var x = xx * 62 + (xx * 7);
-                var y = yy * 62 + (yy * 7) + 35;
-
-                icon = _game.add.sprite(x - 3, y - 2, 'ui-white-square');
-                icon.width = 66;
-                icon.height = 66;
-                icon.tint = _uiColor;
-                _upgradeGroupUI.add(icon);
-
-                var texture = raceJSON.upgrades[index - 1].name;
-                var sprite = _game.make.button(x, y, _race, null, this, texture + "-highlight", texture, texture, texture);
-                sprite.onInputUp.add(_unitPressed, this);
-                _upgradeGroupUI.add(sprite);
-            }
-        }
-    },
-
     _checkBounds: function(sprite, _gameWidth) {
 
         if (sprite.x + sprite.parent.x < -70 || sprite.x + sprite.parent.x > _gameWidth) {
@@ -1487,11 +1579,6 @@ Main.prototype = {
             sprite.visible = true;
             sprite.alive = true;
         }
-    },
-
-    _checkBoundsOnScaleUpdate: function(sprite) {
-
-        //if (sprite.)
     },
 
     _removeBuildOrderSprite: function(sprite, a, b, supply) {
@@ -1572,20 +1659,17 @@ Main.prototype = {
         sprite.x = Math.floor(sprite.z / 2) * 65;
     },
 
-    newArray: function(size) {
+    createArray: function(length) {
 
-        var array;
-        var i;
+        var arr = new Array(length || 0),
+            i = length;
 
-        array = new Array(size);
-        i = 0;
-        while (i < size) {
-
-            array[i] = 0;
-            i++;
+        if (arguments.length > 1) {
+            var args = Array.prototype.slice.call(arguments, 1);
+            while(i--) arr[length-1 - i] = this.createArray.apply(this, args);
         }
 
-        return array;
+        return arr;
     },
 
     pad: function(str, max) {

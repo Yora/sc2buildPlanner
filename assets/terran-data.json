@@ -1,5 +1,27 @@
 
 {   
+    "actions": [{
+
+                "name": "mineral-worker",
+                "buildTime": "1"
+            }, {
+                "name": "gas-worker",
+                "buildTime": "1"
+            }, {
+                "name": "out-worker",
+                "buildTime": "1"
+            }, {
+                "name": "return-worker",
+                "buildTime": "1"
+            }, {
+                "name": "pause",
+                "buildTime": "1"
+            }, {
+                "name": "scanner-sweep",
+                "energy": "15",
+                "buildTime": "1"
+        }],
+
     "units": [{
 
                 "name": "scv",
@@ -239,7 +261,7 @@
     "upgrades": [{
 
             "name": "infantry-weapons-1",
-            "buildTime": "10",
+            "buildTime": "160",
             "mineralCost": "100",
             "gasCost": "100",
             "requires": ["engineering-bay"]
@@ -275,7 +297,7 @@
             "requires": ["armory","vehicle-weapons-1","vehicle-weapons-2"]
         }, {
             "name": "infantry-armor-1",
-            "buildTime": "10",
+            "buildTime": "160",
             "mineralCost": "100",
             "gasCost": "100",
             "requires": ["engineering-bay"]
