@@ -2,16 +2,16 @@
 {   
     "actions": [{
 
-                "name": "mineral-worker",
+                "name": "protoss-minerals-probe",
                 "buildTime": "1"
             }, {
-                "name": "gas-worker",
+                "name": "protoss-gas-probe",
                 "buildTime": "1"
             }, {
-                "name": "out-worker",
+                "name": "probe-worker-out",
                 "buildTime": "1"
             }, {
-                "name": "return-worker",
+                "name": "probe-worker-in",
                 "buildTime": "1"
             }, {
                 "name": "pause",
@@ -19,7 +19,7 @@
             }, {
                 "name": "chrono-boost",
                 "energy": "25",
-                "buildTime": "20"
+                "buildTime": "1"
         }],
 
     "units": [{
@@ -291,6 +291,12 @@
 
     "upgrades": [{
 
+            "name": "warp-gate",
+            "buildTime": "160",
+            "mineralCost": "50",
+            "gasCost": "50",
+            "requires": ["cybernetics-core"]
+        }, {
             "name": "ground-weapons-1",
             "buildTime": "114",
             "mineralCost": "100",
@@ -380,12 +386,6 @@
             "mineralCost": "300",
             "gasCost": "300",
             "requires": ["cybernetics-core","air-armor-1","air-armor-2"]
-        }, {
-            "name": "warp-gate",
-            "buildTime": "160",
-            "mineralCost": "50",
-            "gasCost": "50",
-            "requires": ["cybernetics-core"]
         }, {
             "name": "charge",
             "buildTime": "140",

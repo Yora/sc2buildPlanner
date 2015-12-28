@@ -2,16 +2,16 @@
 {   
     "actions": [{
 
-                "name": "mineral-worker",
+                "name": "zerg-minerals-drone",
                 "buildTime": "1"
             }, {
-                "name": "gas-worker",
+                "name": "zerg-gas-drone",
                 "buildTime": "1"
             }, {
-                "name": "out-worker",
+                "name": "drone-worker-out",
                 "buildTime": "1"
             }, {
-                "name": "return-worker",
+                "name": "drone-worker-in",
                 "buildTime": "1"
             }, {
                 "name": "pause",

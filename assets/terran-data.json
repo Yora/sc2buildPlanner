@@ -2,23 +2,31 @@
 {   
     "actions": [{
 
-                "name": "mineral-worker",
+                "name": "terran-minerals-scv",
                 "buildTime": "1"
             }, {
-                "name": "gas-worker",
+                "name": "terran-gas-scv",
                 "buildTime": "1"
             }, {
-                "name": "out-worker",
+                "name": "scv-worker-out",
                 "buildTime": "1"
             }, {
-                "name": "return-worker",
+                "name": "scv-worker-in",
                 "buildTime": "1"
             }, {
                 "name": "pause",
                 "buildTime": "1"
             }, {
+                "name": "calldown-mule",
+                "energy": "50",
+                "buildTime": "90"
+            }, {
                 "name": "scanner-sweep",
-                "energy": "15",
+                "energy": "50",
+                "buildTime": "1"
+            }, {
+                "name": "calldown-extra-supplies",
+                "energy": "50",
                 "buildTime": "1"
         }],
 

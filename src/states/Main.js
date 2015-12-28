@@ -186,7 +186,7 @@ Main.prototype = {
             case 'terran':
                 startingBuilding = 'command-center';
                 startingWorker = 'scv';
-                this.actionCount = 6;
+                this.actionCount = 8;
                 this.unitCount = 16;
                 this.structureCount = 17;
                 this.upgradeCount = 25;
@@ -219,9 +219,15 @@ Main.prototype = {
         this.workerArray = this.createArray(80, 2);
         this.structureArray[0] = startingBuilding;
 
+
+        // Create the first 12 workers with small delays
         for (var i = 0; i < 12; i++) {
             this.workerArray[i][0] = startingWorker;
-            this.workerArray[i][1] = 0;
+
+            if (i < 8)
+                this.workerArray[i][1] = 1;
+            else
+                this.workerArray[i][1] = 2;
         }
     
 
@@ -251,8 +257,6 @@ Main.prototype = {
         this.initUI();
 
         this.createSelectionUI();
-
-        this.startUI();
 
         this.initBases();
 
@@ -321,9 +325,8 @@ Main.prototype = {
             // Set the time according to timeline location
             this.currentTimeText.setText(realTime);
 
-
                 // -----If timeline is dragged to maximum left, start scrolling backwards
-            if (_timelineDrag.x <= 20 && this.timeLandmarks != -1) {
+            if (_timelineDrag.x <= 20 && this.timeLandmarks != -5) {
 
 
                 // Move time/line group
@@ -333,21 +336,21 @@ Main.prototype = {
                 // If scrolled past the width of a 30 second time block, reset lineGroup position and change times to align
                 if (_timelineGroup.x >= 0) {
 
-                    _timelineGroup.x = -90;
+                    _timelineGroup.x = -450;
 
-                    this.timeLandmarks -= 1;
+                    this.timeLandmarks -= 5;
                     _timeLandmarks = this.timeLandmarks;
 
 
                     // Update time texts
                     for (i = 0; i < _timeIterations * 3; i++) {
 
-                        _timeValue = (i + _timeLandmarks - 1) * 30;
-                        minutes = Math.floor(_timeValue / 60).toString();
-                        seconds = this.pad((_timeValue % 60), 2);
-                        realTime = (minutes + ":" + seconds);
+                        var timeVal = (i + _timeLandmarks - 1) * 30;
+                        var minutes = Math.floor(timeVal / 60).toString();
+                        var seconds = this.pad((timeVal % 60), 2);
+                        var realTime = (minutes + ":" + seconds);
 
-                        time = _timelineGroup.getAt((i * 3));
+                        var time = _timelineGroup.getAt((i * 3));
 
                         time.text = realTime;
                     }
@@ -380,23 +383,23 @@ Main.prototype = {
 
 
                 // If scrolled past the width of a 30 second time block, reset lineGroup position and change times to align
-                if (_timelineGroup.x <= -90) {
+                if (_timelineGroup.x <= -450) {
 
                     _timelineGroup.x = 0;
 
-                    this.timeLandmarks += 1;
+                    this.timeLandmarks += 5;
                     _timeLandmarks = this.timeLandmarks;
 
 
                     // Update time texts
                     for (i = 0; i < _timeIterations * 3; i++) {
 
-                        _timeValue = (i + _timeLandmarks - 1) * 30;
-                        minutes = Math.floor(_timeValue / 60).toString();
-                        seconds = this.pad((_timeValue % 60), 2);
-                        realTime = (minutes + ":" + seconds);
+                        var timeVal = (i + _timeLandmarks - 1) * 30;
+                        var minutes = Math.floor(timeVal / 60).toString();
+                        var seconds = this.pad((timeVal % 60), 2);
+                        var realTime = (minutes + ":" + seconds);
 
-                        time = _timelineGroup.getAt((i * 3));
+                        var time = _timelineGroup.getAt((i * 3));
 
                         time.text = realTime;
                     }
@@ -679,11 +682,11 @@ Main.prototype = {
         if (_game.device.desktop) {
 
             // Desktop
-            this.timeIterations = 25; //Math.floor((__gameWidth - 232) / 90) + 1;
+            this.timeIterations = Math.floor((__gameWidth - 232) / 90) + 6;//25; //Math.floor((__gameWidth - 232) / 90) + 1;
         } else {
 
             // Mobile
-            this.timeIterations = Math.floor((__gameWidth - 232) / 90) + 1;
+            this.timeIterations = Math.floor((__gameWidth - 232) / 90) + 6;
         }
 
 
@@ -754,6 +757,13 @@ Main.prototype = {
         var icon;
         var name;
         var underline;
+
+        var maxHeightVar;
+        var heightDiffereceVar;
+        var scrollingBarHeightVar;
+        var gameAndScrollHeightVar;
+        var structureY;
+        var upgradeY;
         var _game;
         var _actionGroupUI;
         var _unitGroupUI;
@@ -824,21 +834,19 @@ Main.prototype = {
                 var x = xx0 * 62 + (xx0 * 7);
                 var y = yy0 * 62 + (yy0 * 7) + 35;
 
-                //var textureGroup = _game.make.group();
-                //var icon = _game.make.image(x - 3, y - 2, 'ui-white-square');
-                //icon.width = 66;
-                //icon.height = 66;
-                //icon.tint = _uiColor;
-                //var textureName = raceJSON.actions[index - 1].name;
-                //var image = _game.make.image(x, y, _race, textureName);
-                //textureGroup.add(icon);
-                //textureGroup.add(image);
-                //var texture = textureGroup.generateTexture();
-                //textureGroup.destroy();
+                var textureGroup = _game.make.group();
+                var icon = _game.make.image(x - 3, y - 2, 'ui-white-square');
+                icon.width = 66;
+                icon.height = 66;
+                icon.tint = _uiColor;
+                var textureName = raceJSON.actions[index - 1].name;
+                var image = _game.make.image(x, y, _race, textureName);
+                textureGroup.add(icon);
+                textureGroup.add(image);
+                var texture = textureGroup.generateTexture();
+                textureGroup.destroy();
 
-                var texture = "scv-worker-out";
-
-                var sprite = _game.make.sprite(x, y, _race, texture);
+                var sprite = _game.make.sprite(x, y, texture);
                 sprite.inputEnabled = true;
                 sprite.events.onInputUp.add(_unitPressed, this);
                 _actionGroupUI.add(sprite);
@@ -1019,25 +1027,10 @@ Main.prototype = {
             }
         }
         this.upgradeGroupUIHeight = _upgradeGroupUI.height;
-    },
 
-    startUI: function() {
 
-        var maxHeightVar;
-        var heightDiffereceVar;
-        var scrollingBarHeightVar;
-        var gameAndScrollHeightVar;
-        var structureY;
-        var upgradeY;
-        var _actionGroupUI;
-        var __gameHeight;
-        var __gameWidth;
-
-        _game = this.game;
-        _actionGroupUI = this.actionGroupUI;
+        //Adjustment
         __gameHeight = _game.height - 67;
-        __gameWidth = _game.width;
-
 
         // Set state-wide size variables
         maxHeightVar = this.actionGroupUI.height + this.unitGroupUI.height + this.structureGroupUI.height + this.upgradeGroupUI.height + 20;
@@ -1277,7 +1270,7 @@ Main.prototype = {
 
     _updateTimelineVisibility: function(sprite, _timelineGroup, _endOfTimeline) {
 
-        if (sprite.x + _timelineGroup.x > _endOfTimeline) {
+        if (sprite.x + _timelineGroup.x > _endOfTimeline || sprite.x + _timelineGroup.x < -80) {
             sprite.visible = false;
         } else if (!sprite.visible) {
             sprite.visible = true;
@@ -1298,7 +1291,7 @@ Main.prototype = {
             line.x = this.game.width - 390 - (this.game.width % 3);
         }
 
-        if (line.x < 0 && this.timeLandmarks != -1)
+        if (line.x < 0 && this.timeLandmarks != -5)
             line.x = 0;
         else if (line.x < -24)
             line.x = -24;
@@ -1328,29 +1321,134 @@ Main.prototype = {
 
     updateResources: function() {
 
+        var i;
         var val;
+        var minerals;
+        var val2;
         var workerCount;
         var _timeValue;
-        var _workerCount;
+        var _workerArray;
 
         _timeValue = this.timeValue;
+        _workerArray = this.workerArray;
 
-
+        minerals = 50;
         workerCount = 12;
 
-        // Base 12 worker mineral value
-        val = ((_timeValue - 7) * workerCount) - (((_timeValue - 7) * workerCount) % 5) + 50;
+        //console.log(this.timeValue);
+        //console.log(this.workerArray)
+
+        for (i = 0; i < workerCount; i++) {
+
+            // 1st 10s - 77
+            // after - 111
+
+            var completedTime = _workerArray[i][1];
+    
+
+            if (i < 8) {
+                var trips = Math.floor((_timeValue - completedTime) / 4.9);
+            } else {
+                var trips = Math.floor((_timeValue - completedTime) / 5.3);
+            }
 
 
+            if (trips < 0)
+                trips = 0;
+            trips *= 5;
 
+            minerals += trips;
+
+            // Base 12 worker mineral value
+            //val = ((_timeValue - 5) * workerCount) - (((_timeValue - 5) * workerCount) % 5) + 50;
+        }
+
+        /*
+        console.log("\n minerals: " + minerals + " difference: " + (minerals - 350) 
+                        + "\n ,1:00 " + (minerals - 705) + " , " + (minerals - 1065)
+                        + "\n ,2:00 " + (minerals - 1425) + " , " + (minerals - 1775)
+                        + "\n ,3:00: " + (minerals - 2145) + " , " + (minerals - 2495)
+                        + "\n ,4:00 " + (minerals - 2855) + " , " + (minerals - 3215)
+                        + "\n ,5:00 " + (minerals - 3570) + " , " + (minerals - 3925)
+                        + "\n ,6:00 " + (minerals - 4285)
+                        + "\n ,7:00 " + (minerals - 5005)
+                        + "\n ,8:00 " + (minerals - 5705));
+        */
 
         // Minimum minerals
         if (val < 50)
             val = 50;
 
         // Set mineral text
-        this.mineralText.text = val;
+        this.mineralText.text = minerals;
     },
+
+    //micro'd
+    // 0:30 min - 350    - 0
+    // 1:00 min - 705    - 50
+    // 1:30 min - 1065   - 50
+    // 2:00 min - 1425   - 35
+    // 2:30 min - 1775   - 90
+    // 3:00 min - 2145   - 80
+    // 3:30 min - 2495   - 135
+    // 4:00 min - 2855   - 135
+    // 4:30 min - 3215   - 135
+    // 5:00 min - 3570   - 185
+    // 5:30 min - 3925   - 190
+    // 6:00 min - 4285   - 190
+    // 7:00 min - 5005   - 220
+    // 8:00 min - 5705   - 285
+
+    //no micro
+    // 1:00 min - 700
+    // 2:00 min - 1410
+    // 3:00 min - 2100
+    // 4:00 min - 2795
+    // 5:00 min - 3505
+    // 7:00 min - 4905
+    // 8:00 min - 5595
+
+
+    // 30 sec - 360
+    // 1 min - 710
+    // 2 min - 1430
+    // 2:30 min - 1800
+    // 3 min - 2145
+
+
+    //4.7 short
+
+
+    //3 min - 2115
+    //2 min - 1415
+    //1 min - 705
+    //4.7 short
+    //5.1 long
+
+    //6 min - 3065
+    //3 min - 1530
+    //2 min - 1025
+
+    //6.5 short
+    //7.5 long
+    
+
+    /*
+    //val2 = (this.timeValue - this.workerArray[i][1]) / 4.3;
+
+    //val2 = (((_timeValue - 5) - this.workerArray[i][1]) * 1.76); //0.2
+    val2 = (this.timeValue - 6) - this.workerArray[i][1];
+    //console.log((((_timeValue)) - (((_timeValue)) % 5)));
+
+    //4.8 = long round trip time
+    //3.8 = short round trip time
+    //2.94 = mining time
+
+    //2.68 = long round trip time
+    //2.28 = short round trip time
+    //1.76 = mining time
+
+    */
 
     unitPressed: function(unit) {
 
