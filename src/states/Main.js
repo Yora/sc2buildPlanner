@@ -1,5 +1,76 @@
 function Main() {}
 
+//micro'd
+// 0:30 min - 350    - 0
+// 1:00 min - 705    - 50
+// 1:30 min - 1065   - 50
+// 2:00 min - 1425   - 35
+// 2:30 min - 1775   - 90
+// 3:00 min - 2145   - 80
+// 3:30 min - 2495   - 135
+// 4:00 min - 2855   - 135
+// 4:30 min - 3215   - 135
+// 5:00 min - 3570   - 185
+// 5:30 min - 3925   - 190
+// 6:00 min - 4285   - 190
+// 7:00 min - 5005   - 220
+// 8:00 min - 5705   - 285
+
+//no micro
+// 1:00 min - 700
+// 2:00 min - 1410
+// 3:00 min - 2100
+// 4:00 min - 2795
+// 5:00 min - 3505
+// 7:00 min - 4905
+// 8:00 min - 5595
+
+
+// 30 sec - 360
+// 1 min - 710
+// 2 min - 1430
+// 2:30 min - 1800
+// 3 min - 2145
+
+
+//4.7 short
+
+
+//3 min - 2115
+//2 min - 1415
+//1 min - 705
+//4.7 short
+//5.1 long
+
+//6 min - 3065
+//3 min - 1530
+//2 min - 1025
+
+//6.5 short
+//7.5 long
+
+
+/*
+//val2 = (this.timeValue - this.workerArray[i][1]) / 4.3;
+
+//val2 = (((_timeValue - 5) - this.workerArray[i][1]) * 1.76); //0.2
+val2 = (this.timeValue - 6) - this.workerArray[i][1];
+//console.log((((_timeValue)) - (((_timeValue)) % 5)));
+
+//4.8 = long round trip time
+//3.8 = short round trip time
+//2.94 = mining time
+
+//2.68 = long round trip time
+//2.28 = short round trip time
+//1.76 = mining time
+
+*/
+
+
+
+
+
 //grunt custom --exclude gamepad,retrofont,net,debug,arcade,ninja,p2,creature,video --sourcemap true --uglify
 
 ////Math.floor((1 - ((90 - x) / 90)) * 30) * 3;
@@ -1335,32 +1406,23 @@ Main.prototype = {
         minerals = 50;
         workerCount = 12;
 
-        //console.log(this.timeValue);
-        //console.log(this.workerArray)
-
         for (i = 0; i < workerCount; i++) {
 
-            // 1st 10s - 77
-            // after - 111
-
+            // Time the worker was finished at
             var completedTime = _workerArray[i][1];
-    
 
-            if (i < 8) {
+            // Long vs. far distance mining
+            if (i < 8) 
                 var trips = Math.floor((_timeValue - completedTime) / 4.9);
-            } else {
+            else 
                 var trips = Math.floor((_timeValue - completedTime) / 5.3);
-            }
 
-
+            // Calculate total trips taken at this time
             if (trips < 0)
                 trips = 0;
             trips *= 5;
 
             minerals += trips;
-
-            // Base 12 worker mineral value
-            //val = ((_timeValue - 5) * workerCount) - (((_timeValue - 5) * workerCount) % 5) + 50;
         }
 
         /*
@@ -1382,73 +1444,6 @@ Main.prototype = {
         // Set mineral text
         this.mineralText.text = minerals;
     },
-
-    //micro'd
-    // 0:30 min - 350    - 0
-    // 1:00 min - 705    - 50
-    // 1:30 min - 1065   - 50
-    // 2:00 min - 1425   - 35
-    // 2:30 min - 1775   - 90
-    // 3:00 min - 2145   - 80
-    // 3:30 min - 2495   - 135
-    // 4:00 min - 2855   - 135
-    // 4:30 min - 3215   - 135
-    // 5:00 min - 3570   - 185
-    // 5:30 min - 3925   - 190
-    // 6:00 min - 4285   - 190
-    // 7:00 min - 5005   - 220
-    // 8:00 min - 5705   - 285
-
-    //no micro
-    // 1:00 min - 700
-    // 2:00 min - 1410
-    // 3:00 min - 2100
-    // 4:00 min - 2795
-    // 5:00 min - 3505
-    // 7:00 min - 4905
-    // 8:00 min - 5595
-
-
-    // 30 sec - 360
-    // 1 min - 710
-    // 2 min - 1430
-    // 2:30 min - 1800
-    // 3 min - 2145
-
-
-    //4.7 short
-
-
-    //3 min - 2115
-    //2 min - 1415
-    //1 min - 705
-    //4.7 short
-    //5.1 long
-
-    //6 min - 3065
-    //3 min - 1530
-    //2 min - 1025
-
-    //6.5 short
-    //7.5 long
-    
-
-    /*
-    //val2 = (this.timeValue - this.workerArray[i][1]) / 4.3;
-
-    //val2 = (((_timeValue - 5) - this.workerArray[i][1]) * 1.76); //0.2
-    val2 = (this.timeValue - 6) - this.workerArray[i][1];
-    //console.log((((_timeValue)) - (((_timeValue)) % 5)));
-
-    //4.8 = long round trip time
-    //3.8 = short round trip time
-    //2.94 = mining time
-
-    //2.68 = long round trip time
-    //2.28 = short round trip time
-    //1.76 = mining time
-
-    */
 
     unitPressed: function(unit) {
 
